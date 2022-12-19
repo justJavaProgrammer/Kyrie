@@ -1,6 +1,6 @@
 package com.odeyalo.kyrie.core.authentication;
 
-import com.odeyalo.kyrie.core.User;
+import com.odeyalo.kyrie.core.Oauth2User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,13 +15,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AuthenticationResult {
     private boolean success;
-    private User user;
+    private Oauth2User user;
 
     public AuthenticationResult(boolean success) {
         this.success = success;
     }
 
-    public static AuthenticationResult success(User user) {
+    public static AuthenticationResult success(Oauth2User user) {
         return new AuthenticationResult(true, user);
     }
 
