@@ -10,7 +10,7 @@
 <div class="limiter">
     <div class="container-login100">
         <div class="wrap-login100 p-t-50 p-b-90">
-            <form class="login100-form validate-form flex-sb flex-w" action="/oauth2/login" method="post">
+            <form class="login100-form validate-form flex-sb flex-w" id="login-form" action="/oauth2/login" method="post">
 <span class="login100-form-title p-b-51">
 Login
 </span>
@@ -28,7 +28,7 @@ Login
                     </div>
                 </div>
                 <div class="container-login100-form-btn m-t-17">
-                    <button class="login100-form-btn">
+                    <button type="submit" class="login100-form-btn">
                         Login
                     </button>
                 </div>
@@ -38,4 +38,10 @@ Login
 </div>
 <div id="dropDownSelect1"></div>
 </body>
+
+<!--<script>-->
+<!--    var form = document.getElementById("login-form");-->
+<!--    function handleForm(event) { event.preventDefault(); }-->
+<!--    form.addEventListener('submit', handleForm);-->
+<!--</script>-->
 </html>
