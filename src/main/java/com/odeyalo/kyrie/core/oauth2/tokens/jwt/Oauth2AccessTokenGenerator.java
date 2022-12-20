@@ -4,7 +4,7 @@ import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessToken;
 
 /**
- * Generate an access token based on scopes for user
+ * Generate an access token with specific scopes for user
  */
 public interface Oauth2AccessTokenGenerator {
     String SCOPE = "scope";
@@ -16,5 +16,4 @@ public interface Oauth2AccessTokenGenerator {
      * @return - Oauth2AccessToken
      */
     Oauth2AccessToken generateAccessToken(Oauth2User user, String[] scopes);
-
 }
