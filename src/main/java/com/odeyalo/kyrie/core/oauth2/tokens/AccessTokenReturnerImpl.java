@@ -2,7 +2,7 @@ package com.odeyalo.kyrie.core.oauth2.tokens;
 
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.oauth2.client.ClientCredentialsValidator;
-import com.odeyalo.kyrie.core.oauth2.client.ValidationResult;
+import com.odeyalo.kyrie.core.support.ValidationResult;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCode;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCodeManager;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.Oauth2AccessTokenGenerator;
