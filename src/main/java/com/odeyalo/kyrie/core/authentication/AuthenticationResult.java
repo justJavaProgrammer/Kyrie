@@ -17,7 +17,7 @@ public class AuthenticationResult {
     private boolean success;
     private Oauth2User user;
 
-    public AuthenticationResult(boolean success) {
+    private AuthenticationResult(boolean success) {
         this.success = success;
     }
 
