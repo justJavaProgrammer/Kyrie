@@ -39,5 +39,5 @@ public interface Oauth2AccessTokenManager {
      * @param authorizationCode - authorization code that was got from '/oauth2/authorize' endpoint
      * @return - AccessTokenInformation if token obtaining was successful
      */
-    Oauth2AccessToken obtainAccessTokenByAuthorizationCode(Oauth2ClientCredentials clientCredentials, String authorizationCode) throws ObtainTokenException;
+    Oauth2AccessToken obtainAccessTokenByAuthorizationCode(Oauth2ClientCredentials clientCredentials, String authorizationCode);
 }
