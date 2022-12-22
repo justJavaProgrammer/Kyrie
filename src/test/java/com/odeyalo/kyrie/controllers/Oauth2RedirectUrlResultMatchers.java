@@ -4,6 +4,7 @@ import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
 import com.odeyalo.kyrie.core.oauth2.oidc.OidcResponseType;
 import com.odeyalo.kyrie.core.oauth2.support.Oauth2Constants;
 import org.hamcrest.MatcherAssert;
+import org.junit.Assert;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -51,7 +52,7 @@ public class Oauth2RedirectUrlResultMatchers {
      *
      * @return - result matcher success or throw exception
      */
-    public ResultMatcher isTokenTypePresented() {
+    public ResultMatcher isTokenTypeParamPresented() {
         return (result) -> {
             isParameterPresented(Oauth2Constants.TOKEN_TYPE).match(result);
         };
@@ -88,6 +89,16 @@ public class Oauth2RedirectUrlResultMatchers {
     public ResultMatcher isIdTokenParamPresented() {
         return (result) -> {
             isParameterPresented(OidcResponseType.ID_TOKEN.getSimplifiedName()).match(result);
+        };
+    }
+
+    public ResultMatcher isParameterEqualTo(String param, String expected) {
+        return (result) -> {
+            isParameterPresented(param).match(result);
+            String redirectedUrl = result.getResponse().getRedirectedUrl();
+            MultiValueMap<String, String> queryParams = UriComponentsBuilder.fromHttpUrl(redirectedUrl).build().getQueryParams();
+            String actual = queryParams.getFirst(param);
+            Assert.assertEquals(expected, actual);
         };
     }
 
