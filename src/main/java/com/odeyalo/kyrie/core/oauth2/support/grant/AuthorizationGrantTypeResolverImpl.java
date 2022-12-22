@@ -26,7 +26,9 @@ public class AuthorizationGrantTypeResolverImpl implements AuthorizationGrantTyp
         Collection<AuthorizationGrantType> values = Arrays.stream(AuthorizationGrantType.values())
                 .sorted(Comparator.comparingInt(grantType -> grantType.getSupportedResponseTypes().length))
                 .collect(Collectors.toList());
-
+        if (values.contains(null)) {
+            return null;
+        }
         for (AuthorizationGrantType value : values) {
             Oauth2ResponseType[] supportedResponseTypes = value.getSupportedResponseTypes();
             if (List.of(supportedResponseTypes).containsAll(List.of(oauth2ResponseTypes))) {
