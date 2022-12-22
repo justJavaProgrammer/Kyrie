@@ -1,7 +1,7 @@
 package com.odeyalo.kyrie.core.oauth2.flow;
 
 import com.odeyalo.kyrie.core.Oauth2User;
-import com.odeyalo.kyrie.core.OidcOauth2TokenGeneratorFacade;
+import com.odeyalo.kyrie.core.oauth2.oidc.generator.OidcOauth2TokenGeneratorFacade;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
 import com.odeyalo.kyrie.core.oauth2.CombinedOauth2Token;
