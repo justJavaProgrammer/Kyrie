@@ -6,6 +6,8 @@ import com.odeyalo.kyrie.core.support.ValidationResult;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCode;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCodeManager;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.Oauth2AccessTokenGenerator;
+import com.odeyalo.kyrie.exceptions.InvalidClientCredentialsException;
+import com.odeyalo.kyrie.exceptions.Oauth2Exception;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,14 +25,14 @@ public class AccessTokenReturnerImpl implements AccessTokenReturner {
     }
 
     @Override
-    public Oauth2AccessToken getToken(String clientId, String clientSecret, String authorizationCode) throws ObtainTokenException {
+    public Oauth2AccessToken getToken(String clientId, String clientSecret, String authorizationCode) throws Oauth2Exception {
         ValidationResult validationResult = clientCredentialsValidator.validateCredentials(clientId, clientSecret);
         if (!validationResult.isSuccess()) {
-            throw new ObtainTokenException("Client credentials is wrong and cannot be used to obtain an access token");
+            throw new InvalidClientCredentialsException("Client credentials are wrong and cannot be used to obtain an access token");
         }
         AuthorizationCode authCode = authorizationCodeManager.getAuthorizationCodeByAuthorizationCodeValue(authorizationCode);
         if (authCode == null || authCode.isExpired()) {
-            throw new ObtainTokenException("The authorization code does not found or expired");
+            throw new InvalidAuthorizationCodeObtainTokenException("The authorization code does not found or expired");
         }
         Oauth2User user = authCode.getUser();
         String[] scopes = authCode.getScopes();
