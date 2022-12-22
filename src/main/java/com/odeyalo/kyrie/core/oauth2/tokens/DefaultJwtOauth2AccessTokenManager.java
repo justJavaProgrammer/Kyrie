@@ -33,6 +33,10 @@ public class DefaultJwtOauth2AccessTokenManager implements Oauth2AccessTokenMana
 
     @Override
     public Oauth2AccessToken getTokenInfo(String token) {
+        TokenValidationResult result = jwtTokenProvider.isTokenValid(token);
+        if (!result.isValid()) {
+            return Oauth2AccessToken.alreadyExpired();
+        }
         TokenMetadata metadata = jwtTokenProvider.parseToken(token);
         Object scopeClaim = metadata.getClaims().get(Oauth2AccessTokenGenerator.SCOPE);
         String scopes = resolveScopes(scopeClaim);
@@ -52,7 +56,7 @@ public class DefaultJwtOauth2AccessTokenManager implements Oauth2AccessTokenMana
     }
 
     @Override
-    public Oauth2AccessToken obtainAccessTokenByAuthorizationCode(Oauth2ClientCredentials clientCredentials, String authorizationCode) throws ObtainTokenException {
+    public Oauth2AccessToken obtainAccessTokenByAuthorizationCode(Oauth2ClientCredentials clientCredentials, String authorizationCode) {
         return returner.getToken(clientCredentials, authorizationCode);
     }
 
