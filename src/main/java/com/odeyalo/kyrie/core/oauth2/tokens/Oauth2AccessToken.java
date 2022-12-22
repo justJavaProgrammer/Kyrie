@@ -26,6 +26,9 @@ public class Oauth2AccessToken extends AbstractOauth2Token {
         super(tokenValue, issuedAt, expiresIn);
     }
 
+    public static Oauth2AccessToken alreadyExpired() {
+        return new Oauth2AccessToken(null, null, null);
+    }
 
     public boolean isExpired() {
         return expiresIn == null || expiresIn.getEpochSecond() < System.currentTimeMillis() / 1000L;
