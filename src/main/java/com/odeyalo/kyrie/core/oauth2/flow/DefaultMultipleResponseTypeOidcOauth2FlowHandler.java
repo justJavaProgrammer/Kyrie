@@ -1,18 +1,19 @@
 package com.odeyalo.kyrie.core.oauth2.flow;
 
 import com.odeyalo.kyrie.core.Oauth2User;
-import com.odeyalo.kyrie.core.oauth2.oidc.generator.OidcOauth2TokenGeneratorFacade;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
 import com.odeyalo.kyrie.core.oauth2.CombinedOauth2Token;
 import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
 import com.odeyalo.kyrie.core.oauth2.Oauth2Token;
 import com.odeyalo.kyrie.core.oauth2.oidc.OidcResponseType;
+import com.odeyalo.kyrie.core.oauth2.oidc.generator.OidcOauth2TokenGeneratorFacade;
 import com.odeyalo.kyrie.core.oauth2.support.Oauth2Constants;
 import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessToken;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCode;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.provider.AuthorizationCodeProvider;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.Oauth2AccessTokenGenerator;
+import com.odeyalo.kyrie.support.Oauth2Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -53,6 +54,7 @@ public class DefaultMultipleResponseTypeOidcOauth2FlowHandler implements Multipl
                     .tokenValue(accessToken.getTokenValue());
             builder.addInfo(Oauth2Constants.TOKEN_TYPE, accessToken.getTokenType().getValue());
             builder.addInfo(ACCESS_TOKEN_KEY, accessToken);
+            builder.addInfoIfPresent(Oauth2Constants.EXPIRES_IN, Oauth2Utils.getExpiresIn(accessToken));
         }
 
         if (types.contains(OidcResponseType.CODE)) {
