@@ -5,6 +5,8 @@ import com.odeyalo.kyrie.core.oauth2.oidc.OidcResponseType;
 import com.odeyalo.kyrie.core.oauth2.support.Oauth2Constants;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -17,6 +19,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  */
 public class Oauth2RedirectUrlResultMatchers {
     private static final Oauth2RedirectUrlResultMatchers INSTANCE = new Oauth2RedirectUrlResultMatchers();
+    private final Logger logger = LoggerFactory.getLogger(Oauth2RedirectUrlResultMatchers.class);
 
     protected Oauth2RedirectUrlResultMatchers() {
     }
@@ -92,6 +95,17 @@ public class Oauth2RedirectUrlResultMatchers {
         };
     }
 
+    public ResultMatcher isParameterNotNull(String param) {
+        return (result) -> {
+            isParameterPresented(param).match(result);
+            String redirectedUrl = result.getResponse().getRedirectedUrl();
+            MultiValueMap<String, String> queryParams = UriComponentsBuilder.fromHttpUrl(redirectedUrl).build().getQueryParams();
+            String actual = queryParams.getFirst(param);
+            Assert.assertNotNull(actual);
+        };
+    }
+
+
     public ResultMatcher isParameterEqualTo(String param, String expected) {
         return (result) -> {
             isParameterPresented(param).match(result);
@@ -104,7 +118,7 @@ public class Oauth2RedirectUrlResultMatchers {
 
     public ResultMatcher isParameterPresented(String requiredParameter) {
         return (result) -> {
-            System.out.println("param presented lambda " + requiredParameter);
+            logger.debug("Checking is parameter presented for: {}", requiredParameter);
             String redirectedUrl = result.getResponse().getRedirectedUrl();
             MultiValueMap<String, String> queryParams = UriComponentsBuilder.fromHttpUrl(redirectedUrl).build().getQueryParams();
             MatcherAssert.assertThat(String.format("The parameter with name %s is not presented", requiredParameter), queryParams.getFirst(requiredParameter) != null);
