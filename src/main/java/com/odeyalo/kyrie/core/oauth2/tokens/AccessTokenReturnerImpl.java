@@ -28,7 +28,7 @@ public class AccessTokenReturnerImpl implements AccessTokenReturner {
     public Oauth2AccessToken getToken(String clientId, String clientSecret, String authorizationCode) throws Oauth2Exception {
         ValidationResult validationResult = clientCredentialsValidator.validateCredentials(clientId, clientSecret);
         if (!validationResult.isSuccess()) {
-            throw new InvalidClientCredentialsException("Client credentials are wrong and cannot be used to obtain an access token");
+            throw new InvalidClientCredentialsException("Client credentials are wrong and can't be used to obtain an access token");
         }
         AuthorizationCode authCode = authorizationCodeManager.getAuthorizationCodeByAuthorizationCodeValue(authorizationCode);
         if (authCode == null || authCode.isExpired()) {
