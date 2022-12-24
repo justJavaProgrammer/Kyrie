@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test for String2ResponseTypeConverter class
+ * Tests for String2ResponseTypeConverter class
  * @see String2ResponseTypeConverter
  * @version 1.0
  */
