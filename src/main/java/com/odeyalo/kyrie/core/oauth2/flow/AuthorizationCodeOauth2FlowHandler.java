@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * Handle the authorization_code flow.
+ * The Handler is used to return an authorization code that will be used to obtain an access token
+ *
  * @version 1.0
  */
 @Component
