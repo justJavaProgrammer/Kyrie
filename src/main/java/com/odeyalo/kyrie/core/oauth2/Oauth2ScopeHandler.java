@@ -1,4 +1,6 @@
-package com.odeyalo.kyrie.core;
+package com.odeyalo.kyrie.core.oauth2;
+
+import com.odeyalo.kyrie.core.Oauth2User;
 
 import java.util.Map;
 
