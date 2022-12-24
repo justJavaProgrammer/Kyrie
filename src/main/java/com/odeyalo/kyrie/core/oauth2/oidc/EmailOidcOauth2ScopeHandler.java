@@ -1,6 +1,6 @@
 package com.odeyalo.kyrie.core.oauth2.oidc;
 
-import com.odeyalo.kyrie.core.Oauth2ScopeHandler;
+import com.odeyalo.kyrie.core.oauth2.Oauth2ScopeHandler;
 import com.odeyalo.kyrie.core.Oauth2User;
 import org.springframework.stereotype.Component;
 
