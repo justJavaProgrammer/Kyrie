@@ -1,14 +1,17 @@
 package com.odeyalo.kyrie.exceptions;
 
 
+import com.odeyalo.kyrie.dto.ApiErrorMessage;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
@@ -20,9 +23,12 @@ import java.util.Map;
 public class GlobalExceptionHandlerController {
     private final static String MISSED_PARAMETER_NAME_KEY = "missedParameter";
     private final static String DESCRIPTION_KEY = "description";
+    public static final String ERROR_PARAMETER_NAME = "error";
+    public static final String ERROR_DESCRIPTION_PARAMETER_NAME = "error_description";
 
     /**
      * Handle the MissingServletRequestParameterException. This is helpful to return the description about error
+     *
      * @param exception - MissingServletRequestParameterException that was occurred
      * @return - ResponseEntity with description about what request parameter was missed
      */
@@ -31,7 +37,26 @@ public class GlobalExceptionHandlerController {
         Map<String, Object> body = getDefaultBody(HttpStatus.BAD_REQUEST);
         body.put(DESCRIPTION_KEY, "Missed the required parameter: " + exception.getParameterName());
         body.put(MISSED_PARAMETER_NAME_KEY, exception.getParameterName());
-        return ResponseEntity.badRequest().body(body);
+        return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body(body);
+    }
+
+    @ExceptionHandler(value = Oauth2Exception.class)
+    public ResponseEntity<?> handleOauth2Exception(Oauth2Exception exception) {
+        if (exception instanceof InvalidRedirectUriOauth2Exception || exception.getErrorType() == Oauth2ErrorType.INVALID_REDIRECT_URI) {
+            return ResponseEntity.ok("The request can't be processed since redirect_uri parameter is  not valid. Contact developer if error remains");
+        }
+        ApiErrorMessage body = new ApiErrorMessage(exception.getErrorType().getErrorName(), exception.getDescription());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(body);
+    }
+
+
+    @ExceptionHandler(value = RedirectUriAwareOauth2Exception.class)
+    public ResponseEntity<?> handleOauth2Exception(RedirectUriAwareOauth2Exception exception) {
+        String redirectUri = UriComponentsBuilder.fromHttpUrl(exception.getRedirectUri())
+                .queryParam(ERROR_PARAMETER_NAME, exception.getErrorType().getErrorName())
+                .queryParam(ERROR_DESCRIPTION_PARAMETER_NAME, exception.getDescription())
+                .toUriString();
+        return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, redirectUri).build();
     }
 
 
@@ -41,6 +66,7 @@ public class GlobalExceptionHandlerController {
      * status(Integer http status representation),
      * error(String http status representation),
      * path of current request
+     *
      * @param status - status of response
      * @return - map with default body
      */
