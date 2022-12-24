@@ -43,7 +43,6 @@ public class SpaceSeparatedStringToArrayConverter implements ConditionalGenericC
         // Iterate through the elements, convert it to target type and push it to result array
         for (int i = 0; i < elements.length; i++) {
             String element = elements[i];
-            System.out.println("Element is: " + element);;
             Object convertedValue = conversionService.convert(element.trim(), sourceType, targetElementType);
             Array.set(result, i, convertedValue);
         }
