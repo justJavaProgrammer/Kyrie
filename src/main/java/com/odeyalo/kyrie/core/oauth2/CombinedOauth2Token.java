@@ -7,6 +7,7 @@ import lombok.Singular;
 import lombok.experimental.SuperBuilder;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Represent combined oauth2 token that uses to return access token with other data.
@@ -25,4 +26,18 @@ public class CombinedOauth2Token extends AbstractOauth2Token {
      */
     @Singular("addInfo")
     private Map<String, Object> additionalInfo;
+
+
+    public static abstract class CombinedOauth2TokenBuilder<C extends CombinedOauth2Token, B extends CombinedOauth2TokenBuilder<C, B>> extends AbstractOauth2TokenBuilder<C, B> {
+        /**
+         * Add value to  additionalInfo only if optional is presented
+         * @param key - key specified with value
+         * @param optional - optional with value or empty
+         * @return - builder
+         */
+        public CombinedOauth2TokenBuilder<C, B> addInfoIfPresent(String key, Optional<?> optional) {
+            optional.ifPresent(x -> addInfo(key, optional.get()));
+            return this;
+        }
+    }
 }
