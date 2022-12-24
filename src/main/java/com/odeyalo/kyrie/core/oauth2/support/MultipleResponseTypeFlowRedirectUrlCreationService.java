@@ -5,6 +5,7 @@ import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.oauth2.CombinedOauth2Token;
 import com.odeyalo.kyrie.core.oauth2.Oauth2Token;
 import com.odeyalo.kyrie.core.oauth2.flow.MultipleResponseTypeOidcOauth2FlowHandler;
+import com.odeyalo.kyrie.support.Oauth2Utils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -50,7 +51,7 @@ public class MultipleResponseTypeFlowRedirectUrlCreationService implements Redir
         return UriComponentsBuilder.fromUriString(request.getRedirectUrl())
                 .queryParamIfPresent(MultipleResponseTypeOidcOauth2FlowHandler.ACCESS_TOKEN_KEY, Optional.ofNullable(combinedOauth2Token.getTokenValue()))
                 .queryParamIfPresent(Oauth2Constants.TOKEN_TYPE, Optional.ofNullable(additionalInfo.get(Oauth2Constants.TOKEN_TYPE)))
-                .queryParamIfPresent(Oauth2Constants.EXPIRES_IN, getExpiresIn(token))
+                .queryParamIfPresent(Oauth2Constants.EXPIRES_IN, Oauth2Utils.getExpiresIn(token))
                 .queryParamIfPresent(MultipleResponseTypeOidcOauth2FlowHandler.ID_TOKEN_KEY, Optional.ofNullable(additionalInfo.get(MultipleResponseTypeOidcOauth2FlowHandler.ID_TOKEN_KEY)))
                 .queryParamIfPresent(MultipleResponseTypeOidcOauth2FlowHandler.AUTHORIZATION_CODE_TOKEN_KEY, Optional.ofNullable(additionalInfo.get(MultipleResponseTypeOidcOauth2FlowHandler.AUTHORIZATION_CODE_TOKEN_KEY)))
                 .queryParamIfPresent(Oauth2Constants.STATE, Optional.ofNullable(request.getState()))
@@ -62,10 +63,4 @@ public class MultipleResponseTypeFlowRedirectUrlCreationService implements Redir
         return AuthorizationGrantType.MULTIPLE;
     }
 
-    private Optional<Long> getExpiresIn(Oauth2Token token) {
-        if (token.getExpiresIn() != null && token.getIssuedAt() != null) {
-            return Optional.of(token.getExpiresIn().getEpochSecond() - token.getIssuedAt().getEpochSecond());
-        }
-        return Optional.empty();
-    }
 }
