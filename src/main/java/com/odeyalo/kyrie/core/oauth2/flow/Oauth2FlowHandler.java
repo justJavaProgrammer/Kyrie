@@ -12,11 +12,14 @@ public interface Oauth2FlowHandler {
 
     /**
      * Handle an oauth2 flow.
-     * @param request - AuthorizationRequest with all fields set
-     * @param user - user that granted permission
+     * The handleFlow SHOULD NOT make any AuthorizationRequest or Oauth2User checks
+     * because AuthorizationRequest and Oauth2User params are already checked and valid.
+     * @param request - AuthorizationRequest with all fields set and request is valid
+     * @param user    - user that granted permission
      * @return - Oauth2Token any implementation for given flow.
      */
     Oauth2Token handleFlow(AuthorizationRequest request, Oauth2User user);
+
     /**
      * Name of flow that this implementation supports
      * @return - flow name
