@@ -21,6 +21,13 @@ public class DefaultAuthorizationCodeProvider implements AuthorizationCodeProvid
         this.codeStore = codeStore;
     }
 
+    /**
+     * Generate an authorization code and save it to AuthorizationCodeStore
+     * @param clientId - client id that requested authorization
+     * @param user - user that granted access
+     * @param scopes - scopes that will be applied to authorization code
+     * @return - AuthorizationCode that can be used to obtain access token
+     */
     @Override
     public AuthorizationCode getAuthorizationCode(String clientId, Oauth2User user, String[] scopes) {
         AuthorizationCode authorizationCode = codeGenerator.generateAuthorizationCode(user, scopes);
