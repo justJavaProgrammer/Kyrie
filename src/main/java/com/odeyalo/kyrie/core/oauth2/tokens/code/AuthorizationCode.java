@@ -12,14 +12,11 @@ import java.time.ZoneOffset;
  * Represent authorization code from Oauth2 Protocol.
  */
 @EqualsAndHashCode(callSuper = true)
-@Builder
 @Data
 @AllArgsConstructor
 public class AuthorizationCode extends AbstractOauth2Token {
     @NonNull
     private final String codeValue;
-    @NonNull
-    private final LocalDateTime expiresIn;
     @NonNull
     private final Oauth2User user;
     /**
@@ -28,8 +25,18 @@ public class AuthorizationCode extends AbstractOauth2Token {
     @NonNull
     private final String[] scopes;
 
+
+    @Builder
+    public AuthorizationCode(@NonNull String codeValue, Instant issuedAt, @NonNull Instant expiresIn, @NonNull Oauth2User user, @NonNull String[] scopes) {
+        this.codeValue = codeValue;
+        this.issuedAt = issuedAt;
+        this.expiresIn = expiresIn;
+        this.user = user;
+        this.scopes = scopes;
+    }
+
     public boolean isExpired() {
-        return LocalDateTime.now().isAfter(expiresIn);
+        return Instant.now().isAfter(expiresIn);
     }
 
     @Override
@@ -37,8 +44,26 @@ public class AuthorizationCode extends AbstractOauth2Token {
         return codeValue;
     }
 
-    @Override
-    public Instant getExpiresIn() {
-        return expiresIn.toInstant(ZoneOffset.UTC);
+    public static class AuthorizationCodeBuilder {
+        private Instant issuedAt;
+        private @NonNull Instant expiresIn;
+
+        public AuthorizationCodeBuilder issuedAt(LocalDateTime issuedAt) {
+            return issuedAt(issuedAt.toInstant(ZoneOffset.UTC));
+        }
+
+        public AuthorizationCodeBuilder issuedAt(Instant issuedAt) {
+            this.issuedAt = issuedAt;
+            return this;
+        }
+
+        public AuthorizationCodeBuilder expiresIn(LocalDateTime expireTime) {
+            return expiresIn(expireTime.toInstant(ZoneOffset.UTC));
+        }
+
+        public AuthorizationCodeBuilder expiresIn(Instant expiresIn) {
+            this.expiresIn = expiresIn;
+            return this;
+        }
     }
 }
