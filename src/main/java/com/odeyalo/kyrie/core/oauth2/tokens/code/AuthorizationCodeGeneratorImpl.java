@@ -4,7 +4,7 @@ import com.odeyalo.kyrie.core.Oauth2User;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * Generate random authorization code with expire time
@@ -18,8 +18,9 @@ public class AuthorizationCodeGeneratorImpl implements AuthorizationCodeGenerato
         String code = RandomStringUtils.randomAlphabetic(codeLength);
         return AuthorizationCode.builder()
                 .codeValue(code)
+                .issuedAt(Instant.now())
+                .expiresIn(Instant.now().plusSeconds(DEFAULT_AUTHORIZATION_CODE_EXPIRE_TIME_SECONDS))
                 .user(user)
-                .expiresIn(LocalDateTime.now().plusSeconds(expireTimeSeconds))
                 .scopes(scopes)
                 .build();
     }
