@@ -12,9 +12,9 @@ public interface AuthorizationCodeGenerator {
      */
     Integer DEFAULT_CODE_LENGTH = 24;
     /**
-     * Time to expire generated authorization code, in minutes
+     * Time to expire generated authorization code, in seconds
      */
-    Integer DEFAULT_AUTHORIZATION_CODE_EXPIRE_TIME_SECONDS = 5;
+    Integer DEFAULT_AUTHORIZATION_CODE_EXPIRE_TIME_SECONDS = 60;
 
     default AuthorizationCode generateAuthorizationCode(Oauth2User user, String[] scopes) {
         return generateAuthorizationCode(DEFAULT_CODE_LENGTH, DEFAULT_AUTHORIZATION_CODE_EXPIRE_TIME_SECONDS, user, scopes);
