@@ -7,6 +7,7 @@ import com.odeyalo.kyrie.core.oauth2.tokens.jwt.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.lang.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -20,11 +21,13 @@ import java.util.Map;
 @Component
 public class OidcIdTokenGeneratorImpl implements OidcIdTokenGenerator {
     private final JwtTokenProvider jwtTokenProvider;
-    private final String ISSUER = "http://localhost:9000";
+    private final String ISSUER;
+
 
     @Autowired
-    public OidcIdTokenGeneratorImpl(JwtTokenProvider jwtTokenProvider) {
+    public OidcIdTokenGeneratorImpl(JwtTokenProvider jwtTokenProvider, @Value("${kyrie.tokens.common.issuer}") String issuer) {
         this.jwtTokenProvider = jwtTokenProvider;
+        ISSUER = issuer;
     }
 
     @Override
