@@ -33,12 +33,14 @@ import static org.junit.jupiter.api.Assertions.*;
  * @see DefaultMultipleResponseTypeOidcOauth2FlowHandler
  */
 class DefaultMultipleResponseTypeOidcOauth2FlowHandlerTest {
+    public static final String ISSUER = "http://localhost:9000";
+
     private final JwtTokenProviderImpl provider = new JwtTokenProviderImpl("secret");
     private final InMemoryAuthorizationCodeStore store = new InMemoryAuthorizationCodeStore();
 
     private final DefaultMultipleResponseTypeOidcOauth2FlowHandler handler = new DefaultMultipleResponseTypeOidcOauth2FlowHandler(
             new OidcOauth2TokenGeneratorFacadeImpl(
-                    new OidcIdTokenGeneratorImpl(provider), Collections.emptyList()),
+                    new OidcIdTokenGeneratorImpl(provider, ISSUER), Collections.emptyList()),
             new DefaultJwtOauth2AccessTokenGenerator(provider),
             new DefaultAuthorizationCodeProvider(new AuthorizationCodeGeneratorImpl(), store));
 
