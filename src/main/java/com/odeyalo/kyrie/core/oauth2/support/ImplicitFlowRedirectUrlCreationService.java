@@ -4,6 +4,7 @@ import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.oauth2.Oauth2Token;
 import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessToken;
+import com.odeyalo.kyrie.support.Oauth2Utils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -36,20 +37,12 @@ public class ImplicitFlowRedirectUrlCreationService implements RedirectUrlCreati
                 .queryParamIfPresent(Oauth2Constants.STATE, Optional.ofNullable(request.getState()))
                 .queryParam(Oauth2Constants.ACCESS_TOKEN, token.getTokenValue())
                 .queryParam(Oauth2Constants.TOKEN_TYPE, accessToken.getTokenType().getValue())
-                .queryParamIfPresent(Oauth2Constants.EXPIRES_IN, getExpiresIn(accessToken))
+                .queryParamIfPresent(Oauth2Constants.EXPIRES_IN, Oauth2Utils.getExpiresIn(accessToken))
                 .toUriString();
     }
 
     @Override
     public AuthorizationGrantType supportedGrantType() {
         return AuthorizationGrantType.IMPLICIT;
-    }
-
-
-    private Optional<Long> getExpiresIn(Oauth2AccessToken token) {
-        if (token.getExpiresIn() != null && token.getIssuedAt() != null) {
-            return Optional.of(token.getExpiresIn().getEpochSecond() - token.getIssuedAt().getEpochSecond());
-        }
-        return Optional.empty();
     }
 }
