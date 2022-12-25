@@ -6,12 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AuthorizationCodeManagerImpl implements AuthorizationCodeManager {
+public class DefaultAuthorizationCodeManager implements AuthorizationCodeManager {
     private final AuthorizationCodeProvider authorizationCodeProvider;
     private final AuthorizationCodeStore authorizationCodeStore;
 
     @Autowired
-    public AuthorizationCodeManagerImpl(AuthorizationCodeProvider authorizationCodeProvider, AuthorizationCodeStore authorizationCodeStore) {
+    public DefaultAuthorizationCodeManager(AuthorizationCodeProvider authorizationCodeProvider, AuthorizationCodeStore authorizationCodeStore) {
         this.authorizationCodeProvider = authorizationCodeProvider;
         this.authorizationCodeStore = authorizationCodeStore;
     }
