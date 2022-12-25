@@ -33,7 +33,7 @@ public interface OidcIdTokenGenerator {
     /**
      * Generate an ID token for the client with default set of claims, but also add additional claims to the token.
      * @param user - user that granted permission
-     * @param additionalClaims - addtional claims that MUST BE added to the token.
+     * @param additionalClaims - additional claims that MUST BE added to the token.
      * @return - OidcIdToken with all required fields set
      */
     OidcIdToken generateOidcToken(String clientId, Oauth2User user, Map<String, Object> additionalClaims);
