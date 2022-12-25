@@ -13,15 +13,15 @@ import java.util.Map;
  */
 @Component
 public class EmailOidcOauth2ScopeHandler implements Oauth2ScopeHandler {
-    private static final String EMAIL_SCOPE = "email";
-    private static final String EMAIL_VERIFIED_SCOPE = "email_verified";
+    public static final String EMAIL_SCOPE = "email";
+    public static final String EMAIL_VERIFIED_SCOPE = "email_verified";
 
     @Override
     public Map<String, Object> createClaims(Oauth2User user) {
         Object email = user.getAdditionalInfo().get(EMAIL_SCOPE);
         if (email == null) {
             return Map.of(EMAIL_SCOPE, "null",
-                    EMAIL_VERIFIED_SCOPE, user.getAdditionalInfo().getOrDefault(EMAIL_VERIFIED_SCOPE, false));
+                    EMAIL_VERIFIED_SCOPE, false);
         }
         return Map.of(EMAIL_SCOPE, email,
                     EMAIL_VERIFIED_SCOPE, user.getAdditionalInfo().getOrDefault(EMAIL_VERIFIED_SCOPE, true));
