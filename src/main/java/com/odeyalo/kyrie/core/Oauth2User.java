@@ -11,7 +11,6 @@ import java.util.Set;
 @Data
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
 public class Oauth2User {
     private String id;
     private String username;
