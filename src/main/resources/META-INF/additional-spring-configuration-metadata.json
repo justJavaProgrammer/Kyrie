@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "kyrie.tokens.common.issuer",
+      "type": "java.lang.String",
+      "description": "Default issuer claim value that will be added as ISSUER claim to JWT(or any) token."
+    },
+    {
+      "name": "kyrie.tokens.jwt.secret.key",
+      "type": "java.lang.String",
+      "description": "Secret key that will be used to sign in a jwt token."
+    }
+  ]
+}
