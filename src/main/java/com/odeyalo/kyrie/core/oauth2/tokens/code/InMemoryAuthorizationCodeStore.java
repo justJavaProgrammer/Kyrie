@@ -10,7 +10,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * Store authorization codes in memory
+ * Store authorization codes in memory using concurrent map
+ * @version 1.0
  */
 @Component
 public class InMemoryAuthorizationCodeStore implements AuthorizationCodeStore {
@@ -41,6 +42,7 @@ public class InMemoryAuthorizationCodeStore implements AuthorizationCodeStore {
     @Override
     public void delete(String id) {
         store.remove(id);
+        this.logger.info("Deleted element from store with id: {}", id);
     }
 
     @Override
@@ -52,6 +54,7 @@ public class InMemoryAuthorizationCodeStore implements AuthorizationCodeStore {
     public Long deleteALl() {
         int size = store.size();
         store.clear();
+        this.logger.info("Deleted all elements from store. Number elements that was deleted: {}", size);
         return (long) size;
     }
 
