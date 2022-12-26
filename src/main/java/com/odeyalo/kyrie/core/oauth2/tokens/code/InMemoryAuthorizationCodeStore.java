@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -29,7 +30,12 @@ public class InMemoryAuthorizationCodeStore implements AuthorizationCodeStore {
 
     @Override
     public AuthorizationCode findByAuthorizationCodeValue(String authCode) {
-        return store.values().stream().filter(authorizationCode -> authorizationCode.getCodeValue().equals(authCode)).collect(Collectors.toList()).get(0);
+        if (store.size() == 0) {
+            this.logger.info("The store is empty. Returning null for given authorization '{}' code", authCode);
+            return null;
+        }
+        List<AuthorizationCode> result = store.values().stream().filter(authorizationCode -> authorizationCode.getCodeValue().equals(authCode)).collect(Collectors.toList());
+        return result.size() == 0 ? null : result.get(0);
     }
 
     @Override
@@ -40,5 +46,17 @@ public class InMemoryAuthorizationCodeStore implements AuthorizationCodeStore {
     @Override
     public void delete(AuthorizationCode code) {
         store.values().removeIf(x -> x.equals(code));
+    }
+
+    @Override
+    public Long deleteALl() {
+        int size = store.size();
+        store.clear();
+        return (long) size;
+    }
+
+    @Override
+    public Long count() {
+        return (long) store.size();
     }
 }

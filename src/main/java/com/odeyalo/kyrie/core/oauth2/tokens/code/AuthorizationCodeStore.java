@@ -37,4 +37,16 @@ public interface AuthorizationCodeStore {
      * @param code - code to delete
      */
     void delete(AuthorizationCode code);
+
+    /**
+     * Delete EVERYTHING from store, even if code is valid
+     * @return - number of elements that was deleted
+     */
+    Long deleteALl();
+
+    /**
+     * Count of all elements
+     * @return count of all elements that presented in store
+     */
+    Long count();
 }
