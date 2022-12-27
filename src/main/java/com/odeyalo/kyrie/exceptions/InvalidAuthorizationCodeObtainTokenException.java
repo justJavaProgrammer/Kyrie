@@ -1,5 +1,6 @@
-package com.odeyalo.kyrie.core.oauth2.tokens;
+package com.odeyalo.kyrie.exceptions;
 
+import com.odeyalo.kyrie.core.oauth2.tokens.TokenException;
 import com.odeyalo.kyrie.exceptions.Oauth2ErrorType;
 
 /**
