@@ -6,7 +6,7 @@ import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
 import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessToken;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.DefaultJwtOauth2AccessTokenGenerator;
-import com.odeyalo.kyrie.core.oauth2.tokens.jwt.JwtTokenProviderImpl;
+import com.odeyalo.kyrie.core.oauth2.tokens.jwt.DefaultSecretWordJwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @see ImplicitClientSideOauth2FlowHandler
  */
 class ImplicitClientSideOauth2FlowHandlerTest {
-    public final JwtTokenProviderImpl jwtTokenProvider = new JwtTokenProviderImpl("secret");
+    public final DefaultSecretWordJwtTokenProvider jwtTokenProvider = new DefaultSecretWordJwtTokenProvider("secret");
     private final ImplicitClientSideOauth2FlowHandler flowHandler = new ImplicitClientSideOauth2FlowHandler(
             new DefaultJwtOauth2AccessTokenGenerator(jwtTokenProvider)
     );
