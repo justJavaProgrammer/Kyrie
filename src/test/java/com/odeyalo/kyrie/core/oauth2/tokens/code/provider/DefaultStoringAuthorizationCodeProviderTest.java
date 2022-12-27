@@ -16,11 +16,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for DefaultAuthorizationCodeProvider class.
- * @see DefaultAuthorizationCodeProvider
+ * @see DefaultStoringAuthorizationCodeProvider
  */
-class DefaultAuthorizationCodeProviderTest {
+class DefaultStoringAuthorizationCodeProviderTest {
     private final AuthorizationCodeStore store = new InMemoryAuthorizationCodeStore();
-    private final DefaultAuthorizationCodeProvider defaultAuthorizationCodeProvider = new DefaultAuthorizationCodeProvider(
+    private final DefaultStoringAuthorizationCodeProvider defaultStoringAuthorizationCodeProvider = new DefaultStoringAuthorizationCodeProvider(
             new AuthorizationCodeGeneratorImpl(), store);
 
     @Test
@@ -30,7 +30,7 @@ class DefaultAuthorizationCodeProviderTest {
         String[] scopes = {"read", "write"};
 
         Oauth2User expectedUser = new Oauth2User("1", "odeyalo", "innocentdays", Set.of("USER"), Collections.emptyMap());
-        AuthorizationCode code = defaultAuthorizationCodeProvider.getAuthorizationCode(clientId, expectedUser, scopes);
+        AuthorizationCode code = defaultStoringAuthorizationCodeProvider.getAuthorizationCode(clientId, expectedUser, scopes);
 
         String codeValue = code.getCodeValue();
         Instant expiresIn = code.getExpiresIn();

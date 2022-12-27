@@ -11,12 +11,12 @@ import org.springframework.stereotype.Service;
  * Default AuthorizationCodeProvider implementation that just generate and save an AuthorizationCode
  */
 @Service
-public class DefaultAuthorizationCodeProvider implements AuthorizationCodeProvider {
+public class DefaultStoringAuthorizationCodeProvider implements AuthorizationCodeProvider {
     private final AuthorizationCodeGenerator codeGenerator;
     private final AuthorizationCodeStore codeStore;
 
     @Autowired
-    public DefaultAuthorizationCodeProvider(AuthorizationCodeGenerator codeGenerator, AuthorizationCodeStore codeStore) {
+    public DefaultStoringAuthorizationCodeProvider(AuthorizationCodeGenerator codeGenerator, AuthorizationCodeStore codeStore) {
         this.codeGenerator = codeGenerator;
         this.codeStore = codeStore;
     }
