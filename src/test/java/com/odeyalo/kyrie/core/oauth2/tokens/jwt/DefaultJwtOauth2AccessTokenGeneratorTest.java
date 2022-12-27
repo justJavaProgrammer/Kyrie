@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class DefaultJwtOauth2AccessTokenGeneratorTest {
     public static final String SECRET_WORD = "secret";
-    private final JwtTokenProvider provider = new JwtTokenProviderImpl(SECRET_WORD);
+    private final JwtTokenProvider provider = new DefaultSecretWordJwtTokenProvider(SECRET_WORD);
     private final DefaultJwtOauth2AccessTokenGenerator generator = new DefaultJwtOauth2AccessTokenGenerator(provider);
 
     @Test
