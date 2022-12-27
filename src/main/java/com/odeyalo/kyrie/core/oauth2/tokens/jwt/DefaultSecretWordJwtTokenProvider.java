@@ -18,13 +18,13 @@ import java.util.Map;
  * Default JwtTokenProvider implementation that sign jwt token with secret word
  */
 @Service
-public class JwtTokenProviderImpl implements JwtTokenProvider {
+public class DefaultSecretWordJwtTokenProvider implements JwtTokenProvider {
     private static final long JWT_TOKEN_EXPIRATION_TIME_SECONDS = 3600L;
-    private final Logger logger = LoggerFactory.getLogger(JwtTokenProviderImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(DefaultSecretWordJwtTokenProvider.class);
     private final String secretWord;
 
     @Autowired
-    public JwtTokenProviderImpl(@Value("${kyrie.tokens.jwt.secret.key}") String secretWord) {
+    public DefaultSecretWordJwtTokenProvider(@Value("${kyrie.tokens.jwt.secret.key}") String secretWord) {
         this.secretWord = secretWord;
     }
 

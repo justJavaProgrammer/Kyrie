@@ -21,12 +21,12 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests for JwtTokenProviderImpl class
  *
  * @version 1.0.0
- * @see JwtTokenProviderImpl
+ * @see DefaultSecretWordJwtTokenProvider
  */
-class JwtTokenProviderImplTest {
+class DefaultSecretWordJwtTokenProviderTest {
     public static final String USER_ID = "1";
     private final String secretWord = "secretWord";
-    private final JwtTokenProviderImpl provider = new JwtTokenProviderImpl(secretWord);
+    private final DefaultSecretWordJwtTokenProvider provider = new DefaultSecretWordJwtTokenProvider(secretWord);
 
 
     @Test
