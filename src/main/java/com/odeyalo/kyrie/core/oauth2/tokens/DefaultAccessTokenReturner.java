@@ -12,13 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AccessTokenReturnerImpl implements AccessTokenReturner {
+public class DefaultAccessTokenReturner implements AccessTokenReturner {
     private final ClientCredentialsValidator clientCredentialsValidator;
     private final AuthorizationCodeManager authorizationCodeManager;
     private final Oauth2AccessTokenGenerator generator;
 
     @Autowired
-    public AccessTokenReturnerImpl(ClientCredentialsValidator clientCredentialsValidator, AuthorizationCodeManager authorizationCodeManager, Oauth2AccessTokenGenerator generator) {
+    public DefaultAccessTokenReturner(ClientCredentialsValidator clientCredentialsValidator, AuthorizationCodeManager authorizationCodeManager, Oauth2AccessTokenGenerator generator) {
         this.clientCredentialsValidator = clientCredentialsValidator;
         this.authorizationCodeManager = authorizationCodeManager;
         this.generator = generator;
