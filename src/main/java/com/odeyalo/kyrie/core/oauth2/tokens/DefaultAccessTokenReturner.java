@@ -6,6 +6,7 @@ import com.odeyalo.kyrie.core.support.ValidationResult;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCode;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCodeManager;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.Oauth2AccessTokenGenerator;
+import com.odeyalo.kyrie.exceptions.InvalidAuthorizationCodeObtainTokenException;
 import com.odeyalo.kyrie.exceptions.InvalidClientCredentialsException;
 import com.odeyalo.kyrie.exceptions.Oauth2Exception;
 import org.springframework.beans.factory.annotation.Autowired;
