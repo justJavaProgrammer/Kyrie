@@ -3,7 +3,7 @@ package com.odeyalo.kyrie.core.oauth2.oidc.generator;
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.oauth2.oidc.OidcIdToken;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.JwtTokenProvider;
-import com.odeyalo.kyrie.core.oauth2.tokens.jwt.JwtTokenProviderImpl;
+import com.odeyalo.kyrie.core.oauth2.tokens.jwt.DefaultSecretWordJwtTokenProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +24,7 @@ class OidcIdTokenGeneratorImplTest {
     private static final String ISSUER = "http://localhost:9999";
     private static final String USER_ID = "1";
     private static final String SECRET_WORD = "secret";
-    private final JwtTokenProvider provider = new JwtTokenProviderImpl(SECRET_WORD);
+    private final JwtTokenProvider provider = new DefaultSecretWordJwtTokenProvider(SECRET_WORD);
     private final OidcIdTokenGeneratorImpl oidcIdTokenGenerator = new OidcIdTokenGeneratorImpl(provider, ISSUER);
 
     @Test
