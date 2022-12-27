@@ -1,7 +1,6 @@
 package com.odeyalo.kyrie.exceptions;
 
 import com.odeyalo.kyrie.core.oauth2.tokens.TokenException;
-import com.odeyalo.kyrie.exceptions.Oauth2ErrorType;
 
 /**
  * Throw it when received wrong authorization code and token can't be obtained
