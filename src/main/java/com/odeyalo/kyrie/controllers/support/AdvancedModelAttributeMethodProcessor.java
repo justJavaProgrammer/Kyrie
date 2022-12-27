@@ -127,7 +127,8 @@ public class AdvancedModelAttributeMethodProcessor implements HandlerMethodArgum
         Field[] fields = argument.getClass().getDeclaredFields();
         for (Field field : fields) {
             field.setAccessible(true);
-            String key = getParameterNameByFormProperty(argument, field);
+            String key = getParameterNameByFormProperty(field);
+            this.logger.debug("Using '{}' as key for field: {} for class: {}", key, field.getName(), argument);
             resolveAndSet(request, argument, field, key);
         }
     }
@@ -135,28 +136,14 @@ public class AdvancedModelAttributeMethodProcessor implements HandlerMethodArgum
     /**
      * Get parameter name by FormProperty data and return it.
      *
-     * @param argument - original object
-     * @param field    - field to resolve annotation
+     * @param field - field to resolve annotation
      * @return name of parameter from FormProperty annotation
      * @see FormProperty
      */
-    protected String getParameterNameByFormProperty(Object argument, Field field) {
-        return field.isAnnotationPresent(FormProperty.class)
-                && isAnnotationValueNonEmpty(field)
-                && isFieldValueNullOrPrimitive(argument, field) ?
-                field.getAnnotation(FormProperty.class).value()
-                : field.getName();
-    }
-
-    /**
-     * Return true if field value is null or field type is primitive.
-     *
-     * @param argument - original object
-     * @param field    - field to check
-     * @return - true if field value is null or field is primitive
-     */
-    protected boolean isFieldValueNullOrPrimitive(Object argument, Field field) {
-        return ReflectionUtils.getField(field, argument) == null || field.getType().isPrimitive();
+    protected String getParameterNameByFormProperty(Field field) {
+        return field.isAnnotationPresent(FormProperty.class) && isAnnotationValueNonEmpty(field) ?
+                field.getAnnotation(FormProperty.class).value() :
+                field.getName();
     }
 
     /**
@@ -167,7 +154,7 @@ public class AdvancedModelAttributeMethodProcessor implements HandlerMethodArgum
      * @see FormProperty
      */
     protected boolean isAnnotationValueNonEmpty(Field field) {
-        return !field.getAnnotation(FormProperty.class).value().isEmpty();
+        return !field.getAnnotation(FormProperty.class).value().equals(FormProperty.EMPTY_VALUE);
     }
 
 
