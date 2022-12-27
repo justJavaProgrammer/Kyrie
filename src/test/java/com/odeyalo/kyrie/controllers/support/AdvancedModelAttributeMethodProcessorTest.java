@@ -110,6 +110,32 @@ class AdvancedModelAttributeMethodProcessorTest {
     }
 
 
+    @Test
+    @DisplayName("Resolve parameters from request and set it to TestFormPropertyWithEmpty that contains FormProperty without value param")
+    void resolveParametersAndSetItAndExpectSuccess() throws Exception {
+        String AGE_KEY = "age";
+        String AGE_VALUE = "18";
+        String NAME_KEY = "name";
+        String NAME_VALUE = "Odeyalo";
+        String VERIFIED_KEY = "verified";
+        String VERIFIED_VALUE = "true";
+
+        request.setParameter(AGE_KEY, AGE_VALUE);
+        request.setParameter(NAME_KEY, NAME_VALUE);
+        request.setParameter(VERIFIED_KEY, VERIFIED_VALUE);
+
+        MethodParameter parameter = new MethodParameter(TestHandler.class.getDeclaredMethod("methodTestFormPropertyWithEmpty", TestFormPropertyWithEmpty.class), 0);
+        Object o = processor.resolveArgument(parameter, EMPTY_MAV_CONTAINER, nativeWebRequest, WEB_DATA_BINDER_FACTORY);
+        assertNotNull(o);
+
+        TestFormPropertyWithEmpty testFormPropertyWithEmpty = (TestFormPropertyWithEmpty) o;
+
+        assertNotNull(testFormPropertyWithEmpty.name);
+        assertEquals(Integer.parseInt(AGE_VALUE), testFormPropertyWithEmpty.age);
+        assertNotEquals(Boolean.parseBoolean(VERIFIED_VALUE), testFormPropertyWithEmpty.isVerified);
+    }
+
+
     private static class TestHandler {
 
         public void advancedModelAttributeWithoutDefaultValue(@AdvancedModelAttribute TestFormPropertyWithoutDefaultValue dto) {
@@ -127,7 +153,7 @@ class AdvancedModelAttributeMethodProcessorTest {
         public void methodWithoutAdvancedModelAttributeAnnotation(TestFormPropertyWithoutAnnotations dto) {
 
         }
-
+        public void methodTestFormPropertyWithEmpty(@AdvancedModelAttribute TestFormPropertyWithEmpty dto) {}
     }
 
 
@@ -138,6 +164,18 @@ class AdvancedModelAttributeMethodProcessorTest {
         private int age;
         @FormProperty(value = "verified")
         private boolean isVerified;
+        private char sex;
+    }
+
+    @ToString
+    private static class TestFormPropertyWithEmpty {
+        @FormProperty
+        private String name;
+        @FormProperty
+        private int age;
+        @FormProperty
+        private boolean isVerified;
+        @FormProperty
         private char sex;
     }
 
