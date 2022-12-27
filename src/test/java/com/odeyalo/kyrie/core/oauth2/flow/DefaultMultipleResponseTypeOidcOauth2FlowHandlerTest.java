@@ -16,7 +16,7 @@ import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCodeGeneratorImpl;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.InMemoryAuthorizationCodeStore;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.provider.DefaultAuthorizationCodeProvider;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.DefaultJwtOauth2AccessTokenGenerator;
-import com.odeyalo.kyrie.core.oauth2.tokens.jwt.JwtTokenProviderImpl;
+import com.odeyalo.kyrie.core.oauth2.tokens.jwt.DefaultSecretWordJwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class DefaultMultipleResponseTypeOidcOauth2FlowHandlerTest {
     public static final String ISSUER = "http://localhost:9000";
 
-    private final JwtTokenProviderImpl provider = new JwtTokenProviderImpl("secret");
+    private final DefaultSecretWordJwtTokenProvider provider = new DefaultSecretWordJwtTokenProvider("secret");
     private final InMemoryAuthorizationCodeStore store = new InMemoryAuthorizationCodeStore();
 
     private final DefaultMultipleResponseTypeOidcOauth2FlowHandler handler = new DefaultMultipleResponseTypeOidcOauth2FlowHandler(
