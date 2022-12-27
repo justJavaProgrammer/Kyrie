@@ -299,6 +299,7 @@ class TokenControllerTest extends AbstractIntegrationTest {
      * @throws Exception - if any exceptions was occurred
      */
     @Test
+    @DisplayName("Get token info by valid access token and expect success result")
     void getTokenInfoByValidJwtAccessToken_andExpectSuccess() throws Exception {
         String scopes = "read write openid";
         String validToken = generateJwtAccessToken(scopes, 300);
@@ -329,6 +330,7 @@ class TokenControllerTest extends AbstractIntegrationTest {
      * @throws Exception - if any exceptions was occurred
      */
     @Test
+    @DisplayName("Get token info by invalid jwt access token and expect error")
     void getTokenInfoByInvalidJwtAccessToken_andExpectError() throws Exception {
         mockMvc.perform(post("/tokeninfo")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)

@@ -150,7 +150,8 @@ class InMemoryAuthorizationCodeStoreTest {
     }
 
     @Test
-    void deleteALl() {
+    @DisplayName("Delete all elements from store and expect 0 elements after deletion")
+    void deleteAllAndExpect0AsResult() {
         Long count = store.count();
         Long size = store.deleteALl();
         assertEquals(count, size, "Count and size of deleted elements  must be equal");
@@ -159,6 +160,7 @@ class InMemoryAuthorizationCodeStoreTest {
     }
 
     @Test
+    @DisplayName("Count all elements in store")
     void count() {
         assertEquals(elementsCountInStore, store.count(), "Element count in store and store.count must be equal if no element was added");
     }
