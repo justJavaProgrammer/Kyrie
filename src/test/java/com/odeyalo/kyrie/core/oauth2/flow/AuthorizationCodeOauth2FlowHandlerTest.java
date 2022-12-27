@@ -9,7 +9,7 @@ import com.odeyalo.kyrie.core.oauth2.Oauth2Token;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCode;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCodeGeneratorImpl;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.InMemoryAuthorizationCodeStore;
-import com.odeyalo.kyrie.core.oauth2.tokens.code.provider.DefaultAuthorizationCodeProvider;
+import com.odeyalo.kyrie.core.oauth2.tokens.code.provider.DefaultStoringAuthorizationCodeProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AuthorizationCodeOauth2FlowHandlerTest {
     private final InMemoryAuthorizationCodeStore codeStore = new InMemoryAuthorizationCodeStore();
 
-    private final AuthorizationCodeOauth2FlowHandler authorizationCodeOauth2FlowHandler = new AuthorizationCodeOauth2FlowHandler(new DefaultAuthorizationCodeProvider(
+    private final AuthorizationCodeOauth2FlowHandler authorizationCodeOauth2FlowHandler = new AuthorizationCodeOauth2FlowHandler(new DefaultStoringAuthorizationCodeProvider(
             new AuthorizationCodeGeneratorImpl(), codeStore
     ));
     public static final String CLIENT_ID = "client_id";

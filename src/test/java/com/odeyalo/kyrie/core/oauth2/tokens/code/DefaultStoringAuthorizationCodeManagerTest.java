@@ -2,7 +2,7 @@ package com.odeyalo.kyrie.core.oauth2.tokens.code;
 
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.provider.AuthorizationCodeProvider;
-import com.odeyalo.kyrie.core.oauth2.tokens.code.provider.DefaultAuthorizationCodeProvider;
+import com.odeyalo.kyrie.core.oauth2.tokens.code.provider.DefaultStoringAuthorizationCodeProvider;
 import org.junit.jupiter.api.*;
 
 import java.time.Instant;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DefaultStoringAuthorizationCodeManagerTest {
     private final AuthorizationCodeStore store = new InMemoryAuthorizationCodeStore();
-    private final AuthorizationCodeProvider authorizationCodeProvider = new DefaultAuthorizationCodeProvider(new AuthorizationCodeGeneratorImpl(), store);
+    private final AuthorizationCodeProvider authorizationCodeProvider = new DefaultStoringAuthorizationCodeProvider(new AuthorizationCodeGeneratorImpl(), store);
     private final DefaultStoringAuthorizationCodeManager manager = new DefaultStoringAuthorizationCodeManager(authorizationCodeProvider, store);
     private static final String EXISTING_AUTHORIZATION_CODE_ID = "code_id";
     private static final String EXISTING_AUTHORIZATION_CODE_VALUE = "noextended";

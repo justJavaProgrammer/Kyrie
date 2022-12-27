@@ -14,7 +14,7 @@ import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessToken;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCode;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCodeGeneratorImpl;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.InMemoryAuthorizationCodeStore;
-import com.odeyalo.kyrie.core.oauth2.tokens.code.provider.DefaultAuthorizationCodeProvider;
+import com.odeyalo.kyrie.core.oauth2.tokens.code.provider.DefaultStoringAuthorizationCodeProvider;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.DefaultJwtOauth2AccessTokenGenerator;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.DefaultSecretWordJwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
@@ -42,7 +42,7 @@ class DefaultMultipleResponseTypeOidcOauth2FlowHandlerTest {
             new OidcOauth2TokenGeneratorFacadeImpl(
                     new OidcIdTokenGeneratorImpl(provider, ISSUER), Collections.emptyList()),
             new DefaultJwtOauth2AccessTokenGenerator(provider),
-            new DefaultAuthorizationCodeProvider(new AuthorizationCodeGeneratorImpl(), store));
+            new DefaultStoringAuthorizationCodeProvider(new AuthorizationCodeGeneratorImpl(), store));
 
     private static final String USER_ID = "1";
 
