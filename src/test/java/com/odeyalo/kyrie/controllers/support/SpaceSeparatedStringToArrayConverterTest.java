@@ -4,7 +4,10 @@ import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.convert.TypeDescriptor;
+import org.springframework.core.convert.converter.GenericConverter;
 import org.springframework.core.convert.support.DefaultConversionService;
+
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,6 +39,16 @@ class SpaceSeparatedStringToArrayConverterTest {
         assertTrue(stringObjectMatches);
         boolean objectStringMatches = converter.matches(TypeDescriptor.valueOf(Object.class), TypeDescriptor.array(TypeDescriptor.valueOf(String.class)));
         assertFalse(objectStringMatches);
+    }
+
+    @Test
+    @DisplayName("Test 'getConvertibleTypes' method")
+    void testGetConvertibleTypes() {
+        Set<GenericConverter.ConvertiblePair> convertibleTypes = converter.getConvertibleTypes();
+        assertNotNull(convertibleTypes, "getConvertibleTypes can't return null as result");
+        assertNotEquals(0, convertibleTypes.size(), "getConvertibleTypes can't return Set with 0 elements");
+        boolean contains = convertibleTypes.contains(new GenericConverter.ConvertiblePair(String.class, Object[].class));
+        assertTrue(contains, "convertibleTypes must contain String.class with Object[].class pair");
     }
 
     @Test

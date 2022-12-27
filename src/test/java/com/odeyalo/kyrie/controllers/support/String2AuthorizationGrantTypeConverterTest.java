@@ -4,8 +4,7 @@ import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for String2AuthorizationGrantTypeConverter class.
@@ -20,6 +19,7 @@ class String2AuthorizationGrantTypeConverterTest {
     @DisplayName("Convert authorization code grant type and expect success")
     void convertAuthorizationCodeGrantTypeAndExceptSuccess() {
         AuthorizationGrantType convert = converter.convert(AuthorizationGrantType.AUTHORIZATION_CODE.getGrantName());
+        assertNotNull(convert);
         assertEquals(AuthorizationGrantType.AUTHORIZATION_CODE, convert);
     }
 
@@ -27,6 +27,7 @@ class String2AuthorizationGrantTypeConverterTest {
     @DisplayName("Convert implicit grant type and expect success")
     void convertImplicitGrantTypeAndExceptSuccess() {
         AuthorizationGrantType convert = converter.convert(AuthorizationGrantType.IMPLICIT.getGrantName());
+        assertNotNull(convert);
         assertEquals(AuthorizationGrantType.IMPLICIT, convert);
     }
 
@@ -35,6 +36,7 @@ class String2AuthorizationGrantTypeConverterTest {
     @DisplayName("Convert multiple(Hybrid) grant type and expect success")
     void convertMultipleGrantTypeAndExceptSuccess() {
         AuthorizationGrantType convert = converter.convert(AuthorizationGrantType.MULTIPLE.getGrantName());
+        assertNotNull(convert);
         assertEquals(AuthorizationGrantType.MULTIPLE, convert);
     }
 
