@@ -5,7 +5,7 @@ import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
 import com.odeyalo.kyrie.core.oauth2.Oauth2ScopeHandler;
 import com.odeyalo.kyrie.core.oauth2.oidc.EmailOidcOauth2ScopeHandler;
 import com.odeyalo.kyrie.core.oauth2.oidc.OidcIdToken;
-import com.odeyalo.kyrie.core.oauth2.tokens.jwt.JwtTokenProviderImpl;
+import com.odeyalo.kyrie.core.oauth2.tokens.jwt.DefaultSecretWordJwtTokenProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.DisplayName;
@@ -35,7 +35,7 @@ class OidcOauth2TokenGeneratorFacadeImplTest {
 
     private final OidcOauth2TokenGeneratorFacadeImpl generatorFacade = new OidcOauth2TokenGeneratorFacadeImpl(
             new OidcIdTokenGeneratorImpl(
-                    new JwtTokenProviderImpl(SECRET_WORD), ISSUER), handlers);
+                    new DefaultSecretWordJwtTokenProvider(SECRET_WORD), ISSUER), handlers);
 
     @Test
     @DisplayName("Generate token with email scope for user without email and expect email and email_verified properties in result claims")
