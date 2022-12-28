@@ -36,7 +36,7 @@ public class DefaultMultipleResponseTypeOidcOauth2FlowHandler implements Multipl
     }
 
     @Override
-    public Oauth2Token handleFlow(AuthorizationRequest request, Oauth2User user) {
+    public CombinedOauth2Token handleFlow(AuthorizationRequest request, Oauth2User user) {
         CombinedOauth2Token.CombinedOauth2TokenBuilder<?, ?> builder = CombinedOauth2Token.builder();
         Set<Oauth2ResponseType> types = Set.of(request.getResponseTypes());
         String[] scopes = request.getScopes();
