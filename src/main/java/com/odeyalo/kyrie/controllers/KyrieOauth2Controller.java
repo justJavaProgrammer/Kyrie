@@ -14,11 +14,11 @@ import com.odeyalo.kyrie.core.oauth2.flow.Oauth2FlowHandlerFactory;
 import com.odeyalo.kyrie.core.oauth2.support.RedirectUrlCreationServiceFactory;
 import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolver;
 import com.odeyalo.kyrie.core.support.Oauth2ValidationResult;
+import com.odeyalo.kyrie.dto.ApiErrorMessage;
 import com.odeyalo.kyrie.dto.LoginDTO;
 import com.odeyalo.kyrie.exceptions.Oauth2ErrorType;
 import com.odeyalo.kyrie.exceptions.Oauth2Exception;
 import com.odeyalo.kyrie.exceptions.RedirectUriAwareOauth2Exception;
-import com.odeyalo.kyrie.support.cookie.CookieUtils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -29,9 +29,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -42,6 +39,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Log4j2
 public class KyrieOauth2Controller {
     public static final String AUTHORIZATION_REQUEST_ATTRIBUTE_NAME = "authorizationRequest";
+    public static final String WRONG_CREDENTIALS_ERROR_NAME = "wrong_credentials";
+    public static final String MISSING_AUTHORIZATION_REQUEST_ERROR_NAME = "missing_authorization_request";
+    public static final String UNSUPPORTED_GRANT_TYPE_ERROR_NAME = "unsupported_grant_type";
     private final Oauth2UserAuthenticationService oauth2UserAuthenticationService;
     @Autowired
     private Oauth2FlowHandlerFactory handlerFactory;
@@ -69,8 +69,7 @@ public class KyrieOauth2Controller {
             @RequestParam("scope") String[] scopes,
             @RequestParam(name = "redirect_uri") String redirectUrl,
             @RequestParam(name = "state", required = false) String state,
-            @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> authorizationRequestStore,
-            HttpServletResponse res) {
+            @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> authorizationRequestStore) {
 
         AuthorizationGrantType grantType = grantTypeResolver.resolveGrantType(responseTypes);
         AuthorizationRequest request = AuthorizationRequest.builder().clientId(clientId)
@@ -86,8 +85,6 @@ public class KyrieOauth2Controller {
             resolveExceptionAndThrow(redirectUrl, validationResult);
         }
         authorizationRequestStore.put(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME, request);
-        String serialize = CookieUtils.serialize(Collections.singletonList(new LoginDTO("aboba", "aboba")));
-        CookieUtils.addCookie(res, "ACCOUNT_CHOOSER", serialize, 3600);
         return "login";
     }
 
@@ -115,25 +112,27 @@ public class KyrieOauth2Controller {
     private ResponseEntity<Object> doLoginAndGrantTypeProcessing(LoginDTO dto, Map<String, Object> model, SessionStatus status) {
         AuthorizationRequest authorizationRequest = (AuthorizationRequest) model.get(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME);
         if (authorizationRequest == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Session attribute is not found and request cannot be processed");
+            ApiErrorMessage errorMessage = new ApiErrorMessage(MISSING_AUTHORIZATION_REQUEST_ERROR_NAME, "Session attribute does not found and request cannot be processed");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         }
         log.info("Auth request: {}", authorizationRequest);
 
         log.info("Using {} as authentication service", oauth2UserAuthenticationService);
         AuthenticationResult result = oauth2UserAuthenticationService.authenticate(new Oauth2UserAuthenticationInfo(dto.getUsername(), dto.getPassword()));
         if (result == null || !result.isSuccess()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Wrong user credentials");
+            ApiErrorMessage errorMessage = new ApiErrorMessage(WRONG_CREDENTIALS_ERROR_NAME, "User credentials are wrong and login can't be performed");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
         }
 
         Oauth2User user = result.getUser();
 
         Oauth2FlowHandler oauth2FlowHandler = handlerFactory.getOauth2FlowHandler(authorizationRequest);
         if (oauth2FlowHandler == null) {
-            return ResponseEntity.badRequest().body("Wrong authorization request");
+            ApiErrorMessage message = new ApiErrorMessage(UNSUPPORTED_GRANT_TYPE_ERROR_NAME, "Kyrie does not support: " + authorizationRequest.getGrantType());
+            return ResponseEntity.badRequest().body(message);
         }
         Oauth2Token token = oauth2FlowHandler.handleFlow(authorizationRequest, user);
         String redirectUrl = factory.getRedirectUrlCreationService(authorizationRequest).createRedirectUrl(authorizationRequest, token);
-        model.clear();
         status.setComplete();
         log.info("Redirecting to: {}", redirectUrl);
         return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, redirectUrl).build();
