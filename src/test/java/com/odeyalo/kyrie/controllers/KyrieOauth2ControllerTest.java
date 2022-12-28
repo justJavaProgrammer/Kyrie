@@ -17,6 +17,7 @@ import com.odeyalo.kyrie.core.oauth2.oidc.OidcResponseType;
 import com.odeyalo.kyrie.core.oauth2.support.Oauth2Constants;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.Oauth2AccessTokenGenerator;
 import com.odeyalo.kyrie.core.support.Oauth2ValidationResult;
+import com.odeyalo.kyrie.dto.ApiErrorMessage;
 import com.odeyalo.kyrie.dto.LoginDTO;
 import com.odeyalo.kyrie.exceptions.Oauth2ErrorType;
 import org.junit.jupiter.api.BeforeAll;
@@ -47,11 +48,14 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.servlet.http.HttpSession;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.odeyalo.kyrie.controllers.KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME;
+import static com.odeyalo.kyrie.controllers.KyrieOauth2Controller.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -190,7 +194,14 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                 Oauth2RedirectUrlResultMatchers.oauth2().isCodeParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isIdTokenParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isStateParamPresented(),
-                Oauth2RedirectUrlResultMatchers.oauth2().isParameterEqualTo(Oauth2Constants.STATE, MOCK_STATE_VALUE)
+                Oauth2RedirectUrlResultMatchers.oauth2().isParameterEqualTo(Oauth2Constants.STATE, MOCK_STATE_VALUE),
+                (result) -> {
+                    HttpSession session = result.getRequest().getSession();
+                    assertNotNull(session, "Session cannot be null!");
+                    Enumeration<String> attributeNames = session.getAttributeNames();
+                    assertNotNull(attributeNames, "Session attributes cannot be null!");
+                    assertFalse(attributeNames.hasMoreElements());
+                }
         );
     }
 
@@ -229,7 +240,14 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                 Oauth2RedirectUrlResultMatchers.oauth2().isCodeParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isIdTokenParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isStateParamPresented(),
-                Oauth2RedirectUrlResultMatchers.oauth2().isParameterEqualTo(Oauth2Constants.STATE, MOCK_STATE_VALUE)
+                Oauth2RedirectUrlResultMatchers.oauth2().isParameterEqualTo(Oauth2Constants.STATE, MOCK_STATE_VALUE),
+                (result) -> {
+                    HttpSession session = result.getRequest().getSession();
+                    assertNotNull(session, "Session cannot be null!");
+                    Enumeration<String> attributeNames = session.getAttributeNames();
+                    assertNotNull(attributeNames, "Session attributes cannot be null!");
+                    assertFalse(attributeNames.hasMoreElements());
+                }
         );
     }
 
@@ -269,7 +287,14 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                 Oauth2RedirectUrlResultMatchers.oauth2().isCodeParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isIdTokenParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isStateParamPresented(),
-                Oauth2RedirectUrlResultMatchers.oauth2().isParameterEqualTo(Oauth2Constants.STATE, MOCK_STATE_VALUE)
+                Oauth2RedirectUrlResultMatchers.oauth2().isParameterEqualTo(Oauth2Constants.STATE, MOCK_STATE_VALUE),
+                (result) -> {
+                    HttpSession session = result.getRequest().getSession();
+                    assertNotNull(session, "Session cannot be null!");
+                    Enumeration<String> attributeNames = session.getAttributeNames();
+                    assertNotNull(attributeNames, "Session attributes cannot be null!");
+                    assertFalse(attributeNames.hasMoreElements());
+                }
         );
     }
 
@@ -308,7 +333,14 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                 Oauth2RedirectUrlResultMatchers.oauth2().isCodeParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isIdTokenParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isStateParamPresented(),
-                Oauth2RedirectUrlResultMatchers.oauth2().isParameterEqualTo(Oauth2Constants.STATE, MOCK_STATE_VALUE)
+                Oauth2RedirectUrlResultMatchers.oauth2().isParameterEqualTo(Oauth2Constants.STATE, MOCK_STATE_VALUE),
+                (result) -> {
+                    HttpSession session = result.getRequest().getSession();
+                    assertNotNull(session, "Session cannot be null!");
+                    Enumeration<String> attributeNames = session.getAttributeNames();
+                    assertNotNull(attributeNames, "Session attributes cannot be null!");
+                    assertFalse(attributeNames.hasMoreElements());
+                }
         );
     }
 
@@ -352,7 +384,14 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                 Oauth2RedirectUrlResultMatchers.oauth2().isTokenTypeParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isExpiresInParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isParameterEqualTo("state", MOCK_STATE_VALUE),
-                testJwtToken(String.join(" ", scopes))
+                testJwtToken(String.join(" ", scopes)),
+                (result) -> {
+                    HttpSession session = result.getRequest().getSession();
+                    assertNotNull(session, "Session cannot be null!");
+                    Enumeration<String> attributeNames = session.getAttributeNames();
+                    assertNotNull(attributeNames, "Session attributes cannot be null!");
+                    assertFalse(attributeNames.hasMoreElements());
+                }
         );
     }
 
@@ -396,7 +435,14 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                 Oauth2RedirectUrlResultMatchers.oauth2().isTokenTypeParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isExpiresInParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isParameterEqualTo("state", MOCK_STATE_VALUE),
-                testJwtToken(String.join(" ", scopes))
+                testJwtToken(String.join(" ", scopes)),
+                (result) -> {
+                    HttpSession session = result.getRequest().getSession();
+                    assertNotNull(session, "Session cannot be null!");
+                    Enumeration<String> attributeNames = session.getAttributeNames();
+                    assertNotNull(attributeNames, "Session attributes cannot be null!");
+                    assertFalse(attributeNames.hasMoreElements());
+                }
         );
     }
 
@@ -441,7 +487,14 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                 Oauth2RedirectUrlResultMatchers.oauth2().isIdTokenParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isStateParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isParameterEqualTo("state", MOCK_STATE_VALUE),
-                testJwtToken(String.join(" ", scopes))
+                testJwtToken(String.join(" ", scopes)),
+                (result) -> {
+                    HttpSession session = result.getRequest().getSession();
+                    assertNotNull(session, "Session cannot be null!");
+                    Enumeration<String> attributeNames = session.getAttributeNames();
+                    assertNotNull(attributeNames, "Session attributes cannot be null!");
+                    assertFalse(attributeNames.hasMoreElements());
+                }
         );
     }
 
@@ -485,7 +538,14 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                 Oauth2RedirectUrlResultMatchers.oauth2().isIdTokenParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isStateParamPresented(),
                 Oauth2RedirectUrlResultMatchers.oauth2().isParameterEqualTo("state", MOCK_STATE_VALUE),
-                testJwtToken(String.join(" ", scopes))
+                testJwtToken(String.join(" ", scopes)),
+                (result) -> {
+                    HttpSession session = result.getRequest().getSession();
+                    assertNotNull(session, "Session cannot be null!");
+                    Enumeration<String> attributeNames = session.getAttributeNames();
+                    assertNotNull(attributeNames, "Session attributes cannot be null!");
+                    assertFalse(attributeNames.hasMoreElements());
+                }
         );
     }
 
@@ -584,6 +644,33 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                 MockMvcResultMatchers.status().isOk(),
                 MockMvcResultMatchers.content().contentType("text/html;charset=UTF-8")
         ).andReturn();
+    }
+
+    @Test
+    @DisplayName("/authorize endpoint with wrong authorization request and except error")
+    void authorizeEndpointWithWrongAuthRequestAndExpectError() throws Exception {
+        String responseTypes = "code";
+        String scopes = "read write";
+        String malformedRedirectUri = "odeyaloisworst";
+
+        mockMvc.perform(
+                get(OAUTH_2_AUTHORIZE_ENDPOINT)
+                        .param(CLIENT_ID_PARAM_VALUE, CLIENT_ID_PARAM_VALUE)
+                        .param(RESPONSE_TYPE_PARAM_VALUE, responseTypes)
+                        .param(SCOPE_PARAM_VALUE, scopes)
+                        .param(REDIRECT_URI_PARAM_VALUE, malformedRedirectUri)
+                        .param(STATE_PARAM_VALUE, MOCK_STATE_VALUE))
+                .andExpectAll(MockMvcResultMatchers.status().is2xxSuccessful(),
+                        MockMvcResultMatchers.status().isOk(),
+                        (result) -> {
+                            String content = result.getResponse().getContentAsString();
+                            ApiErrorMessage message = objectMapper.readValue(content, ApiErrorMessage.class);
+                            String error = message.getError();
+                            String errorDescription = message.getErrorDescription();
+                            assertNotNull(error, "Error name must be presented!");
+                            assertNotNull(errorDescription, "Error description must be presented!");
+                            assertEquals(Oauth2ErrorType.INVALID_REDIRECT_URI.getErrorName(), error, "When malformed url received must be returned INVALID_REDIRECT_URI");
+                        });
     }
 
     @Test
@@ -687,7 +774,167 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
     }
 
     /**
-     * Extracted method to perfom mock request to endpoint with implicit flow and do some default checks
+     * Test /login endpoint that doesn't contain an authorization request in session store and except 400 Bad Request
+     * @throws Exception - if any exception occurred
+     */
+    @Test
+    @DisplayName("Test /login endpoint using application/json content type with empty authorization request and expect bad request")
+    void loginCheckWithEmptyAuthorizationRequestUsingJsonAndExpect400() throws Exception{
+        LoginDTO dto = new LoginDTO(ADMIN_USERNAME_VALUE, ADMIN_PASSWORD_VALUE);
+        String json = objectMapper.writeValueAsString(dto);
+        mockMvc.perform(post(OAUTH_2_LOGIN_ENDPOINT_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+                .andExpectAll(MockMvcResultMatchers.status().is4xxClientError(),
+                        MockMvcResultMatchers.status().isBadRequest(),
+                        (result) -> {
+                            String content = result.getResponse().getContentAsString();
+                            ApiErrorMessage actual = objectMapper.readValue(content, ApiErrorMessage.class);
+                            assertNotNull(actual, "If request is wrong, then 400 BAD REQUEST must be returned with ApiErrorMessage as body");
+                            assertNotNull(actual.getError(), "Error name cannot be null");
+                            assertNotNull(actual.getErrorDescription(), "Error description cannot be null");
+                            assertEquals(actual.getError(), MISSING_AUTHORIZATION_REQUEST_ERROR_NAME, "Message must be equal to 'missing_authorization_request'");
+                        });
+
+    }
+    /**
+     * Test /login endpoint that doesn't contain an authorization request in session store and except 400 Bad Request
+     * @throws Exception - if any exception occurred
+     */
+    @Test
+    @DisplayName("Test /login endpoint using multipart/form-data content type with empty authorization request and expect bad request")
+    void loginCheckWithEmptyAuthorizationRequestUsingFormDataAndExpect400() throws Exception{
+        mockMvc.perform(post(OAUTH_2_LOGIN_ENDPOINT_VALUE)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .param(USERNAME_PARAMETER_KEY, ADMIN_USERNAME_VALUE)
+                .param(PASSWORD_PARAMETER_KEY, ADMIN_PASSWORD_VALUE))
+                .andExpectAll(MockMvcResultMatchers.status().is4xxClientError(),
+                        MockMvcResultMatchers.status().isBadRequest(),
+                        (result) -> {
+                            String content = result.getResponse().getContentAsString();
+                            ApiErrorMessage actual = objectMapper.readValue(content, ApiErrorMessage.class);
+                            assertNotNull(actual, "If request is wrong, then 400 BAD REQUEST must be returned with ApiErrorMessage as body");
+                            assertNotNull(actual.getError(), "Error name cannot be null");
+                            assertNotNull(actual.getErrorDescription(), "Error description cannot be null");
+                            assertEquals(actual.getError(), MISSING_AUTHORIZATION_REQUEST_ERROR_NAME, "Message must be equal to 'missing_authorization_request'");
+                        });
+
+    }
+
+    @Test
+    @DisplayName("Test /login endpoint using json with wrong user credentials and expect bad request")
+    void loginCheckUsingJsonWithWrongUserCredentials_AndExpectUnauthorized() throws Exception {
+        String[] scopes = {"read", "write"};
+        String redirectUri = "http://localhost:6666/callback";
+
+        LoginDTO dto = new LoginDTO("odeyalo", "password");
+        String json = objectMapper.writeValueAsString(dto);
+
+        AuthorizationRequest request = AuthorizationRequest.builder()
+                .clientId(MOCK_CLIENT_ID_VALUE)
+                .grantType(AuthorizationGrantType.MULTIPLE)
+                .responseTypes(Oauth2ResponseType.CODE, Oauth2ResponseType.TOKEN, OidcResponseType.ID_TOKEN)
+                .redirectUrl(redirectUri)
+                .state(MOCK_STATE_VALUE)
+                .scopes(scopes)
+                .build();
+
+
+        HashMap<String, Object> innerMap = new HashMap<>();
+        innerMap.put(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME, request);
+
+        mockMvc.perform(post(OAUTH_2_LOGIN_ENDPOINT_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .sessionAttrs(new HashMap<>(Collections.singletonMap(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME, innerMap)))
+        ).andExpectAll(MockMvcResultMatchers.status().is4xxClientError(),
+                MockMvcResultMatchers.status().isUnauthorized(),
+                (result) -> {
+                    String content = result.getResponse().getContentAsString();
+                    ApiErrorMessage errorMessage = objectMapper.readValue(content, ApiErrorMessage.class);
+                    assertNotNull(errorMessage, "Error message cannot be null when 400 response was received");
+                    assertNotNull(errorMessage.getError(), "Error name cannot be null when 400 response was received");
+                    assertNotNull(errorMessage.getErrorDescription(), "Error description must be presented!");
+                    assertEquals(WRONG_CREDENTIALS_ERROR_NAME, errorMessage.getError());
+                });
+    }
+
+
+    @Test
+    @DisplayName("Test /login endpoint using multipart/form-data with wrong user credentials and expect bad request")
+    void loginCheckUsingFormDataWithWrongUserCredentials_AndExpectUnauthorized() throws Exception {
+        String[] scopes = {"read", "write"};
+        String redirectUri = "http://localhost:6666/callback";
+
+        AuthorizationRequest request = AuthorizationRequest.builder()
+                .clientId(MOCK_CLIENT_ID_VALUE)
+                .grantType(AuthorizationGrantType.MULTIPLE)
+                .responseTypes(Oauth2ResponseType.CODE, Oauth2ResponseType.TOKEN, OidcResponseType.ID_TOKEN)
+                .redirectUrl(redirectUri)
+                .state(MOCK_STATE_VALUE)
+                .scopes(scopes)
+                .build();
+
+
+        HashMap<String, Object> innerMap = new HashMap<>();
+        innerMap.put(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME, request);
+
+        mockMvc.perform(post(OAUTH_2_LOGIN_ENDPOINT_VALUE)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .param(USERNAME_PARAMETER_KEY, "wrong_username")
+                .param(PASSWORD_PARAMETER_KEY, "wrong_password")
+                .sessionAttrs(new HashMap<>(Collections.singletonMap(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME, innerMap)))
+        ).andExpectAll(MockMvcResultMatchers.status().is4xxClientError(),
+                MockMvcResultMatchers.status().isUnauthorized(),
+                (result) -> {
+                    String content = result.getResponse().getContentAsString();
+                    ApiErrorMessage errorMessage = objectMapper.readValue(content, ApiErrorMessage.class);
+                    assertNotNull(errorMessage, "Error message cannot be null when 400 response was received");
+                    assertNotNull(errorMessage.getError(), "Error name cannot be null when 400 response was received");
+                    assertNotNull(errorMessage.getErrorDescription(), "Error description must be presented!");
+                    assertEquals(WRONG_CREDENTIALS_ERROR_NAME, errorMessage.getError());
+                });
+    }
+
+
+    @Test
+    @DisplayName("Test /login endpoint using json with wrong authorization request")
+    void testLoginUsingJsonWithWrongAuthorizationRequest_AndExceptError() throws Exception {
+        String[] scopes = {"read", "write"};
+        String redirectUri = "http://localhost:6666/callback";
+
+        AuthorizationRequest request = AuthorizationRequest.builder()
+                .clientId(MOCK_CLIENT_ID_VALUE)
+                .grantType(null)
+                .responseTypes(Oauth2ResponseType.CODE, Oauth2ResponseType.TOKEN, OidcResponseType.ID_TOKEN)
+                .redirectUrl(redirectUri)
+                .state(MOCK_STATE_VALUE)
+                .scopes(scopes)
+                .build();
+
+        HashMap<String, Object> innerMap = new HashMap<>();
+        innerMap.put(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME, request);
+
+        LoginDTO dto = new LoginDTO(ADMIN_USERNAME_VALUE, ADMIN_PASSWORD_VALUE);
+        String json = objectMapper.writeValueAsString(dto);
+        mockMvc.perform(post(OAUTH_2_LOGIN_ENDPOINT_VALUE)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json)
+                .sessionAttrs(new HashMap<>(Collections.singletonMap(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME, innerMap))))
+                .andExpectAll(MockMvcResultMatchers.status().is4xxClientError(),
+                        MockMvcResultMatchers.status().isBadRequest(),
+                        (result) -> {
+                            String content = result.getResponse().getContentAsString();
+                            ApiErrorMessage message = objectMapper.readValue(content, ApiErrorMessage.class);
+                            String error = message.getError();
+                            String errorDescription = message.getErrorDescription();
+                            assertNotNull(error, "Error name must be presented");
+                            assertNotNull(errorDescription, "Error description must be presented");
+                            assertEquals(UNSUPPORTED_GRANT_TYPE_ERROR_NAME,error, "Error names must be equal");
+                        });
+    }
+    /**
+     * Extracted method to perform mock request to endpoint with implicit flow and do some default checks
      *
      * @param builder            - builder that contains url and other params
      * @param additionalMatchers - additional ResultMatchers to check request
