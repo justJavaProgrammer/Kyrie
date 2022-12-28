@@ -4,6 +4,7 @@ import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
+import com.odeyalo.kyrie.core.oauth2.Oauth2FlowSideType;
 import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessToken;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.DefaultJwtOauth2AccessTokenGenerator;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.DefaultSecretWordJwtTokenProvider;
@@ -14,6 +15,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Set;
 
+import static com.odeyalo.kyrie.core.oauth2.Oauth2FlowSideType.CLIENT_SIDE;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -60,7 +62,6 @@ class ImplicitClientSideOauth2FlowHandlerTest {
         assertNotNull(tokenType);
         assertTrue(expiresIn.isAfter(issuedAt), "The expires_in parameter must be greater than issued_at");
         assertTrue(jwtTokenProvider.isTokenValid(tokenValue).isValid());
-        ;
         assertEquals(String.join(" ", scopes), scope);
 
     }
@@ -95,7 +96,6 @@ class ImplicitClientSideOauth2FlowHandlerTest {
         assertNotNull(tokenType);
         assertTrue(expiresIn.isAfter(issuedAt), "The expires_in parameter must be greater than issued_at");
         assertTrue(jwtTokenProvider.isTokenValid(tokenValue).isValid());
-        ;
         assertEquals(String.join(" ", scopes), scope);
     }
 
@@ -105,5 +105,13 @@ class ImplicitClientSideOauth2FlowHandlerTest {
         String actual = flowHandler.getFlowName();
         String expected = AuthorizationGrantType.IMPLICIT.getGrantName();
         assertEquals(expected, actual, "The ImplicitFlowHandler must return implicit grant type as flow name");
+    }
+
+    @Test
+    @DisplayName("Check flow type and expect CLIENT_SIDE")
+    void checkFlowType() {
+        Oauth2FlowSideType flowType = flowHandler.getFlowType();
+        assertNotNull(flowType, "Flow type must be presented!");
+        assertEquals(CLIENT_SIDE, flowType, "Flow type must be CLIENT_SIDE!");
     }
 }
