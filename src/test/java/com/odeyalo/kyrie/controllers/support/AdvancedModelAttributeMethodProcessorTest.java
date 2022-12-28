@@ -136,6 +136,13 @@ class AdvancedModelAttributeMethodProcessorTest {
     }
 
 
+    @Test
+    @DisplayName("Put null in parameters and expect exception")
+    void testNullParametersAndExpectException() throws Exception {
+        MethodParameter parameter = new MethodParameter(TestHandler.class.getDeclaredMethod("methodTestFormPropertyWithEmpty", TestFormPropertyWithEmpty.class), 0);
+        assertThrows(IllegalStateException.class, () -> processor.resolveArgument(parameter, null, nativeWebRequest, null));
+    }
+
     private static class TestHandler {
 
         public void advancedModelAttributeWithoutDefaultValue(@AdvancedModelAttribute TestFormPropertyWithoutDefaultValue dto) {
