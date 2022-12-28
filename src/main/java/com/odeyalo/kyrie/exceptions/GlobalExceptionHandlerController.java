@@ -43,7 +43,8 @@ public class GlobalExceptionHandlerController {
     @ExceptionHandler(value = Oauth2Exception.class)
     public ResponseEntity<?> handleOauth2Exception(Oauth2Exception exception) {
         if (exception instanceof InvalidRedirectUriOauth2Exception || exception.getErrorType() == Oauth2ErrorType.INVALID_REDIRECT_URI) {
-            return ResponseEntity.ok("The request can't be processed since redirect_uri parameter is  not valid. Contact developer if error remains");
+            ApiErrorMessage apiErrorMessage = new ApiErrorMessage(Oauth2ErrorType.INVALID_REDIRECT_URI.getErrorName(), "The request can't be processed since redirect_uri parameter is  not valid. Contact developer if error remains");
+            return ResponseEntity.ok(apiErrorMessage);
         }
         ApiErrorMessage body = new ApiErrorMessage(exception.getErrorType().getErrorName(), exception.getDescription());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(body);
