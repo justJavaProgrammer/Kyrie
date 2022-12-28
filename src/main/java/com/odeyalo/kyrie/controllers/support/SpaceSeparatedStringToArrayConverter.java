@@ -38,7 +38,6 @@ public class SpaceSeparatedStringToArrayConverter implements ConditionalGenericC
         String list = (String) source;
         String[] elements = AdvancedStringUtils.spaceDelimitedListToStringArray(list);
         TypeDescriptor targetElementType = targetType.getElementTypeDescriptor();
-        Assert.notNull(targetElementType, "elementTypeDescriptor cannot be null!");
         Object result = Array.newInstance(targetElementType.getType(), elements.length);
         // Iterate through the elements, convert it to target type and push it to result array
         for (int i = 0; i < elements.length; i++) {
