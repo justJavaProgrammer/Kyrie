@@ -34,7 +34,7 @@ public class MultipleResponseTypeFlowRedirectUrlCreationService implements Redir
     public String createRedirectUrl(AuthorizationRequest request, Oauth2Token token) {
         if (request.getResponseTypes() == null || request.getResponseTypes().length <= 1) {
             throw new UnsupportedOperationException(
-                    String.format("%s supports only multiple response types and required 2 response types minimum. Received: %s",
+                    String.format("%s supports only multiple response types and requires 2 response types minimum. Received: %s",
                             MultipleResponseTypeFlowRedirectUrlCreationService.class.getSimpleName(), Arrays.toString(request.getResponseTypes())));
         }
 
