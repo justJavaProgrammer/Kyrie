@@ -4,6 +4,7 @@ import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
+import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessToken;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Set;
@@ -65,7 +67,6 @@ class AuthorizationCodeFlowRedirectUrlCreationServiceTest {
     @DisplayName("Create redirect url withiout state param and expect only code in redirect url")
     void createRedirectUrlWithoutStateAndExpectOnlyCode() {
         String rootRedirectUrl = "http://localhost:6666/callback";
-        String state = "state123";
         String authCodeValue = "helpmeiwanttokillmyself";
         String[] scopes = {"read", "write"};
         AuthorizationRequest request = AuthorizationRequest
@@ -95,6 +96,28 @@ class AuthorizationCodeFlowRedirectUrlCreationServiceTest {
     }
 
     @Test
+    @DisplayName("Test redirect uri creation with wrong oauth2 token type and expect exception")
+    void testUrlCreationWithWrongOauth2TokenAndExpectError() {
+        String rootRedirectUrl = "http://localhost:6666/callback";
+        String state = "state123";
+        String authCodeValue = "helpmeiwanttokillmyself";
+        String[] scopes = {"read", "write"};
+        AuthorizationRequest request = AuthorizationRequest
+                .builder()
+                .redirectUrl(rootRedirectUrl)
+                .grantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .responseTypes(Oauth2ResponseType.CODE)
+                .scopes(scopes)
+                .state(state)
+                .build();
+
+        Oauth2AccessToken accessToken = Oauth2AccessToken.builder().tokenValue("token_value").issuedAt(Instant.now()).expiresIn(Instant.now().plusSeconds(60)).build();
+        assertThrows(UnsupportedOperationException.class, () -> redirectUrlCreationService.createRedirectUrl(request, accessToken));
+
+    }
+
+    @Test
+    @DisplayName("Check supported grant type")
     void supportedGrantType() {
         AuthorizationGrantType actual = redirectUrlCreationService.supportedGrantType();
         AuthorizationGrantType expected = AuthorizationGrantType.AUTHORIZATION_CODE;
