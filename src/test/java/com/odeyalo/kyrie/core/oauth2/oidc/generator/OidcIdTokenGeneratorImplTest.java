@@ -49,7 +49,14 @@ class OidcIdTokenGeneratorImplTest {
         assertEquals(metadataClaims.get(Claims.SUBJECT), claims.getSubject());
         assertEquals(metadataClaims.get(Claims.ISSUER), claims.getIssuer());
         // Cast to long to avoid wrong casting by Junit
-        assertEquals(((Number) metadataClaims.get(OidcIdTokenGenerator.AUTH_TIME)).longValue(), ((Number) claims.get(OidcIdTokenGenerator.AUTH_TIME)).longValue());
+
+        assertNotEquals(0L, metadataClaims.get(OidcIdTokenGenerator.AUTH_TIME), "Auth time cannot be null!");
+        long metadataAuthTimeClaim = ((Number) metadataClaims.get(OidcIdTokenGenerator.AUTH_TIME)).longValue();
+        long parsedJwtAuthTimeClaim = ((Number) claims.get(OidcIdTokenGenerator.AUTH_TIME)).longValue();
+        assertEquals(metadataAuthTimeClaim, parsedJwtAuthTimeClaim, "Claim from metadata and from token must be equal!");
+
+        Instant authTime = Instant.ofEpochSecond(parsedJwtAuthTimeClaim);
+        assertTrue((Instant.now().isAfter(authTime)), "Auth time must be less than current time!");
         assertEquals(metadataClaims.get(Claims.AUDIENCE), claims.getAudience());
         assertEquals(clientId, claims.getAudience());
     }
