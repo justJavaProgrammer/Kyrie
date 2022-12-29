@@ -1,16 +1,20 @@
 package com.odeyalo.kyrie.core.oauth2.support;
 
+import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
 import com.odeyalo.kyrie.core.oauth2.CombinedOauth2Token;
 import com.odeyalo.kyrie.core.oauth2.flow.MultipleResponseTypeOidcOauth2FlowHandler;
 import com.odeyalo.kyrie.core.oauth2.oidc.OidcResponseType;
+import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessToken;
+import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
@@ -229,7 +233,51 @@ class MultipleResponseTypeFlowRedirectUrlCreationServiceTest {
         assertNotNull(message);
     }
 
+
     @Test
+    @DisplayName("createRedirectUrl with wrong number of response types and expect exception")
+    void createRedirectUrlWithWrongNumberResponseTypes_AndExpectException() {
+        AuthorizationRequest request = AuthorizationRequest
+                .builder()
+                .redirectUrl(REDIRECT_URL)
+                .state(STATE)
+                .clientId(CLIENT_ID)
+                .grantType(AuthorizationGrantType.MULTIPLE)
+                .scopes(READ_WRITE_SCOPES)
+                .responseTypes(Oauth2ResponseType.TOKEN)
+                .build();
+
+        CombinedOauth2Token token = CombinedOauth2Token.builder()
+                .addInfo(MultipleResponseTypeOidcOauth2FlowHandler.AUTHORIZATION_CODE_TOKEN_KEY, EXPECTED_AUTH_CODE_VALUE)
+                .issuedAt(LocalDateTime.now().toInstant(ZoneOffset.UTC))
+                .expiresIn(LocalDateTime.now().plusHours(1).toInstant(ZoneOffset.UTC)).build();
+
+
+        assertThrows(UnsupportedOperationException.class, () -> multipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, token),
+                "If response types is less than 2 then the exception must be thrown");
+    }
+
+
+    @Test
+    @DisplayName("createRedirectUrl with wrong Oauth2Token and expect exception")
+    void testCreateRedirectUrlWithWrongOauth2Token_AndExpectException() {
+        AuthorizationRequest request = AuthorizationRequest
+                .builder()
+                .redirectUrl(REDIRECT_URL)
+                .state(STATE)
+                .clientId(CLIENT_ID)
+                .grantType(AuthorizationGrantType.MULTIPLE)
+                .scopes(READ_WRITE_SCOPES)
+                .responseTypes(Oauth2ResponseType.TOKEN, Oauth2ResponseType.CODE)
+                .build();
+
+        Oauth2AccessToken accessToken = Oauth2AccessToken.builder().tokenValue("token_value").issuedAt(Instant.now()).expiresIn(Instant.now().plusSeconds(60)).build();
+        assertThrows(UnsupportedOperationException.class, () -> multipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, accessToken));
+
+    }
+
+    @Test
+    @DisplayName("Check supported type")
     void supportedType() {
         assertEquals(AuthorizationGrantType.MULTIPLE, multipleResponseTypeFlowRedirectUrlCreationService.supportedGrantType());
     }
