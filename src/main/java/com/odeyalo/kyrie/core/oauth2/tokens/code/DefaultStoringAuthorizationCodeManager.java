@@ -33,7 +33,7 @@ public class DefaultStoringAuthorizationCodeManager implements AuthorizationCode
     @Override
     public AuthorizationCode generateAuthorizationCode(String clientId, Oauth2User user, String[] scopes) {
         AuthorizationCode code = authorizationCodeProvider.getAuthorizationCode(clientId, user, scopes);
-        saveIfNotExist(clientId, code);
+        authorizationCodeStore.save(code.getCodeValue(), code);
         return code;
     }
 
@@ -45,11 +45,5 @@ public class DefaultStoringAuthorizationCodeManager implements AuthorizationCode
     @Override
     public void deleteAuthorizationCode(String id) {
         authorizationCodeStore.delete(id);
-    }
-
-    private void saveIfNotExist(String id, AuthorizationCode code) {
-        if (authorizationCodeStore.findById(id) == null) {
-            authorizationCodeStore.save(id, code);
-        }
     }
 }
