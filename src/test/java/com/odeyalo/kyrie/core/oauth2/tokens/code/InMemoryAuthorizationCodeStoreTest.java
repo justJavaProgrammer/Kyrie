@@ -160,6 +160,24 @@ class InMemoryAuthorizationCodeStoreTest {
     }
 
     @Test
+    @DisplayName("Delete not existing element from store and expect nothing")
+    void deleteNotExistingAuthCodeFromStore_AndExpectNothing() {
+        AuthorizationCode code = AuthorizationCode
+                .builder()
+                .codeValue("morethanihateyouiloveyou")
+                .scopes(new String[]{"read", "write", "openid"})
+                .issuedAt(Instant.now())
+                .expiresIn(Instant.now().plusSeconds(80))
+                .user(defaultUser)
+                .build();
+        Long before = store.count();
+        store.delete(code);
+        Long after = store.count();
+        assertEquals(before,after, "If element does not exist in store, then nothing must be deleted and element count must be equal");
+    }
+
+
+    @Test
     @DisplayName("Count all elements in store")
     void count() {
         assertEquals(elementsCountInStore, store.count(), "Element count in store and store.count must be equal if no element was added");
