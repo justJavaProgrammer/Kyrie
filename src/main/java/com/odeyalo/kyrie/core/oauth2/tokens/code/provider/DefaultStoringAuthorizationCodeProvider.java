@@ -31,7 +31,7 @@ public class DefaultStoringAuthorizationCodeProvider implements AuthorizationCod
     @Override
     public AuthorizationCode getAuthorizationCode(String clientId, Oauth2User user, String[] scopes) {
         AuthorizationCode authorizationCode = codeGenerator.generateAuthorizationCode(user, scopes);
-        codeStore.save(clientId, authorizationCode);
+        codeStore.save(authorizationCode.getCodeValue(), authorizationCode);
         return authorizationCode;
     }
 }
