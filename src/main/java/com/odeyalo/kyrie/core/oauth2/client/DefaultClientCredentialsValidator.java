@@ -9,10 +9,20 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class DefaultClientCredentialsValidator implements ClientCredentialsValidator {
+    private final Oauth2ClientRepository oauth2ClientRepository;
+
+    public DefaultClientCredentialsValidator(Oauth2ClientRepository oauth2ClientRepository) {
+        this.oauth2ClientRepository = oauth2ClientRepository;
+    }
 
     @Override
     public ValidationResult validateCredentials(String clientId, String clientSecret) {
-        boolean validation = "client".equals(clientId) && "secret".equals(clientSecret);
-        return validation ? ValidationResult.success() : ValidationResult.failed("Client id or client secret is not valid or is wrong");
+        Oauth2Client client = oauth2ClientRepository.findOauth2ClientById(clientId);
+        if (client == null) {
+            return ValidationResult.failed("Client id or client secret is invalid or incorrect");
+        }
+        boolean validationResult = client.getClientId().equals(clientId) && client.getClientSecret().equals(clientSecret);
+
+        return validationResult ? ValidationResult.success() : ValidationResult.failed("Client id or client secret is not valid or is wrong");
     }
 }
