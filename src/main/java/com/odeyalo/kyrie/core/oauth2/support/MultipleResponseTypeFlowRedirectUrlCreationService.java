@@ -6,7 +6,6 @@ import com.odeyalo.kyrie.core.oauth2.CombinedOauth2Token;
 import com.odeyalo.kyrie.core.oauth2.Oauth2Token;
 import com.odeyalo.kyrie.core.oauth2.flow.MultipleResponseTypeOidcOauth2FlowHandler;
 import com.odeyalo.kyrie.support.Oauth2Utils;
-import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Arrays;
@@ -27,7 +26,6 @@ import java.util.Optional;
  * @version 1.0
  * @see <a href="https://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#Combinations">Possible OpenID Connect multiple Response Type combintations</a>
  */
-@Component
 public class MultipleResponseTypeFlowRedirectUrlCreationService implements RedirectUrlCreationService {
 
     @Override

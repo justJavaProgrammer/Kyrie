@@ -5,7 +5,6 @@ import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
 import com.odeyalo.kyrie.core.oauth2.Oauth2Token;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCode;
-import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Optional;
@@ -14,7 +13,6 @@ import java.util.Optional;
  * Create redirect url ONLY for authorization_code grant type and CODE response type
  * @version 1.0
  */
-@Component
 public class AuthorizationCodeFlowRedirectUrlCreationService implements RedirectUrlCreationService {
 
     @Override

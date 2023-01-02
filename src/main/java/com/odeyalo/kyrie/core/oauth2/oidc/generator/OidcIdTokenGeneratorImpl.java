@@ -6,9 +6,6 @@ import com.odeyalo.kyrie.core.oauth2.tokens.TokenMetadata;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.lang.Assert;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -18,14 +15,12 @@ import java.util.Map;
 /**
  * Generator to generate an ID token from OpenID Connect
  */
-@Component
 public class OidcIdTokenGeneratorImpl implements OidcIdTokenGenerator {
     private final JwtTokenProvider jwtTokenProvider;
     private final String ISSUER;
 
 
-    @Autowired
-    public OidcIdTokenGeneratorImpl(JwtTokenProvider jwtTokenProvider, @Value("${kyrie.tokens.common.issuer}") String issuer) {
+    public OidcIdTokenGeneratorImpl(JwtTokenProvider jwtTokenProvider, String issuer) {
         this.jwtTokenProvider = jwtTokenProvider;
         ISSUER = issuer;
     }

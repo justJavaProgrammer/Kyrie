@@ -1,8 +1,7 @@
 package com.odeyalo.kyrie.core.oauth2.oidc;
 
-import com.odeyalo.kyrie.core.oauth2.Oauth2ScopeHandler;
 import com.odeyalo.kyrie.core.Oauth2User;
-import org.springframework.stereotype.Component;
+import com.odeyalo.kyrie.core.oauth2.Oauth2ScopeHandler;
 
 import java.util.Map;
 
@@ -11,7 +10,6 @@ import java.util.Map;
  * 'email_verified' with true if the End-User's e-mail address has been verified; otherwise false
  * @see <a href="https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims">Standard claims</a>
  */
-@Component
 public class EmailOidcOauth2ScopeHandler implements Oauth2ScopeHandler {
     public static final String EMAIL_SCOPE = "email";
     public static final String EMAIL_VERIFIED_SCOPE = "email_verified";

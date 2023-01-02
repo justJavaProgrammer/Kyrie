@@ -4,7 +4,6 @@ import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -13,7 +12,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-@Component
 public class AuthorizationGrantTypeResolverImpl implements AuthorizationGrantTypeResolver {
     private final Logger logger = LoggerFactory.getLogger(AuthorizationGrantTypeResolverImpl.class);
     private final Map<Oauth2ResponseType[], AuthorizationGrantType> cache;

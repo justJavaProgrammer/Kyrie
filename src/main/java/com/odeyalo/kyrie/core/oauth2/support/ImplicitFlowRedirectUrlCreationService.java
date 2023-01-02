@@ -5,7 +5,6 @@ import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.oauth2.Oauth2Token;
 import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessToken;
 import com.odeyalo.kyrie.support.Oauth2Utils;
-import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Optional;
@@ -14,7 +13,6 @@ import java.util.Optional;
  * RedirectUrlCreationService implementation that supports only IMPLICIT flow and create redirect url only for this flow.
  * @version 1.0
  */
-@Component
 public class ImplicitFlowRedirectUrlCreationService implements RedirectUrlCreationService {
 
     /**
