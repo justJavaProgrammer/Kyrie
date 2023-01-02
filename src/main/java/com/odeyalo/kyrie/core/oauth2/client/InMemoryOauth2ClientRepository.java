@@ -27,7 +27,7 @@ public class InMemoryOauth2ClientRepository implements Oauth2ClientRepository, I
     }
 
     /**
-     * Initialize repository with existing client
+     * Initialize repository with existing clients
      *
      * @param clients - default clients to set
      */
