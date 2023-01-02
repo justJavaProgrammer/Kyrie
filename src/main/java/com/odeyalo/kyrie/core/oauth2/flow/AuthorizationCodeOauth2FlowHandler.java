@@ -6,8 +6,6 @@ import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.oauth2.Oauth2FlowSideType;
 import com.odeyalo.kyrie.core.oauth2.Oauth2Token;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.provider.AuthorizationCodeProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Handle the authorization_code flow.
@@ -15,11 +13,9 @@ import org.springframework.stereotype.Component;
  *
  * @version 1.0
  */
-@Component
 public class AuthorizationCodeOauth2FlowHandler implements Oauth2FlowHandler {
     private final AuthorizationCodeProvider authorizationCodeProvider;
 
-    @Autowired
     public AuthorizationCodeOauth2FlowHandler(AuthorizationCodeProvider authorizationCodeProvider) {
         this.authorizationCodeProvider = authorizationCodeProvider;
     }

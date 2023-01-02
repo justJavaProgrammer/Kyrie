@@ -14,21 +14,17 @@ import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCode;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.provider.AuthorizationCodeProvider;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.Oauth2AccessTokenGenerator;
 import com.odeyalo.kyrie.support.Oauth2Utils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
 /**
  * Default implementation that supports Id_token, access_token and code as response types
  */
-@Component
 public class DefaultMultipleResponseTypeOidcOauth2FlowHandler implements MultipleResponseTypeOidcOauth2FlowHandler {
     private final OidcOauth2TokenGeneratorFacade generatorFacade;
     private final Oauth2AccessTokenGenerator accessTokenGenerator;
     private final AuthorizationCodeProvider authorizationCodeProvider;
 
-    @Autowired
     public DefaultMultipleResponseTypeOidcOauth2FlowHandler(OidcOauth2TokenGeneratorFacade generatorFacade, Oauth2AccessTokenGenerator generator, AuthorizationCodeProvider authorizationCodeProvider) {
         this.generatorFacade = generatorFacade;
         this.accessTokenGenerator = generator;

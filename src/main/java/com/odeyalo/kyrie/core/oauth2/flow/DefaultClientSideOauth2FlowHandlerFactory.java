@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
  * @see AuthorizationRequest
  * @version 1.0
  */
-@Component
 public class DefaultClientSideOauth2FlowHandlerFactory implements ClientSideOauth2FlowHandlerFactory {
     private final Map<String, ClientSideOauth2FlowHandler> handlers;
     private final Logger logger = LoggerFactory.getLogger(DefaultClientSideOauth2FlowHandlerFactory.class);
