@@ -1,4 +1,4 @@
-package com.odeyalo.kyrie.config;
+package com.odeyalo.kyrie.config.configuration;
 
 import com.odeyalo.kyrie.controllers.support.AuthorizationRequestValidator;
 import com.odeyalo.kyrie.controllers.support.DefaultChainAuthorizationRequestValidator;

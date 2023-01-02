@@ -1,4 +1,4 @@
-package com.odeyalo.kyrie.config;
+package com.odeyalo.kyrie.config.configuration;
 
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authentication.InMemoryOauth2UserAuthenticationService;

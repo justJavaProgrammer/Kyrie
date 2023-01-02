@@ -1,7 +1,6 @@
-package com.odeyalo.kyrie.config;
+package com.odeyalo.kyrie.config.configuration;
 
-import com.odeyalo.kyrie.config.configuration.Oauth2FlowHandlersConfiguration;
-import com.odeyalo.kyrie.config.configuration.RedirectUriCreationServicesConfiguration;
+import com.odeyalo.kyrie.config.Oauth2ClientValidationFilter;
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authentication.InMemoryOauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
