@@ -1,16 +1,19 @@
 package com.odeyalo.kyrie.config;
 
 import com.odeyalo.kyrie.controllers.KyrieOauth2Controller;
+import com.odeyalo.kyrie.controllers.TokenController;
 import com.odeyalo.kyrie.controllers.support.AuthorizationRequestValidator;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
+import com.odeyalo.kyrie.core.oauth2.Oauth2TokenGeneratorFacade;
 import com.odeyalo.kyrie.core.oauth2.flow.Oauth2FlowHandlerFactory;
 import com.odeyalo.kyrie.core.oauth2.support.RedirectUrlCreationServiceFactory;
 import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolver;
+import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessTokenManager;
+import com.odeyalo.kyrie.dto.GetAccessTokenRequestDTO;
 import com.odeyalo.kyrie.dto.LoginDTO;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.support.SessionStatus;
@@ -28,19 +31,27 @@ import java.util.Map;
  *
  * @version 1.0
  */
-@Configuration
-@EnableWebMvc
+//@AutoConfigureOrder()
+    @EnableWebMvc
 public class KyrieOauth2ServerEndpointsMappingConfiguration {
 
 
     @Bean
-    public WebMvcRegistrations webMvcRegistrations(KyrieOauth2Controller kyrieOauth2Controller, RequestMappingHandlerMapping mapping) throws Exception{
+    public WebMvcRegistrations webMvcRegistrations(KyrieOauth2Controller kyrieOauth2Controller,
+                                                   TokenController tokenController,
+                                                   RequestMappingHandlerMapping mapping) throws Exception{
 
         registryAuthorizeEndpoint(kyrieOauth2Controller, mapping);
 
         registryLoginEndpointJson(kyrieOauth2Controller, mapping);
 
         registryLoginEndpointFormData(kyrieOauth2Controller, mapping);
+
+        registryTokenEndpointJson(tokenController, mapping);
+
+        registryTokenEndpointFormData(tokenController, mapping);
+
+        registryTokenInfoEndpoint(tokenController, mapping);
 
         return new WebMvcRegistrations() {
             @Override
@@ -59,6 +70,35 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
         return new KyrieOauth2Controller(authenticationService, factory, resolver, redirectUrlCreationServiceFactory, validator);
     }
 
+
+    @Bean
+    public TokenController tokenController(Oauth2AccessTokenManager accessTokenManager, Oauth2TokenGeneratorFacade tokenGeneratorFacade) {
+        return new TokenController(accessTokenManager, tokenGeneratorFacade);
+    }
+
+    private void registryTokenInfoEndpoint(TokenController tokenController, RequestMappingHandlerMapping mapping) throws NoSuchMethodException {
+        RequestMappingInfo info = RequestMappingInfo.paths("/token")
+                .consumes(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .methods(RequestMethod.POST)
+                .build();
+        mapping.registerMapping(info, tokenController, TokenController.class.getDeclaredMethod("tokenInfoRfc7662", String.class));
+    }
+
+    private void registryTokenEndpointJson(TokenController tokenController, RequestMappingHandlerMapping mapping) throws NoSuchMethodException {
+        RequestMappingInfo info = RequestMappingInfo.paths("/token")
+                .consumes(MediaType.APPLICATION_JSON_VALUE)
+                .methods(RequestMethod.POST)
+                .build();
+        mapping.registerMapping(info, tokenController, TokenController.class.getDeclaredMethod("resolveAccessTokenUsingJson", GetAccessTokenRequestDTO.class));
+    }
+
+    private void registryTokenEndpointFormData(TokenController tokenController, RequestMappingHandlerMapping mapping) throws NoSuchMethodException {
+        RequestMappingInfo info = RequestMappingInfo.paths("/token")
+                .consumes(MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .methods(RequestMethod.POST)
+                .build();
+        mapping.registerMapping(info, tokenController, TokenController.class.getDeclaredMethod("resolveAccessTokenUsingFormData", GetAccessTokenRequestDTO.class));
+    }
 
     private void registryLoginEndpointFormData(KyrieOauth2Controller kyrieOauth2Controller, RequestMappingHandlerMapping mapping) throws NoSuchMethodException {
         RequestMappingInfo info = RequestMappingInfo.paths("/oauth2/login")

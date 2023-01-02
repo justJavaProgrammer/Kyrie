@@ -2,7 +2,6 @@ package com.odeyalo.kyrie.core.oauth2.tokens.code;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +12,6 @@ import java.util.stream.Collectors;
  * Store authorization codes in memory using concurrent map
  * @version 1.0
  */
-@Component
 public class InMemoryAuthorizationCodeStore implements AuthorizationCodeStore {
     private final Map<String, AuthorizationCode> store = new ConcurrentHashMap<>();
     private final Logger logger = LoggerFactory.getLogger(InMemoryAuthorizationCodeStore.class);

@@ -5,12 +5,10 @@ import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCode;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCodeGenerator;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCodeStore;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
  * Default AuthorizationCodeProvider implementation that just generate and save an AuthorizationCode
  */
-@Service
 public class DefaultStoringAuthorizationCodeProvider implements AuthorizationCodeProvider {
     private final AuthorizationCodeGenerator codeGenerator;
     private final AuthorizationCodeStore codeStore;

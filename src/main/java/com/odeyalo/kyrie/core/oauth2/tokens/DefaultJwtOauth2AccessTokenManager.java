@@ -4,8 +4,6 @@ import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.JwtTokenProvider;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.Oauth2AccessTokenGenerator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
@@ -13,13 +11,11 @@ import java.util.List;
 /**
  * Default Oauth2AccessTokenManager implementation that uses jwt as access token
  */
-@Service
 public class DefaultJwtOauth2AccessTokenManager implements Oauth2AccessTokenManager {
     private final JwtTokenProvider jwtTokenProvider;
     private final AccessTokenReturner returner;
     private final Oauth2AccessTokenGenerator generator;
 
-    @Autowired
     public DefaultJwtOauth2AccessTokenManager(JwtTokenProvider jwtTokenProvider, AccessTokenReturner returner, Oauth2AccessTokenGenerator generator) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.returner = returner;

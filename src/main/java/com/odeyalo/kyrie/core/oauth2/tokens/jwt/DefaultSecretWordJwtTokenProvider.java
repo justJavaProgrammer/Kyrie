@@ -6,9 +6,6 @@ import com.odeyalo.kyrie.core.oauth2.tokens.TokenValidationResult;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -17,14 +14,12 @@ import java.util.Map;
 /**
  * Default JwtTokenProvider implementation that sign jwt token with secret word
  */
-@Service
 public class DefaultSecretWordJwtTokenProvider implements JwtTokenProvider {
     private static final long JWT_TOKEN_EXPIRATION_TIME_SECONDS = 3600L;
     private final Logger logger = LoggerFactory.getLogger(DefaultSecretWordJwtTokenProvider.class);
     private final String secretWord;
 
-    @Autowired
-    public DefaultSecretWordJwtTokenProvider(@Value("${kyrie.tokens.jwt.secret.key}") String secretWord) {
+    public DefaultSecretWordJwtTokenProvider(String secretWord) {
         this.secretWord = secretWord;
     }
 

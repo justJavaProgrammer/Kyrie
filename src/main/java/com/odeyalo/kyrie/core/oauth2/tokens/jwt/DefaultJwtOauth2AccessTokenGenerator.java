@@ -1,10 +1,8 @@
 package com.odeyalo.kyrie.core.oauth2.tokens.jwt;
 
 import com.odeyalo.kyrie.core.Oauth2User;
-import com.odeyalo.kyrie.core.oauth2.tokens.TokenMetadata;
 import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessToken;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.odeyalo.kyrie.core.oauth2.tokens.TokenMetadata;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -12,11 +10,9 @@ import java.util.Collections;
 /**
  * Generate an access token with specific scopes
  */
-@Component
 public class DefaultJwtOauth2AccessTokenGenerator implements Oauth2AccessTokenGenerator {
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
     public DefaultJwtOauth2AccessTokenGenerator(JwtTokenProvider jwtTokenProvider) {
         this.jwtTokenProvider = jwtTokenProvider;
     }

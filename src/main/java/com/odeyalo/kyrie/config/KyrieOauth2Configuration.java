@@ -1,5 +1,7 @@
 package com.odeyalo.kyrie.config;
 
+import com.odeyalo.kyrie.config.configuration.Oauth2FlowHandlersConfiguration;
+import com.odeyalo.kyrie.config.configuration.RedirectUriCreationServicesConfiguration;
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authentication.InMemoryOauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
@@ -28,7 +30,12 @@ import java.util.Set;
  *
  * @version 1.0
  */
-@Import({KyrieOauth2ServerEndpointsMappingConfiguration.class})
+@Import(value = {
+        Oauth2FlowHandlersConfiguration.class,
+        RedirectUriCreationServicesConfiguration.class,
+        KyrieOauth2RequestValidationConfiguration.class,
+        KyrieOauth2ServerEndpointsMappingConfiguration.class
+})
 public class KyrieOauth2Configuration {
     private final Logger logger = LoggerFactory.getLogger(KyrieOauth2Configuration.class);
 

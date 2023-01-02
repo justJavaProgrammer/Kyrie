@@ -2,23 +2,19 @@ package com.odeyalo.kyrie.core.oauth2.tokens;
 
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.oauth2.client.ClientCredentialsValidator;
-import com.odeyalo.kyrie.core.support.ValidationResult;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCode;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCodeManager;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.Oauth2AccessTokenGenerator;
+import com.odeyalo.kyrie.core.support.ValidationResult;
 import com.odeyalo.kyrie.exceptions.InvalidAuthorizationCodeObtainTokenException;
 import com.odeyalo.kyrie.exceptions.InvalidClientCredentialsException;
 import com.odeyalo.kyrie.exceptions.Oauth2Exception;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-@Service
 public class DefaultAccessTokenReturner implements AccessTokenReturner {
     private final ClientCredentialsValidator clientCredentialsValidator;
     private final AuthorizationCodeManager authorizationCodeManager;
     private final Oauth2AccessTokenGenerator generator;
 
-    @Autowired
     public DefaultAccessTokenReturner(ClientCredentialsValidator clientCredentialsValidator, AuthorizationCodeManager authorizationCodeManager, Oauth2AccessTokenGenerator generator) {
         this.clientCredentialsValidator = clientCredentialsValidator;
         this.authorizationCodeManager = authorizationCodeManager;

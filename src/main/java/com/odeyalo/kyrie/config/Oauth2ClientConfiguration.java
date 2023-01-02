@@ -1,5 +1,8 @@
 package com.odeyalo.kyrie.config;
 
+import com.odeyalo.kyrie.core.Oauth2User;
+import com.odeyalo.kyrie.core.authentication.InMemoryOauth2UserAuthenticationService;
+import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.oauth2.client.InMemoryOauth2ClientRepository;
 import com.odeyalo.kyrie.core.oauth2.client.Oauth2Client;
 import com.odeyalo.kyrie.core.oauth2.client.Oauth2ClientRepository;
@@ -28,6 +31,14 @@ public class Oauth2ClientConfiguration {
     public Oauth2ClientRepository oauth2ClientRepository(List<Oauth2Client> clients) {
         return new InMemoryOauth2ClientRepository(clients);
     }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @Autowired(required = false)
+    public Oauth2UserAuthenticationService oauth2UserAuthenticationService(List<Oauth2User> users) {
+        return new InMemoryOauth2UserAuthenticationService();
+    }
+
 
     @Bean
     public List<Oauth2Client> clients() {

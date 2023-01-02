@@ -2,15 +2,17 @@ package com.odeyalo.kyrie.core.oauth2.tokens.code;
 
 import com.odeyalo.kyrie.core.Oauth2User;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 
 /**
- * Generate random authorization code with expire time
+ * <p>
+ * Generate random authorization code with expire time.
+ * This implementation does not generate self-contained string with required info and must be saved in any store for processing in different request.
+ * </p>
+ * @see AuthorizationCodeGenerator
+ * @version 1.0
  */
-
-@Component
 public class AuthorizationCodeGeneratorImpl implements AuthorizationCodeGenerator {
 
     @Override

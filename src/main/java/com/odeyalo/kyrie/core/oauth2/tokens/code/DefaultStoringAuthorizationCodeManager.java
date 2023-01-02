@@ -2,8 +2,6 @@ package com.odeyalo.kyrie.core.oauth2.tokens.code;
 
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.provider.AuthorizationCodeProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
  * AuthorizationCodeManager implementation that always use a code store to manipulate with authorization codes.
@@ -11,12 +9,10 @@ import org.springframework.stereotype.Service;
  * @version 1.0
  * @see AuthorizationCodeStore
  */
-@Service
 public class DefaultStoringAuthorizationCodeManager implements AuthorizationCodeManager {
     private final AuthorizationCodeProvider authorizationCodeProvider;
     private final AuthorizationCodeStore authorizationCodeStore;
 
-    @Autowired
     public DefaultStoringAuthorizationCodeManager(AuthorizationCodeProvider authorizationCodeProvider, AuthorizationCodeStore authorizationCodeStore) {
         this.authorizationCodeProvider = authorizationCodeProvider;
         this.authorizationCodeStore = authorizationCodeStore;
