@@ -2,10 +2,16 @@ package com.odeyalo.kyrie.config;
 
 import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
 import com.odeyalo.kyrie.core.oauth2.client.ClientCredentialsValidator;
+import com.odeyalo.kyrie.core.oauth2.client.Oauth2Client;
+import com.odeyalo.kyrie.core.oauth2.client.Oauth2ClientRepository;
+import com.odeyalo.kyrie.core.support.ValidationResult;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.*;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -34,9 +40,11 @@ import java.util.Base64;
 public class Oauth2ClientValidationFilter extends OncePerRequestFilter {
     public static final String BASIC_AUTHENTICATION_PREFIX = "Basic ";
     private final ClientCredentialsValidator clientCredentialsValidator;
+    private final Oauth2ClientRepository oauth2ClientRepository;
 
-    public Oauth2ClientValidationFilter(ClientCredentialsValidator clientCredentialsValidator) {
+    public Oauth2ClientValidationFilter(ClientCredentialsValidator clientCredentialsValidator, Oauth2ClientRepository oauth2ClientRepository) {
         this.clientCredentialsValidator = clientCredentialsValidator;
+        this.oauth2ClientRepository = oauth2ClientRepository;
     }
 
     @Override
@@ -48,28 +56,49 @@ public class Oauth2ClientValidationFilter extends OncePerRequestFilter {
         } else {
             clientCredentials = parseBasicAuthentication(authHeader);
         }
-        if (clientCredentials != null) {
-            clientCredentialsValidator.validateCredentials(clientCredentials);
+        // If credentials are null then filter check is failed and other checks are useless
+        if (clientCredentials == null) {
+            filterChain.doFilter(request, response);
+            return;
         }
+
+        ValidationResult validationResult = clientCredentialsValidator.validateCredentials(clientCredentials);
+
+        if (validationResult.isSuccess()) {
+            Oauth2Client client = oauth2ClientRepository.findOauth2ClientById(clientCredentials.getClientId());
+            SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(client, client.getPassword(), client.getAuthorities()));
+        }
+
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * Using to resolve Oauth2ClientCredentials by request parameter that was provided in request.
+     * @param request - request with parameters
+     * @return - Oauth2ClientCredentials that was resolved from request parameters
+     * or null if request does not contain client_id or client_secret parameters
+     */
     private Oauth2ClientCredentials getOauth2ClientCredentialsByParameters(HttpServletRequest request) {
-        Oauth2ClientCredentials clientCredentials;
         String clientId = request.getParameter("client_id");
         String clientSecret = request.getParameter("client_secret");
-        clientCredentials = Oauth2ClientCredentials.of(clientId, clientSecret);
-        return clientCredentials;
+        if (clientId == null || clientSecret == null) {
+            return null;
+        }
+        return Oauth2ClientCredentials.of(clientId, clientSecret);
     }
 
-
+    /**
+     * Using to resolve Oauth2ClientCredentials by 'Authorization' HTTP Header using Basic Authentication
+     * @param authHeader - 'Authorization' header from request
+     * @return - resolved {@link Oauth2ClientCredentials} or null if Authorization header contain not Basic-Authentication type of authentication.
+     */
     private Oauth2ClientCredentials parseBasicAuthentication(String authHeader) {
         if (!authHeader.startsWith(BASIC_AUTHENTICATION_PREFIX)) {
             return null;
         }
         String basicHeaderValue = authHeader.substring(BASIC_AUTHENTICATION_PREFIX.length());
-        String creds = new String(Base64.getDecoder().decode(basicHeaderValue));
-        String[] usernamePassword = creds.split(":");
+        String decodedCredentials = new String(Base64.getDecoder().decode(basicHeaderValue));
+        String[] usernamePassword = decodedCredentials.split(":");
         if (usernamePassword.length != 2) {
             return null;
         }
