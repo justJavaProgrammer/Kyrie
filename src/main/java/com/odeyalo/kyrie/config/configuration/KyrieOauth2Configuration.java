@@ -1,5 +1,6 @@
 package com.odeyalo.kyrie.config.configuration;
 
+import com.odeyalo.kyrie.config.MockedWebSecurityConfiguration;
 import com.odeyalo.kyrie.config.Oauth2ClientValidationFilter;
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authentication.InMemoryOauth2UserAuthenticationService;
@@ -11,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
@@ -33,7 +33,8 @@ import java.util.Set;
         Oauth2FlowHandlersConfiguration.class,
         RedirectUriCreationServicesConfiguration.class,
         KyrieOauth2RequestValidationConfiguration.class,
-        KyrieOauth2ServerEndpointsMappingConfiguration.class
+        KyrieOauth2ServerEndpointsMappingConfiguration.class,
+        MockedWebSecurityConfiguration.class
 })
 public class KyrieOauth2Configuration {
     private final Logger logger = LoggerFactory.getLogger(KyrieOauth2Configuration.class);
@@ -45,17 +46,8 @@ public class KyrieOauth2Configuration {
 
     @Bean
     @ConditionalOnMissingBean
-    public FilterRegistrationBean<Oauth2ClientValidationFilter> oauth2ClientValidationFilterFilterRegistrationBean(Oauth2ClientValidationFilter oauth2ClientValidationFilter) {
-        FilterRegistrationBean<Oauth2ClientValidationFilter> filterRegistration = new FilterRegistrationBean<>();
-        filterRegistration.addUrlPatterns("/token");
-        filterRegistration.setFilter(oauth2ClientValidationFilter);
-        return filterRegistration;
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public Oauth2ClientValidationFilter oauth2ClientValidationFilter(ClientCredentialsValidator validator) {
-        return new Oauth2ClientValidationFilter(validator);
+    public Oauth2ClientValidationFilter oauth2ClientValidationFilter(ClientCredentialsValidator validator, Oauth2ClientRepository oauth2ClientRepository) {
+        return new Oauth2ClientValidationFilter(validator, oauth2ClientRepository);
     }
 
     @Bean
