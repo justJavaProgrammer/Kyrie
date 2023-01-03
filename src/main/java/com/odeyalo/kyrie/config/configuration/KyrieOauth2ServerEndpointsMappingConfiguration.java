@@ -77,8 +77,8 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
     }
 
     private void registryTokenInfoEndpoint(TokenController tokenController, RequestMappingHandlerMapping mapping) throws NoSuchMethodException {
-        RequestMappingInfo info = RequestMappingInfo.paths("/token")
-                .consumes(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        RequestMappingInfo info = RequestMappingInfo.paths("/tokeninfo")
+                .consumes(MediaType.APPLICATION_FORM_URLENCODED_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE)
                 .methods(RequestMethod.POST)
                 .build();
         mapping.registerMapping(info, tokenController, TokenController.class.getDeclaredMethod("tokenInfoRfc7662", String.class));
