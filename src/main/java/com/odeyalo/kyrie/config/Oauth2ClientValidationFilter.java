@@ -27,7 +27,7 @@ import java.util.Base64;
  *         <p>Required list of request parameters that must be presented if Authorization is not presented:</p>
  *         <ul>
  *             <li>client_id - is used to determine what client is trying to authenticate</li>
- *             <li>client_secret - to confirm that client credentials is correct</li>
+ *             <li>client_secret - to confirm that client credentials are correct</li>
  *         </ul>
  *     </li>
  * </ul>
