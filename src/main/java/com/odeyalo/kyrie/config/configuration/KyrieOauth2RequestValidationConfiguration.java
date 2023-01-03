@@ -3,6 +3,9 @@ package com.odeyalo.kyrie.config.configuration;
 import com.odeyalo.kyrie.controllers.support.AuthorizationRequestValidator;
 import com.odeyalo.kyrie.controllers.support.DefaultChainAuthorizationRequestValidator;
 import com.odeyalo.kyrie.controllers.support.validation.AuthorizationRequestValidationStep;
+import com.odeyalo.kyrie.controllers.support.validation.ClientIdAuthorizationRequestValidationStep;
+import com.odeyalo.kyrie.controllers.support.validation.RedirectUriAuthorizationRequestValidationStep;
+import com.odeyalo.kyrie.core.oauth2.client.Oauth2ClientRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 
@@ -23,5 +26,15 @@ public class KyrieOauth2RequestValidationConfiguration {
     public AuthorizationRequestValidator authorizationRequestValidator(List<AuthorizationRequestValidationStep> steps) {
         return new DefaultChainAuthorizationRequestValidator(steps);
     }
+    @Bean
+    @ConditionalOnMissingBean
+    public ClientIdAuthorizationRequestValidationStep clientIdAuthorizationRequestValidationStep(Oauth2ClientRepository oauth2ClientRepository) {
+        return new ClientIdAuthorizationRequestValidationStep(oauth2ClientRepository);
+    }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public RedirectUriAuthorizationRequestValidationStep redirectUriAuthorizationRequestValidationStep() {
+        return new RedirectUriAuthorizationRequestValidationStep();
+    }
 }
