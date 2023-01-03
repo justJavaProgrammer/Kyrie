@@ -5,14 +5,12 @@ import com.odeyalo.kyrie.core.oauth2.client.Oauth2Client;
 import com.odeyalo.kyrie.core.oauth2.client.Oauth2ClientRepository;
 import com.odeyalo.kyrie.core.support.Oauth2ValidationResult;
 import com.odeyalo.kyrie.exceptions.Oauth2ErrorType;
-import org.springframework.stereotype.Component;
 
 /**
  * AuthorizationRequestValidationStep to check client id from AuthorizationRequest
  *
  * @see AuthorizationRequest
  */
-@Component
 public class ClientIdAuthorizationRequestValidationStep implements AuthorizationRequestValidationStep {
     private final Oauth2ClientRepository clientRepository;
 
