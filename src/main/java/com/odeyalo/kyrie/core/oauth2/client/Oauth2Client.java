@@ -4,13 +4,20 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
+/**
+ * Oauth2Client that registered in Kyrie and can obtain oauth2 tokens.
+ */
 @AllArgsConstructor
 @Builder
 @Data
-public class Oauth2Client {
+public class Oauth2Client implements UserDetails {
     /**
      * Unique id for this client
      */
@@ -28,5 +35,40 @@ public class Oauth2Client {
 
     public void addAllowedRedirectUri(String redirectUri) {
         this.allowedRedirectUris.add(redirectUri);
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public String getPassword() {
+        return clientSecret;
+    }
+
+    @Override
+    public String getUsername() {
+        return clientId;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
