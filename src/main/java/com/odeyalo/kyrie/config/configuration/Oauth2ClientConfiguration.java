@@ -36,9 +36,8 @@ public class Oauth2ClientConfiguration {
     @ConditionalOnMissingBean
     @Autowired(required = false)
     public Oauth2UserAuthenticationService oauth2UserAuthenticationService(List<Oauth2User> users) {
-        return new InMemoryOauth2UserAuthenticationService();
+        return new InMemoryOauth2UserAuthenticationService(users);
     }
-
 
     @Bean
     public List<Oauth2Client> clients() {
