@@ -35,7 +35,6 @@ import java.util.List;
  */
 public class Oauth2FlowHandlersConfiguration {
 
-
     @Bean
     @ConditionalOnMissingBean
     public Oauth2AccessTokenGenerator oauth2AccessTokenGenerator(JwtTokenProvider jwtTokenProvider) {
@@ -121,7 +120,7 @@ public class Oauth2FlowHandlersConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public AuthorizationCodeProvider defaultStoringAuthorizationCodeProvider(AuthorizationCodeGenerator authorizationCodeGenerator,
-                                                                                           AuthorizationCodeStore codeStore) {
+                                                                             AuthorizationCodeStore codeStore) {
         return new DefaultStoringAuthorizationCodeProvider(authorizationCodeGenerator, codeStore);
     }
 
@@ -130,6 +129,7 @@ public class Oauth2FlowHandlersConfiguration {
     public DefaultStoringAuthorizationCodeManager defaultStoringAuthorizationCodeManager(AuthorizationCodeProvider authorizationCodeProvider, AuthorizationCodeStore codeStore) {
         return new DefaultStoringAuthorizationCodeManager(authorizationCodeProvider, codeStore);
     }
+
     @Bean
     @ConditionalOnMissingBean
     public AuthorizationCodeStore authorizationCodeStore() {
