@@ -1,7 +1,6 @@
 package com.odeyalo.kyrie.config.configuration;
 
 import com.odeyalo.kyrie.config.MockedWebSecurityConfiguration;
-import com.odeyalo.kyrie.config.Oauth2ClientValidationFilter;
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authentication.InMemoryOauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
@@ -42,12 +41,6 @@ public class KyrieOauth2Configuration {
     @PostConstruct
     void setup() {
         logger.info("The Authorization Server is enabled, starting Kyrie bootstrap");
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public Oauth2ClientValidationFilter oauth2ClientValidationFilter(ClientCredentialsValidator validator, Oauth2ClientRepository oauth2ClientRepository) {
-        return new Oauth2ClientValidationFilter(validator, oauth2ClientRepository);
     }
 
     @Bean
