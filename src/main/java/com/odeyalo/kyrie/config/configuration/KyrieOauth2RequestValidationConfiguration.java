@@ -1,5 +1,7 @@
 package com.odeyalo.kyrie.config.configuration;
 
+import com.odeyalo.kyrie.config.DefaultOauth2ClientCredentialsResolverHelper;
+import com.odeyalo.kyrie.config.Oauth2ClientCredentialsResolverHelper;
 import com.odeyalo.kyrie.config.Oauth2ClientValidationFilter;
 import com.odeyalo.kyrie.controllers.support.AuthorizationRequestValidator;
 import com.odeyalo.kyrie.controllers.support.DefaultChainAuthorizationRequestValidator;
@@ -18,10 +20,17 @@ public class KyrieOauth2RequestValidationConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public Oauth2ClientValidationFilter oauth2ClientValidationFilter(ClientCredentialsValidator validator, Oauth2ClientRepository oauth2ClientRepository) {
-        return new Oauth2ClientValidationFilter(validator, oauth2ClientRepository);
+    public Oauth2ClientValidationFilter oauth2ClientValidationFilter(ClientCredentialsValidator validator,
+                                                                     Oauth2ClientRepository oauth2ClientRepository,
+                                                                     Oauth2ClientCredentialsResolverHelper oauth2ClientCredentialsResolverHelper) {
+        return new Oauth2ClientValidationFilter(validator, oauth2ClientRepository, oauth2ClientCredentialsResolverHelper);
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public Oauth2ClientCredentialsResolverHelper oauth2ClientCredentialsResolverHelper() {
+        return new DefaultOauth2ClientCredentialsResolverHelper();
+    }
     /**
      * Registry AuthorizationRequestValidator only if bean is missing.
      * @param steps - validation steps to validate an {@link com.odeyalo.kyrie.core.authorization.AuthorizationRequest}
