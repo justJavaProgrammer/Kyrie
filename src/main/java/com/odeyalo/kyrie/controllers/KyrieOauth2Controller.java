@@ -19,14 +19,16 @@ import com.odeyalo.kyrie.dto.LoginDTO;
 import com.odeyalo.kyrie.exceptions.Oauth2ErrorType;
 import com.odeyalo.kyrie.exceptions.Oauth2Exception;
 import com.odeyalo.kyrie.exceptions.RedirectUriAwareOauth2Exception;
+import com.odeyalo.kyrie.support.html.DefaultTemplateResolver;
+import com.odeyalo.kyrie.support.html.TemplateResolver;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -46,15 +48,18 @@ public class KyrieOauth2Controller {
     private final AuthorizationRequestValidator validator;
 
     //todo: Create TemplateResolver that will be used to get html templates in runtime
-    @Value("${kyrie.ouath2.template.login}")
-    private String template;
+    private final TemplateResolver templateResolver;
 
-    public KyrieOauth2Controller(Oauth2UserAuthenticationService oauth2UserAuthenticationService, Oauth2FlowHandlerFactory handlerFactory, AuthorizationGrantTypeResolver grantTypeResolver, RedirectUrlCreationServiceFactory factory, AuthorizationRequestValidator validator) {
+    public KyrieOauth2Controller(Oauth2UserAuthenticationService oauth2UserAuthenticationService, Oauth2FlowHandlerFactory handlerFactory,
+                                 AuthorizationGrantTypeResolver grantTypeResolver,
+                                 RedirectUrlCreationServiceFactory factory,
+                                 AuthorizationRequestValidator validator, TemplateResolver templateResolver) {
         this.oauth2UserAuthenticationService = oauth2UserAuthenticationService;
         this.handlerFactory = handlerFactory;
         this.grantTypeResolver = grantTypeResolver;
         this.factory = factory;
         this.validator = validator;
+        this.templateResolver = templateResolver;
     }
 
     @ModelAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME)
@@ -64,7 +69,7 @@ public class KyrieOauth2Controller {
 
     //todo add logic to retrieve info from session
     @GetMapping(value = "/authorize")
-    public String authorization(
+    public ModelAndView authorization(
             @RequestParam("client_id") String clientId,
             @RequestParam("response_type") Oauth2ResponseType[] responseTypes,
             @RequestParam("scope") String[] scopes,
@@ -73,6 +78,7 @@ public class KyrieOauth2Controller {
             @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> authorizationRequestStore) {
 
         AuthorizationGrantType grantType = grantTypeResolver.resolveGrantType(responseTypes);
+
         AuthorizationRequest request = AuthorizationRequest.builder().clientId(clientId)
                 .responseTypes(responseTypes)
                 .grantType(grantType)
@@ -86,7 +92,7 @@ public class KyrieOauth2Controller {
             resolveExceptionAndThrow(redirectUrl, validationResult);
         }
         authorizationRequestStore.put(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME, request);
-        return template;
+        return templateResolver.getTemplate(DefaultTemplateResolver.LOGIN_TEMPLATE_TYPE);
     }
 
     /**
