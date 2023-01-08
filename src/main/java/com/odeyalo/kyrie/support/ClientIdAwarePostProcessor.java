@@ -12,8 +12,6 @@ import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <p>{@link BeanPostProcessor} implementation that uses to handle {@link ClientIdAware} implementations.</p>
@@ -26,7 +24,6 @@ import java.util.Map;
  */
 @Component
 public class ClientIdAwarePostProcessor implements BeanPostProcessor, BeanFactoryAware {
-    private final Map<String, Object> beans = new HashMap<>();
     private final Logger logger = LoggerFactory.getLogger(ClientIdAware.class);
     private BeanFactory beanFactory;
 
