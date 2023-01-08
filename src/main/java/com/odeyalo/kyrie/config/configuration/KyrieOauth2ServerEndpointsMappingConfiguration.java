@@ -3,6 +3,7 @@ package com.odeyalo.kyrie.config.configuration;
 import com.odeyalo.kyrie.config.KyrieOauth2Configurer;
 import com.odeyalo.kyrie.config.KyrieOauth2ConfigurerComposite;
 import com.odeyalo.kyrie.config.configurers.Oauth2ServerEndpointsConfigurer;
+import com.odeyalo.kyrie.config.configurers.Oauth2ServerViewRegistry;
 import com.odeyalo.kyrie.controllers.KyrieOauth2Controller;
 import com.odeyalo.kyrie.controllers.TokenController;
 import com.odeyalo.kyrie.controllers.support.AuthorizationRequestValidator;
@@ -22,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcRegistrations;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
@@ -53,6 +55,7 @@ import java.util.Map;
 @EnableWebMvc
 public class KyrieOauth2ServerEndpointsMappingConfiguration {
 
+    public static final String DEAFULT_LOGIN_TEMPLATE_NAME = "login.html";
     private final KyrieOauth2ConfigurerComposite configurer = new KyrieOauth2ConfigurerComposite();
     private final Logger logger = LoggerFactory.getLogger(KyrieOauth2ServerEndpointsMappingConfiguration.class);
 
@@ -124,12 +127,32 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
         return new KyrieOauth2Controller(authenticationService, factory, resolver, redirectUrlCreationServiceFactory, validator, templateResolver);
     }
 
-
+    /**
+     * Registry {@link TemplateResolver} bean inside the Spring Container. Registry default templates that used by Kyrie.
+     * It also configurers by {@link Oauth2ServerViewRegistry}.
+     * @param processors - custom enhancers
+     * @return - DefaultTemplateResolver with added views and enhancers
+     * @throws Exception - if any exception occurred
+     */
     @Bean
+    @ConditionalOnMissingBean
     public TemplateResolver templateResolver(List<ModelEnhancerPostProcessor> processors) throws Exception {
+        Oauth2ServerViewRegistry viewRegistry = new Oauth2ServerViewRegistry();
+
+        configurer.configureTemplates(viewRegistry);
+
+        Map<String, View> views = viewRegistry.getViews();
+        View loginView = viewResolver.resolveViewName(DEAFULT_LOGIN_TEMPLATE_NAME, Locale.ENGLISH);
+
+        views.putIfAbsent(DefaultTemplateResolver.LOGIN_TEMPLATE_TYPE, loginView);
+
         DefaultTemplateResolver defaultTemplateResolver = new DefaultTemplateResolver(processors);
-        View view = viewResolver.resolveViewName("login.html", Locale.ENGLISH);
-        defaultTemplateResolver.addTemplate(DefaultTemplateResolver.LOGIN_TEMPLATE_TYPE, view);
+
+        for (Map.Entry<String, View> entry : views.entrySet()) {
+            String templateType = entry.getKey();
+            View view = entry.getValue();
+            defaultTemplateResolver.addTemplate(templateType, view);
+        }
         return defaultTemplateResolver;
     }
 
