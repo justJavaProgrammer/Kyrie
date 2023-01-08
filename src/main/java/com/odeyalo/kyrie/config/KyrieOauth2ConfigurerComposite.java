@@ -1,6 +1,7 @@
 package com.odeyalo.kyrie.config;
 
 import com.odeyalo.kyrie.config.configurers.Oauth2ServerEndpointsConfigurer;
+import com.odeyalo.kyrie.config.configurers.Oauth2ServerViewRegistry;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -31,6 +32,13 @@ public class KyrieOauth2ConfigurerComposite implements KyrieOauth2Configurer {
     public void configureEndpoints(Oauth2ServerEndpointsConfigurer configurer) {
         for (KyrieOauth2Configurer delegate : delegates) {
             delegate.configureEndpoints(configurer);
+        }
+    }
+
+    @Override
+    public void configureTemplates(Oauth2ServerViewRegistry viewRegistry) {
+        for (KyrieOauth2Configurer delegate : delegates) {
+            delegate.configureTemplates(viewRegistry);
         }
     }
 }
