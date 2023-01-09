@@ -38,15 +38,4 @@ public class Oauth2ClientConfiguration {
     public Oauth2UserAuthenticationService oauth2UserAuthenticationService(List<Oauth2User> users) {
         return new InMemoryOauth2UserAuthenticationService(users);
     }
-
-    @Bean
-    public List<Oauth2Client> clients() {
-        Oauth2Client client = Oauth2Client
-                .builder()
-                .clientId("odeyalo")
-                .clientSecret("password")
-                .allowedRedirectUri("https://oauth.pstmn.io/v1/callback")
-                .build();
-        return List.of(client);
-    }
 }
