@@ -1,4 +1,4 @@
-package com.odeyalo.kyrie.core.support;
+package com.odeyalo.kyrie.core.authorization.support;
 
 /**
  *  A strategy for storing authorization request information against a thread.

@@ -1,4 +1,4 @@
-package com.odeyalo.kyrie.core.support;
+package com.odeyalo.kyrie.core.authorization.support;
 
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import lombok.AllArgsConstructor;
