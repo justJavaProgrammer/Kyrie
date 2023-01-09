@@ -21,14 +21,12 @@ public class ThreadLocalAuthorizationRequestContextHolderStrategy implements Aut
     @Override
     public void setContext(AuthorizationRequestContext context) {
         Assert.notNull(context, "The AuthorizationRequestContext must be not null");
-        System.out.println("Set " + Thread.currentThread().getName());
         holder.set(context);
     }
 
     @Override
     public AuthorizationRequestContext getContext() {
         AuthorizationRequestContext context = holder.get();
-        System.out.println("Get " + Thread.currentThread().getName());
         return context != null ? context : createEmptyContext();
     }
 
