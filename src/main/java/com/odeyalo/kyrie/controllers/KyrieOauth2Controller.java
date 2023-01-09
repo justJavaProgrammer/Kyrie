@@ -13,6 +13,8 @@ import com.odeyalo.kyrie.core.oauth2.flow.Oauth2FlowHandler;
 import com.odeyalo.kyrie.core.oauth2.flow.Oauth2FlowHandlerFactory;
 import com.odeyalo.kyrie.core.oauth2.support.RedirectUrlCreationServiceFactory;
 import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolver;
+import com.odeyalo.kyrie.core.support.AuthorizationRequestContext;
+import com.odeyalo.kyrie.core.support.AuthorizationRequestContextHolder;
 import com.odeyalo.kyrie.core.support.Oauth2ValidationResult;
 import com.odeyalo.kyrie.dto.ApiErrorMessage;
 import com.odeyalo.kyrie.dto.LoginDTO;
@@ -92,6 +94,9 @@ public class KyrieOauth2Controller {
             resolveExceptionAndThrow(redirectUrl, validationResult);
         }
         authorizationRequestStore.put(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME, request);
+
+        AuthorizationRequestContextHolder.setContext(new AuthorizationRequestContext(request));
+
         return templateResolver.getTemplate(DefaultTemplateResolver.LOGIN_TEMPLATE_TYPE);
     }
 
