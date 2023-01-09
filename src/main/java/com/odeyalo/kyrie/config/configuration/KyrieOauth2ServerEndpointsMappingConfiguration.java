@@ -55,7 +55,7 @@ import java.util.Map;
 @EnableWebMvc
 public class KyrieOauth2ServerEndpointsMappingConfiguration {
 
-    public static final String DEAFULT_LOGIN_TEMPLATE_NAME = "login.html";
+    public static final String DEFAULT_LOGIN_TEMPLATE_NAME = "login.html";
     private final KyrieOauth2ConfigurerComposite configurer = new KyrieOauth2ConfigurerComposite();
     private final Logger logger = LoggerFactory.getLogger(KyrieOauth2ServerEndpointsMappingConfiguration.class);
 
@@ -142,7 +142,7 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
         configurer.configureTemplates(viewRegistry);
 
         Map<String, View> views = viewRegistry.getViews();
-        View loginView = viewResolver.resolveViewName(DEAFULT_LOGIN_TEMPLATE_NAME, Locale.ENGLISH);
+        View loginView = viewResolver.resolveViewName(DEFAULT_LOGIN_TEMPLATE_NAME, Locale.ENGLISH);
 
         views.putIfAbsent(DefaultTemplateResolver.LOGIN_TEMPLATE_TYPE, loginView);
 
