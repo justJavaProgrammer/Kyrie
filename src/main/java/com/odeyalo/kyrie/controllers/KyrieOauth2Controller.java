@@ -23,7 +23,8 @@ import com.odeyalo.kyrie.exceptions.Oauth2Exception;
 import com.odeyalo.kyrie.exceptions.RedirectUriAwareOauth2Exception;
 import com.odeyalo.kyrie.support.html.DefaultTemplateResolver;
 import com.odeyalo.kyrie.support.html.TemplateResolver;
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,31 +36,41 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-//todo: Write test for this controller
+/**
+ * Main controller that provides '/authorize' and '/login' endpoints .
+ * <p>
+ * The KyrieOauth2Controller is used to create {@link AuthorizationRequest} and store it in Session attributes,
+ * used to login an user and return an oauth2 token to client.
+ * </p>
+ *
+ * @version 1.0
+ * @see com.odeyalo.kyrie.config.configuration.KyrieOauth2ServerEndpointsMappingConfiguration
+ */
 @SessionAttributes(value = {KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME})
-@Log4j2
 public class KyrieOauth2Controller {
+
+    private final Oauth2UserAuthenticationService oauth2UserAuthenticationService;
+    private final Oauth2FlowHandlerFactory oauth2FlowHandlerFactory;
+    private final AuthorizationGrantTypeResolver grantTypeResolver;
+    private final RedirectUrlCreationServiceFactory redirectUrlCreationServiceFactory;
+    private final AuthorizationRequestValidator validator;
+    private final TemplateResolver templateResolver;
+
     public static final String AUTHORIZATION_REQUEST_ATTRIBUTE_NAME = "authorizationRequest";
     public static final String WRONG_CREDENTIALS_ERROR_NAME = "wrong_credentials";
     public static final String MISSING_AUTHORIZATION_REQUEST_ERROR_NAME = "missing_authorization_request";
     public static final String UNSUPPORTED_GRANT_TYPE_ERROR_NAME = "unsupported_grant_type";
-    private final Oauth2UserAuthenticationService oauth2UserAuthenticationService;
-    private final Oauth2FlowHandlerFactory handlerFactory;
-    private final AuthorizationGrantTypeResolver grantTypeResolver;
-    private final RedirectUrlCreationServiceFactory factory;
-    private final AuthorizationRequestValidator validator;
 
-    //todo: Create TemplateResolver that will be used to get html templates in runtime
-    private final TemplateResolver templateResolver;
+    private final Logger logger = LoggerFactory.getLogger(KyrieOauth2Controller.class);
 
-    public KyrieOauth2Controller(Oauth2UserAuthenticationService oauth2UserAuthenticationService, Oauth2FlowHandlerFactory handlerFactory,
+    public KyrieOauth2Controller(Oauth2UserAuthenticationService oauth2UserAuthenticationService, Oauth2FlowHandlerFactory oauth2FlowHandlerFactory,
                                  AuthorizationGrantTypeResolver grantTypeResolver,
-                                 RedirectUrlCreationServiceFactory factory,
+                                 RedirectUrlCreationServiceFactory redirectUrlCreationServiceFactory,
                                  AuthorizationRequestValidator validator, TemplateResolver templateResolver) {
         this.oauth2UserAuthenticationService = oauth2UserAuthenticationService;
-        this.handlerFactory = handlerFactory;
+        this.oauth2FlowHandlerFactory = oauth2FlowHandlerFactory;
         this.grantTypeResolver = grantTypeResolver;
-        this.factory = factory;
+        this.redirectUrlCreationServiceFactory = redirectUrlCreationServiceFactory;
         this.validator = validator;
         this.templateResolver = templateResolver;
     }
@@ -69,7 +80,26 @@ public class KyrieOauth2Controller {
         return new ConcurrentHashMap<>(256);
     }
 
-    //todo add logic to retrieve info from session
+    /**
+     * '/authorize' endpoint for only GET HTTP requests.
+     * Used to validate and store valid {@link AuthorizationRequest} in Session Attributes.
+     * It also stores the valid AuthorizationRequest in {@link AuthorizationRequestContextHolder} for LOCAL thread only.
+     * <p>
+     * The endpoint response is html template.
+     *
+     * @param clientId                  - client application id that wants to access user's data
+     * @param responseTypes             - oauth2 response types that must be returned to client.
+     * @param scopes                    - scopes that client application request. Unknown scopes will be ignored
+     * @param redirectUrl               - redirect url to redirect after successful or failed user authentication. If url is malformed then 400 BAD REQUEST will be returned to end user.
+     * @param state                     - optional parameter. If state was presented, then state will be returned in request parameters from redirect_uri parameter.
+     * @param authorizationRequestStore - session store
+     * @return - {@link ModelAndView} resolved by {@link TemplateResolver}
+     * @see AuthorizationRequest
+     * @see AuthorizationRequestContextHolder
+     * @see javax.servlet.http.HttpSession
+     * @see <a href="https://www.rfc-editor.org/rfc/rfc6749#section-3.1.1">Oauth2 Response Type</a>
+     * @see <a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-request/">The Authorization Request</a>
+     */
     @GetMapping(value = "/authorize")
     public ModelAndView authorization(
             @RequestParam("client_id") String clientId,
@@ -91,7 +121,8 @@ public class KyrieOauth2Controller {
 
         Oauth2ValidationResult validationResult = validator.validateAuthorizationRequest(request);
         if (!validationResult.isSuccess()) {
-            resolveExceptionAndThrow(redirectUrl, validationResult);
+            // The AuthorizationRequest is not valid, throw exception based on validation result
+            throw resolveException(redirectUrl, validationResult);
         }
         authorizationRequestStore.put(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME, request);
 
@@ -101,35 +132,56 @@ public class KyrieOauth2Controller {
     }
 
     /**
-     * Login an user AND return the access token to a client
+     * The '/login' endpoint for only POST HTTP request with ONLY application/json content-type.
+     * <p>Possible Http response supported by endpoint:</p>
+     * <ul>
+     *     <li>HTTP 302 REDIRECT with values based on {@link AuthorizationRequest} that was stored in sessionStore if login was success</li>
+     *     <li>HTTP 400 BAD REQUEST if session store does not contain {@link KyrieOauth2Controller#AUTHORIZATION_REQUEST_ATTRIBUTE_NAME} or if AuthorizationRequest is malformed</li>
+     *     <li>HTTP 500 SERVER ERROR if error was occurred and no exception handler was found.</li>
+     * </ul>
+     *
+     * @param dto          - dto that contains user's username and password
+     * @param sessionStore - store that contains the values for the given session
+     * @param status       - current session status. After successful login the session will be closed.
+     * @return - ResponseEntity with redirect or error, see above for more info.
      */
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> loginCheckAndGrantTypeProcessingUsingJson(@RequestBody LoginDTO dto,
-                                                                       @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> model,
-                                                                       SessionStatus status
-    ) {
-        log.info("Received model: {}", model);
-        log.info("session status: {}", status);
-        return doLoginAndGrantTypeProcessing(dto, model, status);
+                                                                       @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> sessionStore,
+                                                                       SessionStatus status) {
+        return doLoginAndGrantTypeProcessing(dto, sessionStore, status);
     }
 
+
+    /**
+     * The '/login' endpoint for only POST HTTP request with multipart/form-data and application/x-www-form-urlencoded content-types.
+     * <ul>
+     *     <li>HTTP 302 REDIRECT with values based on {@link AuthorizationRequest} that was stored in sessionStore if login was success</li>
+     *     <li>HTTP 400 BAD REQUEST if session store does not contain {@link KyrieOauth2Controller#AUTHORIZATION_REQUEST_ATTRIBUTE_NAME} or if AuthorizationRequest is malformed</li>
+     *     <li>HTTP 500 SERVER ERROR if error was occurred and no exception handler was found.</li>
+     * </ul>
+     *
+     * @param dto          - dto that contains user's username and password
+     * @param sessionStore - store that contains the values for the given session
+     * @param status       - current session status. After successful login the session will be closed.
+     * @return - ResponseEntity with redirect or error, see above for more info.
+     */
     @PostMapping(value = "/login", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE})
     public ResponseEntity<?> loginCheckAndGrantTypeProcessingUsingFormData(@ModelAttribute LoginDTO dto,
-                                                                           @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> model,
-                                                                           SessionStatus status
-    ) {
-        return doLoginAndGrantTypeProcessing(dto, model, status);
+                                                                           @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> sessionStore,
+                                                                           SessionStatus status) {
+        return doLoginAndGrantTypeProcessing(dto, sessionStore, status);
     }
 
-    private ResponseEntity<Object> doLoginAndGrantTypeProcessing(LoginDTO dto, Map<String, Object> model, SessionStatus status) {
-        AuthorizationRequest authorizationRequest = (AuthorizationRequest) model.get(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME);
+    private ResponseEntity<?> doLoginAndGrantTypeProcessing(LoginDTO dto, Map<String, Object> sessionStore, SessionStatus status) {
+        AuthorizationRequest authorizationRequest = (AuthorizationRequest) sessionStore.get(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME);
         if (authorizationRequest == null) {
             ApiErrorMessage errorMessage = new ApiErrorMessage(MISSING_AUTHORIZATION_REQUEST_ERROR_NAME, "Session attribute does not found and request cannot be processed");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         }
-        log.info("Auth request: {}", authorizationRequest);
 
-        log.info("Using {} as authentication service", oauth2UserAuthenticationService);
+        logger.info("Auth request: {}", authorizationRequest);
+
         AuthenticationResult result = oauth2UserAuthenticationService.authenticate(new Oauth2UserAuthenticationInfo(dto.getUsername(), dto.getPassword()));
         if (result == null || !result.isSuccess()) {
             ApiErrorMessage errorMessage = new ApiErrorMessage(WRONG_CREDENTIALS_ERROR_NAME, "User credentials are wrong and login can't be performed");
@@ -138,26 +190,27 @@ public class KyrieOauth2Controller {
 
         Oauth2User user = result.getUser();
 
-        Oauth2FlowHandler oauth2FlowHandler = handlerFactory.getOauth2FlowHandler(authorizationRequest);
+        Oauth2FlowHandler oauth2FlowHandler = oauth2FlowHandlerFactory.getOauth2FlowHandler(authorizationRequest);
         if (oauth2FlowHandler == null) {
             ApiErrorMessage message = new ApiErrorMessage(UNSUPPORTED_GRANT_TYPE_ERROR_NAME, "Kyrie does not support: " + authorizationRequest.getGrantType());
             return ResponseEntity.badRequest().body(message);
         }
         Oauth2Token token = oauth2FlowHandler.handleFlow(authorizationRequest, user);
-        String redirectUrl = factory.getRedirectUrlCreationService(authorizationRequest).createRedirectUrl(authorizationRequest, token);
+        String redirectUrl = redirectUrlCreationServiceFactory.getRedirectUrlCreationService(authorizationRequest).createRedirectUrl(authorizationRequest, token);
+        // No need to clear the sessionStore, if session is completed, then session store will be automatically cleared by DefaultSessionAttributeStore
         status.setComplete();
-        log.info("Redirecting to: {}", redirectUrl);
+        logger.info("Redirecting to: {}", redirectUrl);
         return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, redirectUrl).build();
     }
 
 
-    private void resolveExceptionAndThrow(String redirectUrl, Oauth2ValidationResult validationResult) {
-        if (validationResult.getErrorType().equals(Oauth2ErrorType.INVALID_REDIRECT_URI)) {
-            throw new Oauth2Exception(
+    private RuntimeException resolveException(String redirectUrl, Oauth2ValidationResult validationResult) {
+        if (Oauth2ErrorType.INVALID_REDIRECT_URI.equals(validationResult.getErrorType())) {
+            return new Oauth2Exception(
                     String.format("Failed to initialize Authorization request. Reason: %s", validationResult.getMessage()),
                     validationResult.getMessage(), validationResult.getErrorType());
         }
-        throw new RedirectUriAwareOauth2Exception(String.format("Failed to initialize Authorization request. Reason: %s", validationResult.getMessage()),
+        return new RedirectUriAwareOauth2Exception(String.format("Failed to initialize Authorization request. Reason: %s", validationResult.getMessage()),
                 validationResult.getMessage(), redirectUrl, validationResult.getErrorType());
     }
 }
