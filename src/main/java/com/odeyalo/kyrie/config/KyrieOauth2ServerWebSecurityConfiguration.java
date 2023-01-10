@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @AutoConfigureAfter(value = KyrieOauth2ServerEndpointsMappingConfiguration.class)
-public class MockedWebSecurityConfiguration {
+public class KyrieOauth2ServerWebSecurityConfiguration {
     private final Oauth2ClientValidationFilter filter;
     private final KyrieOauth2ConfigurerComposite configurer = new KyrieOauth2ConfigurerComposite();
 
@@ -34,7 +34,7 @@ public class MockedWebSecurityConfiguration {
         this.info = configurer.buildOauth2ServerEndpointsInfo();
     }
 
-    public MockedWebSecurityConfiguration(Oauth2ClientValidationFilter filter) {
+    public KyrieOauth2ServerWebSecurityConfiguration(Oauth2ClientValidationFilter filter) {
         this.filter = filter;
     }
 
