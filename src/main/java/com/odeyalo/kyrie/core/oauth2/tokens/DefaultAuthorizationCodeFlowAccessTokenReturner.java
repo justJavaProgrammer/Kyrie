@@ -10,12 +10,12 @@ import com.odeyalo.kyrie.exceptions.InvalidAuthorizationCodeObtainTokenException
 import com.odeyalo.kyrie.exceptions.InvalidClientCredentialsException;
 import com.odeyalo.kyrie.exceptions.Oauth2Exception;
 
-public class DefaultAccessTokenReturner implements AccessTokenReturner {
+public class DefaultAuthorizationCodeFlowAccessTokenReturner implements AuthorizationCodeFlowAccessTokenReturner {
     private final ClientCredentialsValidator clientCredentialsValidator;
     private final AuthorizationCodeManager authorizationCodeManager;
     private final Oauth2AccessTokenGenerator generator;
 
-    public DefaultAccessTokenReturner(ClientCredentialsValidator clientCredentialsValidator, AuthorizationCodeManager authorizationCodeManager, Oauth2AccessTokenGenerator generator) {
+    public DefaultAuthorizationCodeFlowAccessTokenReturner(ClientCredentialsValidator clientCredentialsValidator, AuthorizationCodeManager authorizationCodeManager, Oauth2AccessTokenGenerator generator) {
         this.clientCredentialsValidator = clientCredentialsValidator;
         this.authorizationCodeManager = authorizationCodeManager;
         this.generator = generator;

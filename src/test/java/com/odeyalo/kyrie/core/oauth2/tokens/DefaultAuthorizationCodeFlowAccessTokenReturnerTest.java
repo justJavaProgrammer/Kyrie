@@ -7,8 +7,8 @@ import com.odeyalo.kyrie.core.oauth2.tokens.code.*;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.provider.AuthorizationCodeProvider;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.provider.DefaultStoringAuthorizationCodeProvider;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.DefaultJwtOauth2AccessTokenGenerator;
-import com.odeyalo.kyrie.core.oauth2.tokens.jwt.JwtTokenProvider;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.DefaultSecretWordJwtTokenProvider;
+import com.odeyalo.kyrie.core.oauth2.tokens.jwt.JwtTokenProvider;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.Oauth2AccessTokenGenerator;
 import com.odeyalo.kyrie.core.support.ValidationResult;
 import com.odeyalo.kyrie.exceptions.InvalidAuthorizationCodeObtainTokenException;
@@ -28,9 +28,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for DefaultAccessTokenReturner class.
- * @see DefaultAccessTokenReturner
+ * @see DefaultAuthorizationCodeFlowAccessTokenReturner
  */
-class DefaultAccessTokenReturnerTest {
+class DefaultAuthorizationCodeFlowAccessTokenReturnerTest {
     public static final String CLIENT_ID = "odeyalo";
     public static final String CLIENT_SECRET = "tired";
     public static final String SECRET_WORD = "fearoffailure";
@@ -67,7 +67,7 @@ class DefaultAccessTokenReturnerTest {
     private final AuthorizationCodeProvider authorizationCodeProvider = new DefaultStoringAuthorizationCodeProvider(new AuthorizationCodeGeneratorImpl(), codeStore);
     private final AuthorizationCodeManager authorizationCodeManager = new DefaultStoringAuthorizationCodeManager(authorizationCodeProvider, codeStore);
 
-    private final DefaultAccessTokenReturner returner = new DefaultAccessTokenReturner(validator, authorizationCodeManager, new DefaultJwtOauth2AccessTokenGenerator(jwtTokenProvider));
+    private final DefaultAuthorizationCodeFlowAccessTokenReturner returner = new DefaultAuthorizationCodeFlowAccessTokenReturner(validator, authorizationCodeManager, new DefaultJwtOauth2AccessTokenGenerator(jwtTokenProvider));
 
 
     @BeforeEach

@@ -6,7 +6,7 @@ import com.odeyalo.kyrie.exceptions.Oauth2Exception;
 /**
  * Return access token by authorization code
  */
-public interface AccessTokenReturner {
+public interface AuthorizationCodeFlowAccessTokenReturner {
 
     /**
      * Return the token if the all checks has been passed
