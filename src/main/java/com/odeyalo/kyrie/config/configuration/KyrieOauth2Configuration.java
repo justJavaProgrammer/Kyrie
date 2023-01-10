@@ -1,6 +1,6 @@
 package com.odeyalo.kyrie.config.configuration;
 
-import com.odeyalo.kyrie.config.MockedWebSecurityConfiguration;
+import com.odeyalo.kyrie.config.KyrieOauth2ServerWebSecurityConfiguration;
 import com.odeyalo.kyrie.config.Oauth2ClientCredentialsResolverHelper;
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authentication.InMemoryOauth2UserAuthenticationService;
@@ -40,7 +40,7 @@ import java.util.Set;
         RedirectUriCreationServicesConfiguration.class,
         KyrieOauth2RequestValidationConfiguration.class,
         KyrieOauth2ServerEndpointsMappingConfiguration.class,
-        MockedWebSecurityConfiguration.class
+        KyrieOauth2ServerWebSecurityConfiguration.class
 })
 public class KyrieOauth2Configuration {
     private final Logger logger = LoggerFactory.getLogger(KyrieOauth2Configuration.class);
