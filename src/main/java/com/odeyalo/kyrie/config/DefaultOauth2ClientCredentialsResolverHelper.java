@@ -26,7 +26,7 @@ public class DefaultOauth2ClientCredentialsResolverHelper implements Oauth2Clien
         if (authHeader != null) {
             clientCredentials = parseBasicAuthentication(authHeader);
         } else {
-            clientCredentials = getOauth2ClientCredentialsByParameters(request, requireClientSecret);
+            clientCredentials = getOauth2ClientCredentialsByParameters(request);
         }
 
         return clientCredentials;
@@ -35,20 +35,11 @@ public class DefaultOauth2ClientCredentialsResolverHelper implements Oauth2Clien
     /**
      * Using to resolve Oauth2ClientCredentials by request parameter that was provided in request.
      * @param request - request with parameters
-     * @param requireClientSecret - if client_secret parameter is required
      * @return - Oauth2ClientCredentials that was resolved from request parameters
      */
-    private Oauth2ClientCredentials getOauth2ClientCredentialsByParameters(HttpServletRequest request, boolean requireClientSecret) {
+    private Oauth2ClientCredentials getOauth2ClientCredentialsByParameters(HttpServletRequest request) {
         String clientId = request.getParameter("client_id");
         String clientSecret = request.getParameter("client_secret");
-
-        if (clientId != null && !requireClientSecret) {
-            return Oauth2ClientCredentials.of(clientId);
-        }
-
-        if (clientId == null || clientSecret == null) {
-            return null;
-        }
 
         return Oauth2ClientCredentials.of(clientId, clientSecret);
     }
