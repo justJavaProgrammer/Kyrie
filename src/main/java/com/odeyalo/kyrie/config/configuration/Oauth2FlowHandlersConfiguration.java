@@ -10,8 +10,8 @@ import com.odeyalo.kyrie.core.oauth2.oidc.generator.OidcOauth2TokenGeneratorFaca
 import com.odeyalo.kyrie.core.oauth2.oidc.generator.OidcOauth2TokenGeneratorFacadeImpl;
 import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolver;
 import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolverImpl;
-import com.odeyalo.kyrie.core.oauth2.tokens.AccessTokenReturner;
-import com.odeyalo.kyrie.core.oauth2.tokens.DefaultAccessTokenReturner;
+import com.odeyalo.kyrie.core.oauth2.tokens.AuthorizationCodeFlowAccessTokenReturner;
+import com.odeyalo.kyrie.core.oauth2.tokens.DefaultAuthorizationCodeFlowAccessTokenReturner;
 import com.odeyalo.kyrie.core.oauth2.tokens.DefaultJwtOauth2AccessTokenManager;
 import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessTokenManager;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.*;
@@ -49,8 +49,8 @@ public class Oauth2FlowHandlersConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AccessTokenReturner accessTokenReturner(ClientCredentialsValidator clientCredentialsValidator, AuthorizationCodeManager authorizationCodeManager, Oauth2AccessTokenGenerator oauth2AccessTokenGenerator) {
-        return new DefaultAccessTokenReturner(clientCredentialsValidator, authorizationCodeManager, oauth2AccessTokenGenerator);
+    public AuthorizationCodeFlowAccessTokenReturner accessTokenReturner(ClientCredentialsValidator clientCredentialsValidator, AuthorizationCodeManager authorizationCodeManager, Oauth2AccessTokenGenerator oauth2AccessTokenGenerator) {
+        return new DefaultAuthorizationCodeFlowAccessTokenReturner(clientCredentialsValidator, authorizationCodeManager, oauth2AccessTokenGenerator);
     }
 
 
@@ -138,7 +138,7 @@ public class Oauth2FlowHandlersConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public Oauth2AccessTokenManager oauth2AccessTokenManager(JwtTokenProvider jwtTokenProvider, AccessTokenReturner returner, Oauth2AccessTokenGenerator oauth2AccessTokenGenerator) {
+    public Oauth2AccessTokenManager oauth2AccessTokenManager(JwtTokenProvider jwtTokenProvider, AuthorizationCodeFlowAccessTokenReturner returner, Oauth2AccessTokenGenerator oauth2AccessTokenGenerator) {
         return new DefaultJwtOauth2AccessTokenManager(jwtTokenProvider, returner, oauth2AccessTokenGenerator);
     }
 }

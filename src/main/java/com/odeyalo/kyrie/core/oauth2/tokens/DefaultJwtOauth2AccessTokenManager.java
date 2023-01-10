@@ -13,10 +13,10 @@ import java.util.List;
  */
 public class DefaultJwtOauth2AccessTokenManager implements Oauth2AccessTokenManager {
     private final JwtTokenProvider jwtTokenProvider;
-    private final AccessTokenReturner returner;
+    private final AuthorizationCodeFlowAccessTokenReturner returner;
     private final Oauth2AccessTokenGenerator generator;
 
-    public DefaultJwtOauth2AccessTokenManager(JwtTokenProvider jwtTokenProvider, AccessTokenReturner returner, Oauth2AccessTokenGenerator generator) {
+    public DefaultJwtOauth2AccessTokenManager(JwtTokenProvider jwtTokenProvider, AuthorizationCodeFlowAccessTokenReturner returner, Oauth2AccessTokenGenerator generator) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.returner = returner;
         this.generator = generator;

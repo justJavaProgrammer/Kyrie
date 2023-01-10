@@ -67,7 +67,7 @@ class DefaultJwtOauth2AccessTokenManagerTest {
     private final AuthorizationCodeProvider authorizationCodeProvider = new DefaultStoringAuthorizationCodeProvider(new AuthorizationCodeGeneratorImpl(), codeStore);
     private final AuthorizationCodeManager authorizationCodeManager = new DefaultStoringAuthorizationCodeManager(authorizationCodeProvider, codeStore);
 
-    private final DefaultAccessTokenReturner returner = new DefaultAccessTokenReturner(validator, authorizationCodeManager, accessTokenGenerator);
+    private final DefaultAuthorizationCodeFlowAccessTokenReturner returner = new DefaultAuthorizationCodeFlowAccessTokenReturner(validator, authorizationCodeManager, accessTokenGenerator);
 
     private final DefaultJwtOauth2AccessTokenManager manager = new DefaultJwtOauth2AccessTokenManager(jwtTokenProvider, returner, accessTokenGenerator);
 
