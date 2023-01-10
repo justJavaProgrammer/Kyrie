@@ -27,7 +27,7 @@ public interface AccessTokenGranterStrategy {
      * @param request - request that was received from controller
      * @return - true if request is valid, false otherwise
      */
-    default boolean isValid(TokenRequest request) {
+    default boolean isGrantValid(TokenRequest request) {
         return request.getGrantType() == grantType();
     }
 }
