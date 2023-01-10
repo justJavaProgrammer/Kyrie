@@ -19,15 +19,19 @@ public enum AuthorizationGrantType {
     AUTHORIZATION_CODE("authorization_code", Oauth2ResponseType.CODE),
     /**
      * Implicit grant type
-     * Refer to @see <a href="https://www.rfc-editor.org/rfc/rfc6749#section-1.3.2">Implicit flow</a>
+     * Refer to <a href="https://www.rfc-editor.org/rfc/rfc6749#section-1.3.2">Implicit flow</a>
      */
     IMPLICIT("implicit", Oauth2ResponseType.TOKEN),
 
     /**
      * Represent custom multiple response type. Same as hybrid but supports Implicit flow too.
      */
-    MULTIPLE("multiple", Oauth2ResponseType.CODE, Oauth2ResponseType.TOKEN, OidcResponseType.ID_TOKEN);
+    MULTIPLE("multiple", Oauth2ResponseType.CODE, Oauth2ResponseType.TOKEN, OidcResponseType.ID_TOKEN),
 
+    /**
+     * Represent Password grant type. Refer to <a href="https://www.rfc-editor.org/rfc/rfc6749#section-4.3">Password grant</a>
+     */
+    PASSWORD("password", Oauth2ResponseType.TOKEN);
 
     private final String grantName;
     private final Oauth2ResponseType[] supportedResponseType;
