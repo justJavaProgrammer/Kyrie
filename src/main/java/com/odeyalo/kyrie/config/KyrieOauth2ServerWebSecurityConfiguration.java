@@ -15,6 +15,15 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+/**
+ * Configuration class that used to configure HTTP security for Kyrie Oauth2 Server.
+ * The configuration registry {@link DefaultSecurityFilterChain} bean with custom filters and custom {@link RequestMatcher}.
+ * It also can be configured through {@link KyrieOauth2Configurer}
+ *
+ * @see KyrieOauth2Configurer
+ * @see Oauth2ClientValidationFilter
+ * @see DefaultSecurityFilterChain
+ */
 @AutoConfigureAfter(value = KyrieOauth2ServerEndpointsMappingConfiguration.class)
 public class KyrieOauth2ServerWebSecurityConfiguration {
     private final Oauth2ClientValidationFilter filter;
@@ -38,6 +47,19 @@ public class KyrieOauth2ServerWebSecurityConfiguration {
         this.filter = filter;
     }
 
+    /**
+     * Create DefaultSecurityFilterChain bean that will be used when {@link KyrieOauth2RequestMatcher#matches(HttpServletRequest)} returns true.
+     *
+     * The bean has 0 order to make it first in {@link org.springframework.security.web.FilterChainProxy}.
+     *
+     * @param security - http security that was configured by Spring Security
+     * @return - DefaultSecurityFilterChain that will be registered in {@link org.springframework.security.web.FilterChainProxy}
+     * @throws Exception - if any exception was occurred during bean configuration
+     *
+     * @see org.springframework.security.web.FilterChainProxy
+     * @see DefaultSecurityFilterChain
+     * @see KyrieOauth2RequestMatcher
+     */
     @Bean
     @Order(0)
     public DefaultSecurityFilterChain kyrieAuthorizationServerSecurityFilterChain(HttpSecurity security) throws Exception {
@@ -54,6 +76,9 @@ public class KyrieOauth2ServerWebSecurityConfiguration {
 
     }
 
+    /**
+     * Simple RequestMatcher that matches only endpoints that were provided by {@link Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo}
+     */
     private class KyrieOauth2RequestMatcher implements RequestMatcher {
 
         @Override
