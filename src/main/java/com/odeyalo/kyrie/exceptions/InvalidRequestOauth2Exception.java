@@ -6,6 +6,11 @@ package com.odeyalo.kyrie.exceptions;
  */
 public class InvalidRequestOauth2Exception extends RedirectUriAwareOauth2Exception {
 
+
+    public InvalidRequestOauth2Exception(String message, String responseMessage) {
+        super(message, responseMessage, null, Oauth2ErrorType.INVALID_REQUEST);
+    }
+
     public InvalidRequestOauth2Exception(String message, String responseMessage, String redirectUri) {
         super(message, responseMessage, redirectUri, Oauth2ErrorType.INVALID_REQUEST);
     }
