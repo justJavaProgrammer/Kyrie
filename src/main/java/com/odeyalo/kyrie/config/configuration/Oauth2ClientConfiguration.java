@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.Set;
 
 @Configuration
 public class Oauth2ClientConfiguration {
@@ -37,5 +38,27 @@ public class Oauth2ClientConfiguration {
     @Autowired(required = false)
     public Oauth2UserAuthenticationService oauth2UserAuthenticationService(List<Oauth2User> users) {
         return new InMemoryOauth2UserAuthenticationService(users);
+    }
+
+    @Bean
+    public List<Oauth2User> users() {
+        Oauth2User user = Oauth2User.builder()
+                .id("1")
+                .username("Miku")
+                .password("password")
+                .authorities(Set.of("USER"))
+                .build();
+        return List.of(user);
+    }
+
+    @Bean
+    public List<Oauth2Client> clients() {
+        Oauth2Client client = Oauth2Client.builder()
+                .clientId("odeyalo")
+                .clientSecret("password")
+                .clientType(Oauth2Client.ClientType.CONFIDENTIAL)
+                .allowedRedirectUri("https://oauth.pstmn.io/v1/callback")
+                .build();
+        return List.of(client);
     }
 }
