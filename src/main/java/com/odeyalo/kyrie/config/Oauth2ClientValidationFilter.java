@@ -48,10 +48,16 @@ public class Oauth2ClientValidationFilter extends OncePerRequestFilter {
 
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-        Oauth2ClientCredentials clientCredentials = clientCredentialsResolverHelper.resolveCredentials(request, true);
+        Oauth2ClientCredentials clientCredentials = clientCredentialsResolverHelper.resolveCredentials(request, false);
 
         // If credentials are null then filter check is failed and other checks are useless
         if (clientCredentials == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        Oauth2Client client = oauth2ClientRepository.findOauth2ClientById(clientCredentials.getClientId());
+
+        if (client == null || (client.getClientType() == Oauth2Client.ClientType.CONFIDENTIAL && clientCredentials.getClientSecret() == null)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -59,7 +65,6 @@ public class Oauth2ClientValidationFilter extends OncePerRequestFilter {
         ValidationResult validationResult = clientCredentialsValidator.validateCredentials(clientCredentials);
 
         if (validationResult.isSuccess()) {
-            Oauth2Client client = oauth2ClientRepository.findOauth2ClientById(clientCredentials.getClientId());
             SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(client, client.getPassword(), client.getAuthorities()));
         }
 
