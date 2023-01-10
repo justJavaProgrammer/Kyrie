@@ -52,8 +52,13 @@ public class GlobalExceptionHandlerController {
 
 
     @ExceptionHandler(value = RedirectUriAwareOauth2Exception.class)
-    public ResponseEntity<?> handleOauth2Exception(RedirectUriAwareOauth2Exception exception) {
-        String redirectUri = UriComponentsBuilder.fromHttpUrl(exception.getRedirectUri())
+    public ResponseEntity<?> handleRedirectUriAwareOauth2Exception(RedirectUriAwareOauth2Exception exception) {
+        String uri = exception.getRedirectUri();
+        // If uri is not set, then delegate it to generic exception handler
+        if (uri == null) {
+            return handleOauth2Exception(exception);
+        }
+        String redirectUri = UriComponentsBuilder.fromHttpUrl(uri)
                 .queryParam(ERROR_PARAMETER_NAME, exception.getErrorType().getErrorName())
                 .queryParam(ERROR_DESCRIPTION_PARAMETER_NAME, exception.getDescription())
                 .toUriString();
