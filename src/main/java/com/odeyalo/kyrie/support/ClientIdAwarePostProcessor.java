@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
  */
 @Component
 public class ClientIdAwarePostProcessor implements BeanPostProcessor, BeanFactoryAware {
-    private final Logger logger = LoggerFactory.getLogger(ClientIdAware.class);
+    private final Logger logger = LoggerFactory.getLogger(ClientIdAwarePostProcessor.class);
     private BeanFactory beanFactory;
 
 
@@ -36,7 +36,7 @@ public class ClientIdAwarePostProcessor implements BeanPostProcessor, BeanFactor
             return bean;
         }
 
-        this.logger.info("Found ClientIdAware implementation. Creating proxy...");
+        this.logger.trace("Found ClientIdAware implementation. Creating proxy...");
         ClientIdAware clientIdAware = (ClientIdAware) bean;
         Enhancer enhancer = new Enhancer();
 
