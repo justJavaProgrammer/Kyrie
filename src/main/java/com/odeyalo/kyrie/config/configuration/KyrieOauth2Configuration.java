@@ -2,9 +2,6 @@ package com.odeyalo.kyrie.config.configuration;
 
 import com.odeyalo.kyrie.config.KyrieOauth2ServerWebSecurityConfiguration;
 import com.odeyalo.kyrie.config.Oauth2ClientCredentialsResolverHelper;
-import com.odeyalo.kyrie.core.Oauth2User;
-import com.odeyalo.kyrie.core.authentication.InMemoryOauth2UserAuthenticationService;
-import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
 import com.odeyalo.kyrie.core.oauth2.client.ClientCredentialsValidator;
 import com.odeyalo.kyrie.core.oauth2.client.DefaultClientCredentialsValidator;
@@ -12,7 +9,6 @@ import com.odeyalo.kyrie.core.oauth2.client.Oauth2ClientRepository;
 import com.odeyalo.kyrie.support.ClientId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -22,9 +18,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 /**
  * <p>
@@ -59,19 +52,6 @@ public class KyrieOauth2Configuration {
     @ConditionalOnMissingBean
     public ClientCredentialsValidator clientCredentialsValidator(Oauth2ClientRepository repository) {
         return new DefaultClientCredentialsValidator(repository);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    @Autowired(required = false)
-    public Oauth2UserAuthenticationService authenticationService(List<Oauth2User> users) {
-        return new InMemoryOauth2UserAuthenticationService(users);
-    }
-
-    @Bean
-    public List<Oauth2User> users() {
-        Oauth2User user = Oauth2User.builder().username("admin").password("123").authorities(Set.of("USER")).additionalInfo(Collections.emptyMap()).build();
-        return List.of(user);
     }
 
     /**
