@@ -1,7 +1,10 @@
-package com.odeyalo.kyrie.config;
+package com.odeyalo.kyrie.config.configuration;
 
-import com.odeyalo.kyrie.config.configuration.KyrieOauth2ServerEndpointsMappingConfiguration;
+import com.odeyalo.kyrie.config.KyrieOauth2Configurer;
+import com.odeyalo.kyrie.config.KyrieOauth2ConfigurerComposite;
+import com.odeyalo.kyrie.config.Oauth2ClientValidationFilter;
 import com.odeyalo.kyrie.config.configurers.Oauth2ServerEndpointsConfigurer;
+import com.odeyalo.kyrie.config.support.UnauthorizedOauth2ClientAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
@@ -62,7 +65,7 @@ public class KyrieOauth2ServerWebSecurityConfiguration {
      */
     @Bean
     @Order(0)
-    public DefaultSecurityFilterChain kyrieAuthorizationServerSecurityFilterChain(HttpSecurity security) throws Exception {
+    public DefaultSecurityFilterChain kyrieAuthorizationServerSecurityFilterChain(HttpSecurity security, UnauthorizedOauth2ClientAuthenticationEntryPoint authenticationEntryPoint) throws Exception {
         security.requestMatcher(new KyrieOauth2RequestMatcher());
         return security.csrf().disable()
                 .authorizeRequests()
@@ -72,8 +75,16 @@ public class KyrieOauth2ServerWebSecurityConfiguration {
                 .permitAll()
                 .and()
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .and()
                 .build();
 
+    }
+
+    @Bean
+    public UnauthorizedOauth2ClientAuthenticationEntryPoint unauthorizedOauth2ClientAuthenticationEntryPoint() {
+        return new UnauthorizedOauth2ClientAuthenticationEntryPoint();
     }
 
     /**
