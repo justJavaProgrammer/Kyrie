@@ -10,6 +10,6 @@ public class String2AuthorizationGrantTypeConverter implements Converter<String,
 
     @Override
     public AuthorizationGrantType convert(String source) {
-        return AuthorizationGrantType.ALL_TYPES.get(source);
+        return AuthorizationGrantType.fromSimplifiedName(source);
     }
 }
