@@ -40,10 +40,10 @@ import java.io.IOException;
 public class Oauth2ClientValidationFilter extends OncePerRequestFilter {
     private final ClientCredentialsValidator clientCredentialsValidator;
     private final Oauth2ClientRepository oauth2ClientRepository;
-    private final Oauth2ClientCredentialsResolverHelper clientCredentialsResolverHelper;
+    private final Oauth2ClientCredentialsResolver clientCredentialsResolverHelper;
     private final Logger logger = LoggerFactory.getLogger(Oauth2ClientValidationFilter.class);
 
-    public Oauth2ClientValidationFilter(ClientCredentialsValidator clientCredentialsValidator, Oauth2ClientRepository oauth2ClientRepository, Oauth2ClientCredentialsResolverHelper clientCredentialsResolverHelper) {
+    public Oauth2ClientValidationFilter(ClientCredentialsValidator clientCredentialsValidator, Oauth2ClientRepository oauth2ClientRepository, Oauth2ClientCredentialsResolver clientCredentialsResolverHelper) {
         this.clientCredentialsValidator = clientCredentialsValidator;
         this.oauth2ClientRepository = oauth2ClientRepository;
         this.clientCredentialsResolverHelper = clientCredentialsResolverHelper;
