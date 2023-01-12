@@ -1,6 +1,5 @@
 package com.odeyalo.kyrie.config.configuration;
 
-import com.odeyalo.kyrie.config.KyrieOauth2ServerWebSecurityConfiguration;
 import com.odeyalo.kyrie.config.Oauth2ClientCredentialsResolverHelper;
 import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
 import com.odeyalo.kyrie.core.oauth2.client.ClientCredentialsValidator;
