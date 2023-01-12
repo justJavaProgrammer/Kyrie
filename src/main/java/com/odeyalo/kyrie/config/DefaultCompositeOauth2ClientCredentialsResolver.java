@@ -5,7 +5,6 @@ import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * {@link Oauth2ClientCredentialsResolver} implementation that supports Oauth2 client authentication
@@ -25,10 +24,11 @@ public class DefaultCompositeOauth2ClientCredentialsResolver implements Oauth2Cl
 
     @Override
     public Oauth2ClientCredentials resolveCredentials(HttpServletRequest request, boolean requireClientSecret) {
-        Optional<Oauth2ClientCredentialsResolverHelper> optional = resolvers.stream().filter(resolver -> resolver.canBeResolved(request)).findFirst();
-        if (optional.isEmpty()) {
-            return null;
-        }
-        return optional.get().resolveCredentials(request);
+        return resolvers
+                .stream()
+                .filter(resolver -> resolver.canBeResolved(request))
+                .findFirst()
+                .map(resolver -> resolver.resolveCredentials(request))
+                .orElse(null);
     }
 }
