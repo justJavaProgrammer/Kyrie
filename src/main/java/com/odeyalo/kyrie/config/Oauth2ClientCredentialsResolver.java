@@ -7,7 +7,9 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Used to resolve client credentials from http request
  */
-public interface Oauth2ClientCredentialsResolverHelper {
+public interface Oauth2ClientCredentialsResolver {
+    boolean REQUIRE_CLIENT_SECRET_FLAG = true;
+    boolean DO_NOT_REQUIRE_CLIENT_SECRET_FLAG = false;
 
     /**
      * Resolve client credentials from request.
