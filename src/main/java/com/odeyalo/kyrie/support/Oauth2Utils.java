@@ -20,4 +20,11 @@ public abstract class Oauth2Utils {
         }
         return Optional.empty();
     }
+
+    public static String[] fromRawScopes(String rawScopes) {
+        if (rawScopes == null) {
+            return null;
+        }
+        return AdvancedStringUtils.spaceDelimitedListToStringArray(rawScopes);
+    }
 }
