@@ -45,6 +45,10 @@ public enum AuthorizationGrantType {
         this.supportedResponseType = supportedResponseType;
     }
 
+    public static AuthorizationGrantType fromSimplifiedName(String name) {
+        return ALL_TYPES.get(name);
+    }
+
     public String getGrantName() {
         return grantName;
     }
