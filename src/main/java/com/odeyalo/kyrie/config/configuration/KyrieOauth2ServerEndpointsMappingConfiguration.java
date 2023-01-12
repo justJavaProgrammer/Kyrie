@@ -15,7 +15,6 @@ import com.odeyalo.kyrie.core.oauth2.flow.Oauth2FlowHandlerFactory;
 import com.odeyalo.kyrie.core.oauth2.support.RedirectUrlCreationServiceFactory;
 import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolver;
 import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessTokenManager;
-import com.odeyalo.kyrie.dto.GetAccessTokenRequestDTO;
 import com.odeyalo.kyrie.dto.LoginDTO;
 import com.odeyalo.kyrie.support.html.DefaultTemplateResolver;
 import com.odeyalo.kyrie.support.html.ModelEnhancerPostProcessor;
@@ -106,7 +105,7 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
 
         registryTokenEndpointJson(tokenController, mapping);
 
-//        registryTokenEndpointFormData(tokenController, mapping);
+        registryTokenEndpointFormData(tokenController, mapping);
 
         registryTokenInfoEndpoint(tokenController, mapping);
 
@@ -177,8 +176,9 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
         this.logger.debug("Using the: {} endpoint for token obtain endpoint with application/json content type", tokenEndpointName);
         RequestMappingInfo info = RequestMappingInfo.paths(tokenEndpointName)
                 .methods(RequestMethod.POST)
+                .consumes(MediaType.APPLICATION_JSON_VALUE)
                 .build();
-        mapping.registerMapping(info, tokenController, TokenController.class.getDeclaredMethod("resolveAccessTokenUsingJson", AuthorizationGrantType.class, String.class, String[].class, Map.class));
+        mapping.registerMapping(info, tokenController, TokenController.class.getDeclaredMethod("resolveAccessTokenUsingJson", Map.class));
     }
 
     private void registryTokenEndpointFormData(TokenController tokenController, RequestMappingHandlerMapping mapping) throws NoSuchMethodException {
@@ -188,7 +188,7 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
                 .consumes(MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .methods(RequestMethod.POST)
                 .build();
-        mapping.registerMapping(info, tokenController, TokenController.class.getDeclaredMethod("resolveAccessTokenUsingFormData", GetAccessTokenRequestDTO.class));
+        mapping.registerMapping(info, tokenController, TokenController.class.getDeclaredMethod("resolveAccessTokenUsingParams", AuthorizationGrantType.class, String.class, String[].class, Map.class));
     }
 
     private void registryLoginEndpointFormData(KyrieOauth2Controller kyrieOauth2Controller, RequestMappingHandlerMapping mapping) throws NoSuchMethodException {
