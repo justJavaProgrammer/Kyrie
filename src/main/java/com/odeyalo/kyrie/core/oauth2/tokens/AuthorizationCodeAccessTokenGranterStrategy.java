@@ -3,9 +3,11 @@ package com.odeyalo.kyrie.core.oauth2.tokens;
 import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
 import com.odeyalo.kyrie.core.oauth2.client.Oauth2Client;
+import com.odeyalo.kyrie.exceptions.InvalidClientCredentialsException;
 import com.odeyalo.kyrie.exceptions.InvalidGrantOauth2Exception;
 import com.odeyalo.kyrie.exceptions.Oauth2ErrorType;
 import com.odeyalo.kyrie.exceptions.Oauth2Exception;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +30,13 @@ public class AuthorizationCodeAccessTokenGranterStrategy implements AccessTokenG
             throw new InvalidGrantOauth2Exception(Oauth2ErrorType.INVALID_GRANT.getErrorName(), "The grant is invalid or malformed");
         }
 
-        Oauth2Client client = (Oauth2Client) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null) {
+            throw new InvalidClientCredentialsException("The client is unauthorized", "The client is unauthorized. To avoid the error add correct client_id and client secret");
+        }
+
+        Oauth2Client client = (Oauth2Client) authentication.getPrincipal();
         Oauth2ClientCredentials credentials = Oauth2ClientCredentials.of(client.getClientId(), client.getClientSecret());
         String authorizationCode = request.getRequestParameters().get(AUTHORIZATION_CODE_REQUEST_PARAMETER_VALUE);
         return authorizationCodeFlowAccessTokenReturner.getToken(credentials, authorizationCode);
