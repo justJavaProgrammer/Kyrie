@@ -1,14 +1,13 @@
 package com.odeyalo.kyrie.config.configuration;
 
-import com.odeyalo.kyrie.config.DefaultOauth2ClientCredentialsResolverHelper;
-import com.odeyalo.kyrie.config.Oauth2ClientCredentialsResolverHelper;
-import com.odeyalo.kyrie.config.Oauth2ClientValidationFilter;
+import com.odeyalo.kyrie.config.DefaultCompositeOauth2ClientCredentialsResolver;
+import com.odeyalo.kyrie.config.Oauth2ClientCredentialsResolver;
+import com.odeyalo.kyrie.config.support.Oauth2ClientCredentialsResolverHelper;
 import com.odeyalo.kyrie.controllers.support.AuthorizationRequestValidator;
 import com.odeyalo.kyrie.controllers.support.DefaultChainAuthorizationRequestValidator;
 import com.odeyalo.kyrie.controllers.support.validation.AuthorizationRequestValidationStep;
 import com.odeyalo.kyrie.controllers.support.validation.ClientIdAuthorizationRequestValidationStep;
 import com.odeyalo.kyrie.controllers.support.validation.RedirectUriAuthorizationRequestValidationStep;
-import com.odeyalo.kyrie.core.oauth2.client.ClientCredentialsValidator;
 import com.odeyalo.kyrie.core.oauth2.client.Oauth2ClientRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -17,19 +16,10 @@ import java.util.List;
 
 public class KyrieOauth2RequestValidationConfiguration {
 
-
     @Bean
     @ConditionalOnMissingBean
-    public Oauth2ClientValidationFilter oauth2ClientValidationFilter(ClientCredentialsValidator validator,
-                                                                     Oauth2ClientRepository oauth2ClientRepository,
-                                                                     Oauth2ClientCredentialsResolverHelper oauth2ClientCredentialsResolverHelper) {
-        return new Oauth2ClientValidationFilter(validator, oauth2ClientRepository, oauth2ClientCredentialsResolverHelper);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public Oauth2ClientCredentialsResolverHelper oauth2ClientCredentialsResolverHelper() {
-        return new DefaultOauth2ClientCredentialsResolverHelper();
+    public Oauth2ClientCredentialsResolver oauth2ClientCredentialsResolverHelper(List<Oauth2ClientCredentialsResolverHelper> resolvers) {
+        return new DefaultCompositeOauth2ClientCredentialsResolver(resolvers);
     }
     /**
      * Registry AuthorizationRequestValidator only if bean is missing.
