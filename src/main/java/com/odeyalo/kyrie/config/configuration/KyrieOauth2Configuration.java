@@ -1,6 +1,6 @@
 package com.odeyalo.kyrie.config.configuration;
 
-import com.odeyalo.kyrie.config.Oauth2ClientCredentialsResolverHelper;
+import com.odeyalo.kyrie.config.Oauth2ClientCredentialsResolver;
 import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
 import com.odeyalo.kyrie.core.oauth2.client.ClientCredentialsValidator;
 import com.odeyalo.kyrie.core.oauth2.client.DefaultClientCredentialsValidator;
@@ -36,9 +36,9 @@ import javax.servlet.http.HttpServletRequest;
 })
 public class KyrieOauth2Configuration {
     private final Logger logger = LoggerFactory.getLogger(KyrieOauth2Configuration.class);
-    private final Oauth2ClientCredentialsResolverHelper resolverHelper;
+    private final Oauth2ClientCredentialsResolver resolverHelper;
 
-    public KyrieOauth2Configuration(Oauth2ClientCredentialsResolverHelper resolverHelper) {
+    public KyrieOauth2Configuration(Oauth2ClientCredentialsResolver resolverHelper) {
         this.resolverHelper = resolverHelper;
     }
 
