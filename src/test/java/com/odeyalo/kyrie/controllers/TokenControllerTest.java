@@ -2,7 +2,6 @@ package com.odeyalo.kyrie.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odeyalo.kyrie.AbstractIntegrationTest;
-import com.odeyalo.kyrie.config.configuration.KyrieOauth2ServerWebSecurityConfiguration;
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 import com.odeyalo.kyrie.core.oauth2.client.ClientCredentialsValidator;
@@ -57,7 +56,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureMockMvc
-@Import({TokenControllerTest.TokenControllerTestConfiguration.class, KyrieOauth2ServerWebSecurityConfiguration.class})
+@Import({TokenControllerTest.TokenControllerTestConfiguration.class})
 @PropertySource(value = "classpath:application-test.properties")
 class TokenControllerTest extends AbstractIntegrationTest {
     public static final String CLIENT_ID = "client_id";
