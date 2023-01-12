@@ -19,12 +19,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static com.odeyalo.kyrie.core.oauth2.support.Oauth2Constants.ERROR_DESCRIPTION_PARAMETER_NAME;
+import static com.odeyalo.kyrie.core.oauth2.support.Oauth2Constants.ERROR_PARAMETER_NAME;
+
 @RestControllerAdvice
 public class GlobalExceptionHandlerController {
     private final static String MISSED_PARAMETER_NAME_KEY = "missedParameter";
     private final static String DESCRIPTION_KEY = "description";
-    public static final String ERROR_PARAMETER_NAME = "error";
-    public static final String ERROR_DESCRIPTION_PARAMETER_NAME = "error_description";
 
     /**
      * Handle the MissingServletRequestParameterException. This is helpful to return the description about error
@@ -50,6 +51,16 @@ public class GlobalExceptionHandlerController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON).body(body);
     }
 
+
+    @ExceptionHandler(InvalidClientCredentialsException.class)
+    public ResponseEntity<?> handleInvalidClientCredentialsException(InvalidClientCredentialsException exception) {
+
+        String description = exception.getDescription();
+        String errorName = exception.getErrorType().getErrorName();
+        ApiErrorMessage message = new ApiErrorMessage(errorName, description);
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(message);
+    }
 
     @ExceptionHandler(value = RedirectUriAwareOauth2Exception.class)
     public ResponseEntity<?> handleRedirectUriAwareOauth2Exception(RedirectUriAwareOauth2Exception exception) {
