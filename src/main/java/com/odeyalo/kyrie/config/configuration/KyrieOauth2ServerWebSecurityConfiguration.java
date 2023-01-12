@@ -2,16 +2,22 @@ package com.odeyalo.kyrie.config.configuration;
 
 import com.odeyalo.kyrie.config.KyrieOauth2Configurer;
 import com.odeyalo.kyrie.config.KyrieOauth2ConfigurerComposite;
+import com.odeyalo.kyrie.config.Oauth2ClientCredentialsResolver;
 import com.odeyalo.kyrie.config.Oauth2ClientValidationFilter;
 import com.odeyalo.kyrie.config.configurers.Oauth2ServerEndpointsConfigurer;
+import com.odeyalo.kyrie.config.support.Request2CachedContentHttpServletRequestWrapperFilter;
 import com.odeyalo.kyrie.config.support.UnauthorizedOauth2ClientAuthenticationEntryPoint;
+import com.odeyalo.kyrie.core.oauth2.client.ClientCredentialsValidator;
+import com.odeyalo.kyrie.core.oauth2.client.Oauth2ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.HeaderWriterFilter;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.annotation.PostConstruct;
@@ -29,7 +35,6 @@ import java.util.List;
  */
 @AutoConfigureAfter(value = KyrieOauth2ServerEndpointsMappingConfiguration.class)
 public class KyrieOauth2ServerWebSecurityConfiguration {
-    private final Oauth2ClientValidationFilter filter;
     private final KyrieOauth2ConfigurerComposite configurer = new KyrieOauth2ConfigurerComposite();
 
     private Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo info;
@@ -44,10 +49,6 @@ public class KyrieOauth2ServerWebSecurityConfiguration {
         Oauth2ServerEndpointsConfigurer configurer = new Oauth2ServerEndpointsConfigurer();
         this.configurer.configureEndpoints(configurer);
         this.info = configurer.buildOauth2ServerEndpointsInfo();
-    }
-
-    public KyrieOauth2ServerWebSecurityConfiguration(Oauth2ClientValidationFilter filter) {
-        this.filter = filter;
     }
 
     /**
@@ -65,7 +66,11 @@ public class KyrieOauth2ServerWebSecurityConfiguration {
      */
     @Bean
     @Order(0)
-    public DefaultSecurityFilterChain kyrieAuthorizationServerSecurityFilterChain(HttpSecurity security, UnauthorizedOauth2ClientAuthenticationEntryPoint authenticationEntryPoint) throws Exception {
+    public DefaultSecurityFilterChain kyrieAuthorizationServerSecurityFilterChain(HttpSecurity security,
+                                                                                  UnauthorizedOauth2ClientAuthenticationEntryPoint authenticationEntryPoint,
+                                                                                  Request2CachedContentHttpServletRequestWrapperFilter request2CachedContentHttpServletRequestWrapperFilter,
+                                                                                  Oauth2ClientValidationFilter oauth2ClientValidationFilter
+    ) throws Exception {
         security.requestMatcher(new KyrieOauth2RequestMatcher());
         return security.csrf().disable()
                 .authorizeRequests()
@@ -74,7 +79,8 @@ public class KyrieOauth2ServerWebSecurityConfiguration {
                 .requestMatchers(new KyrieOauth2RequestMatcher())
                 .permitAll()
                 .and()
-                .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(request2CachedContentHttpServletRequestWrapperFilter, HeaderWriterFilter.class)
+                .addFilterBefore(oauth2ClientValidationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint)
                 .and()
@@ -82,11 +88,25 @@ public class KyrieOauth2ServerWebSecurityConfiguration {
 
     }
 
+
+    @Bean
+    @ConditionalOnMissingBean
+    public Oauth2ClientValidationFilter oauth2ClientValidationFilter(ClientCredentialsValidator validator,
+                                                                     Oauth2ClientRepository oauth2ClientRepository,
+                                                                     Oauth2ClientCredentialsResolver oauth2ClientCredentialsResolver) {
+        return new Oauth2ClientValidationFilter(validator, oauth2ClientRepository, oauth2ClientCredentialsResolver);
+    }
+
+
     @Bean
     public UnauthorizedOauth2ClientAuthenticationEntryPoint unauthorizedOauth2ClientAuthenticationEntryPoint() {
         return new UnauthorizedOauth2ClientAuthenticationEntryPoint();
     }
 
+    @Bean
+    public Request2CachedContentHttpServletRequestWrapperFilter requestCacheFilter() {
+        return new Request2CachedContentHttpServletRequestWrapperFilter();
+    }
     /**
      * Simple RequestMatcher that matches only endpoints that were provided by {@link Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo}
      */
