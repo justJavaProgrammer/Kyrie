@@ -4,11 +4,13 @@ import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-class DefaultOauth2ClientCredentialsResolverHelperTest {
-    DefaultOauth2ClientCredentialsResolverHelper helper = new DefaultOauth2ClientCredentialsResolverHelper();
+class DefaultCompositeOauth2ClientCredentialsResolverTest {
+    DefaultCompositeOauth2ClientCredentialsResolver helper = new DefaultCompositeOauth2ClientCredentialsResolver(List.of());
 
     @Test
     void resolveCredentials() {
