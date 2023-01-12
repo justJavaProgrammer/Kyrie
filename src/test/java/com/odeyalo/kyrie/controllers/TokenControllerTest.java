@@ -2,9 +2,13 @@ package com.odeyalo.kyrie.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odeyalo.kyrie.AbstractIntegrationTest;
+import com.odeyalo.kyrie.config.configuration.KyrieOauth2ServerWebSecurityConfiguration;
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 import com.odeyalo.kyrie.core.oauth2.client.ClientCredentialsValidator;
+import com.odeyalo.kyrie.core.oauth2.client.InMemoryOauth2ClientRepository;
+import com.odeyalo.kyrie.core.oauth2.client.Oauth2Client;
+import com.odeyalo.kyrie.core.oauth2.client.Oauth2ClientRepository;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCode;
 import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCodeStore;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.Oauth2AccessTokenGenerator;
@@ -32,6 +36,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -52,7 +57,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureMockMvc
-@Import(TokenControllerTest.TokenControllerTestConfiguration.class)
+@Import({TokenControllerTest.TokenControllerTestConfiguration.class, KyrieOauth2ServerWebSecurityConfiguration.class})
 @PropertySource(value = "classpath:application-test.properties")
 class TokenControllerTest extends AbstractIntegrationTest {
     public static final String CLIENT_ID = "client_id";
@@ -101,7 +106,9 @@ class TokenControllerTest extends AbstractIntegrationTest {
 
     @BeforeAll
     public void init() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).alwaysDo(MockMvcResultHandlers.print()).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .alwaysDo(MockMvcResultHandlers.print()).build();
     }
 
     @TestConfiguration
@@ -123,6 +130,17 @@ class TokenControllerTest extends AbstractIntegrationTest {
                 }
                 return ValidationResult.failed("Client credentials are wrong");
             };
+        }
+        @Bean
+        @Primary
+        public Oauth2ClientRepository oauth2ClientRepository() {
+            Oauth2Client client = Oauth2Client.builder()
+                    .clientId(CLIENT_ID)
+                    .clientSecret(CLIENT_SECRET)
+                    .allowedRedirectUri("http://localhost:9000")
+                    .clientType(Oauth2Client.ClientType.CONFIDENTIAL)
+                    .build();
+            return new InMemoryOauth2ClientRepository(client);
         }
     }
 
@@ -255,7 +273,7 @@ class TokenControllerTest extends AbstractIntegrationTest {
                 .content(json)
         ).andExpectAll(
                 MockMvcResultMatchers.status().is4xxClientError(),
-                MockMvcResultMatchers.status().isBadRequest(),
+                MockMvcResultMatchers.status().isUnauthorized(),
                 MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON),
                 (result) -> {
                     String content = result.getResponse().getContentAsString();
@@ -276,13 +294,14 @@ class TokenControllerTest extends AbstractIntegrationTest {
     void resolveAccessTokenWithCorrectAuthorizationCodeUsingFormDataWithInvalidClientCredentials_AndExpectBadRequest() throws Exception {
         mockMvc.perform(post(TOKEN_ENDPOINT)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
+                .param(GRANT_TYPE_PARAMETER_NAME, AuthorizationGrantType.AUTHORIZATION_CODE.getGrantName())
                 .param(CODE_PARAMETER_NAME, MOCKED_EXISTING_AUTHORIZATION_CODE_VALUE)
                 .param(REDIRECT_URI_PARAMETER_NAME, REDIRECT_URL)
                 .param(CLIENT_ID_PARAMETER_NAME, NO_EXISTING_CLIENT_ID)
                 .param(CLIENT_SECRET_PARAMETER_NAME, NO_EXISTING_CLIENT_SECRET)
         ).andExpectAll(
                 MockMvcResultMatchers.status().is4xxClientError(),
-                MockMvcResultMatchers.status().isBadRequest(),
+                MockMvcResultMatchers.status().isUnauthorized(),
                 MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON),
                 (result) -> {
                     String content = result.getResponse().getContentAsString();
