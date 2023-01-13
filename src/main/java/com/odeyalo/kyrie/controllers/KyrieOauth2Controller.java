@@ -1,5 +1,6 @@
 package com.odeyalo.kyrie.controllers;
 
+import com.odeyalo.kyrie.controllers.support.AdvancedModelAttribute;
 import com.odeyalo.kyrie.controllers.support.AuthorizationRequestValidator;
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authentication.AuthenticationResult;
@@ -167,7 +168,7 @@ public class KyrieOauth2Controller {
      * @return - ResponseEntity with redirect or error, see above for more info.
      */
     @PostMapping(value = "/login", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_FORM_URLENCODED_VALUE})
-    public ResponseEntity<?> loginCheckAndGrantTypeProcessingUsingFormData(@ModelAttribute LoginDTO dto,
+    public ResponseEntity<?> loginCheckAndGrantTypeProcessingUsingFormData(@AdvancedModelAttribute LoginDTO dto,
                                                                            @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> sessionStore,
                                                                            SessionStatus status) {
         return doLoginAndGrantTypeProcessing(dto, sessionStore, status);
