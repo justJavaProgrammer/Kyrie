@@ -70,7 +70,7 @@ public class ClientIdAwarePostProcessor implements BeanPostProcessor, BeanFactor
 
         @Override
         public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-            if (method.getName().equals(ClientId.class.getMethod("getClientIdValue").getName())) {
+            if (method.equals(ClientId.class.getMethod("getClientIdValue"))) {
                 try {
                     ClientId clientId = beanFactory.getBean(ClientId.class);
                     logger.trace("Client id value received from factory: {}", clientId);
