@@ -13,14 +13,20 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * AccessTokenGranterStrategy implementation that used only for authorization code oauth2 flow and does not support other flow types
+ * <p> {@link AccessTokenGranterStrategy} implementation that used only for authorization code oauth2 flow and does not support other flow types</p>
+ *
+ * The implementation exchanges the provided authorization code for an access token, if authorization code is correct
+ *
+ * @see AccessTokenGranterStrategy
+ * @see <a href="https://www.rfc-editor.org/rfc/rfc6749#section-4.1.3">Access Token Request</a>
+ * @see <a href="https://www.rfc-editor.org/rfc/rfc6749#section-4.1.4">Access Token Response</a>
  */
 @Component
-public class AuthorizationCodeAccessTokenGranterStrategy implements AccessTokenGranterStrategy {
+public class AuthorizationCodeExchangeAccessTokenGranterStrategy implements AccessTokenGranterStrategy {
     private final AuthorizationCodeFlowAccessTokenReturner authorizationCodeFlowAccessTokenReturner;
     private static final String AUTHORIZATION_CODE_REQUEST_PARAMETER_VALUE = "code";
 
-    public AuthorizationCodeAccessTokenGranterStrategy(AuthorizationCodeFlowAccessTokenReturner authorizationCodeFlowAccessTokenReturner) {
+    public AuthorizationCodeExchangeAccessTokenGranterStrategy(AuthorizationCodeFlowAccessTokenReturner authorizationCodeFlowAccessTokenReturner) {
         this.authorizationCodeFlowAccessTokenReturner = authorizationCodeFlowAccessTokenReturner;
     }
 
