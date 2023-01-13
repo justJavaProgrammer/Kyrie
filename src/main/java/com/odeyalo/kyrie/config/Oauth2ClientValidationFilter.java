@@ -51,8 +51,8 @@ public class Oauth2ClientValidationFilter extends OncePerRequestFilter {
 
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+        this.logger.debug("Invoke Oauth2ClientValidationFilter for request: {}", request.getRequestURL());
         Oauth2ClientCredentials clientCredentials = clientCredentialsResolverHelper.resolveCredentials(request, false);
-
         // If credentials are null then filter check is failed and other checks are useless
         if (clientCredentials == null) {
             filterChain.doFilter(request, response);
