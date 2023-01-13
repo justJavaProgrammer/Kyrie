@@ -7,16 +7,21 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.*;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Map;
 
 /**
- * Simple {@link HttpServletRequestWrapper} implementation that used to cache request body and override {@link #getInputStream()} and {@link #getReader()} methods
+ * Simple {@link HttpServletRequestWrapper} implementation that used to cache request body and request parameters from request, override some methods from parent class that return cached values.
  *
  * Similar to {@link org.springframework.web.util.ContentCachingRequestWrapper} but override also 'getInputStream' and 'getReader' methods.
  * @see HttpServletRequestWrapper
  * @see org.springframework.web.util.ContentCachingRequestWrapper
+ * @see Request2CachedContentHttpServletRequestWrapperFilter
  */
 public class CachedContentHttpServletRequestWrapper extends HttpServletRequestWrapper {
     private final byte[] cachedBody;
+    private final Map<String, String[]> parameters;
 
     /**
      * Constructs a request object wrapping the given request.
@@ -26,7 +31,8 @@ public class CachedContentHttpServletRequestWrapper extends HttpServletRequestWr
      */
     public CachedContentHttpServletRequestWrapper(HttpServletRequest request) throws IOException {
         super(request);
-        cachedBody = StreamUtils.copyToByteArray(request.getInputStream());
+        this.parameters = request.getParameterMap();
+        this.cachedBody = StreamUtils.copyToByteArray(request.getInputStream());
     }
 
 
@@ -43,6 +49,26 @@ public class CachedContentHttpServletRequestWrapper extends HttpServletRequestWr
     public BufferedReader getReader() throws IOException {
         ByteArrayInputStream array = new ByteArrayInputStream(cachedBody);
         return new BufferedReader(new InputStreamReader(array));
+    }
+
+    @Override
+    public String getParameter(String name) {
+        return parameters.containsKey(name) ? parameters.get(name)[0] : null;
+    }
+
+    @Override
+    public Map<String, String[]> getParameterMap() {
+        return parameters;
+    }
+
+    @Override
+    public Enumeration<String> getParameterNames() {
+        return Collections.enumeration(parameters.keySet());
+    }
+
+    @Override
+    public String[] getParameterValues(String name) {
+        return parameters.get(name);
     }
 
     public static class CachedContentServletInputStream extends ServletInputStream {
