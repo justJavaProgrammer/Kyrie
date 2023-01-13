@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.stream.Collectors;
 
 /**
  * {@link Oauth2ClientCredentialsResolverHelper} implementation that parses ONLY request body and resolves client credentials only from it.
@@ -69,9 +71,11 @@ public class RequestBodyOauth2ClientCredentialsResolverHelper implements Oauth2C
      * @return - body from request, null otherwise
      */
     private String getBody(HttpServletRequest request) {
-//        return new String(.getContentAsByteArray());
-        CachedContentHttpServletRequestWrapper wrapper = (CachedContentHttpServletRequestWrapper) request;
-        return new String(wrapper.getContentAsByteArray());
+        try {
+            return request.getReader().lines().collect(Collectors.joining());
+        } catch (IOException e) {
+            return null;
+        }
     }
 
     /**
