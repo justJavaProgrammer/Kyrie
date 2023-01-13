@@ -10,9 +10,10 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Represent combined oauth2 token that uses to return access token with other data.
- * It useful when using multiple response types and response needs to return an access token with ID token.
- * In this case tokenValue from AbstractOauth2Token is access token and map store additional info, such other tokens and etc
+ * <p> Represent combined oauth2 token that uses to return access token with other data.</p>
+ * <p> It useful when using multiple response types and response needs to return an access token with ID token.</p>
+ * <p> In this case tokenValue from AbstractOauth2Token is access token and map store additional info, such other tokens and etc</p>
+ *
  * @see AbstractOauth2Token
  */
 @EqualsAndHashCode(callSuper = true)
@@ -27,11 +28,43 @@ public class CombinedOauth2Token extends AbstractOauth2Token {
     @Singular("addInfo")
     private Map<String, Object> additionalInfo;
 
+    /**
+     * Constructs the CombinedOauth2Token object from parent {@link Oauth2Token} object
+     *
+     * @param parent - parent Oauth2Token
+     */
+    protected CombinedOauth2Token(Oauth2Token parent) {
+        this.tokenValue = parent.getTokenValue();
+        this.issuedAt = parent.getIssuedAt();
+        this.expiresIn = parent.getExpiresIn();
+    }
+
+    /**
+     * Constructs the CombinedOauth2Token object from parent {@link Oauth2Token} object and add additional info.
+     * @param parent - parent {@link Oauth2Token} object
+     * @param additionalInfo - info that must be added to object
+     */
+    protected CombinedOauth2Token(Oauth2Token parent, Map<String, Object> additionalInfo) {
+        this(parent);
+        this.additionalInfo = additionalInfo;
+    }
+
+    public static CombinedOauth2Token from(Oauth2Token parent) {
+        return new CombinedOauth2Token(parent);
+    }
+
+    public static CombinedOauth2Token from(Oauth2Token parent, Map<String, Object> additionalInfo) {
+        return new CombinedOauth2Token(parent, additionalInfo);
+    }
+
+
+    // TODO: Write Enhancer for Oauth2Token that will be transformed into CombinedOauth2Token
 
     public static abstract class CombinedOauth2TokenBuilder<C extends CombinedOauth2Token, B extends CombinedOauth2TokenBuilder<C, B>> extends AbstractOauth2TokenBuilder<C, B> {
         /**
          * Add value to  additionalInfo only if optional is presented
-         * @param key - key specified with value
+         *
+         * @param key      - key specified with value
          * @param optional - optional with value or empty
          * @return - builder
          */
