@@ -7,13 +7,14 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
- * {@link Oauth2ClientCredentialsResolver} implementation that supports Oauth2 client authentication
- * through Basic Authentication, request parameters and JSON body.
- * <p>The parameters that will be used to perform authentication</p>
- * <ul>
- *     <li>client_id</li>
- *     <li>client_secret</li>
- * </ul>
+ * {@link Oauth2ClientCredentialsResolver} implementation that uses {@link Oauth2ClientCredentialsResolverHelper} to resolve client credentials.
+ *
+ * <p>
+ *     Note: ONLY first matching {@link Oauth2ClientCredentialsResolverHelper} will be used, other implementations will be ignored.
+ * </p>
+ *
+ * @see Oauth2ClientCredentialsResolverHelper
+ * @see Oauth2ClientCredentialsResolver
  */
 public class DefaultCompositeOauth2ClientCredentialsResolver implements Oauth2ClientCredentialsResolver {
     private final List<Oauth2ClientCredentialsResolverHelper> resolvers;
