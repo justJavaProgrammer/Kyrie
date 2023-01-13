@@ -12,7 +12,9 @@ import com.odeyalo.kyrie.core.oauth2.client.Oauth2ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.DefaultSecurityFilterChain;
@@ -97,6 +99,22 @@ public class KyrieOauth2ServerWebSecurityConfiguration {
         return new Oauth2ClientValidationFilter(validator, oauth2ClientRepository, oauth2ClientCredentialsResolver);
     }
 
+    @Bean
+    public FilterRegistrationBean<Oauth2ClientValidationFilter> oauth2ClientValidationFilterFilterRegistrationBean(Oauth2ClientValidationFilter oauth2ClientValidationFilter) {
+        FilterRegistrationBean<Oauth2ClientValidationFilter> filterFilterRegistrationBean = new FilterRegistrationBean<>();
+        filterFilterRegistrationBean.setFilter(oauth2ClientValidationFilter);
+        filterFilterRegistrationBean.setEnabled(false);
+        return filterFilterRegistrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<Request2CachedContentHttpServletRequestWrapperFilter> request2CachedContentHttpServletRequestWrapperFilterFilterRegistrationBean(Request2CachedContentHttpServletRequestWrapperFilter filter) {
+        FilterRegistrationBean<Request2CachedContentHttpServletRequestWrapperFilter> filterFilterRegistrationBean = new FilterRegistrationBean<>();
+        filterFilterRegistrationBean.setFilter(filter);
+        filterFilterRegistrationBean.setEnabled(false);
+        return filterFilterRegistrationBean;
+    }
+
 
     @Bean
     public UnauthorizedOauth2ClientAuthenticationEntryPoint unauthorizedOauth2ClientAuthenticationEntryPoint() {
@@ -104,6 +122,7 @@ public class KyrieOauth2ServerWebSecurityConfiguration {
     }
 
     @Bean
+    @Order(value = Ordered.HIGHEST_PRECEDENCE)
     public Request2CachedContentHttpServletRequestWrapperFilter requestCacheFilter() {
         return new Request2CachedContentHttpServletRequestWrapperFilter();
     }
