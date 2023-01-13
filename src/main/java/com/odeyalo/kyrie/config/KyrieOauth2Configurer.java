@@ -4,7 +4,7 @@ import com.odeyalo.kyrie.config.configurers.Oauth2ServerEndpointsConfigurer;
 import com.odeyalo.kyrie.config.configurers.Oauth2ServerViewRegistry;
 
 /**
- * The interface provides functionality to configure a different parts of Kyrie Server.
+ * The interface provides functionality to customize different parts of Kyrie Server.
  */
 public interface KyrieOauth2Configurer  {
 
