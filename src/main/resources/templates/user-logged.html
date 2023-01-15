@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Kyrie</title>
+</head>
+
+<style>
+    .account {
+        background-color: #a8a8a8;
+        color: white;
+        width: 200px;
+        height: 50px;
+        text-align: center;
+        line-height: 3;
+        cursor: pointer;
+        position: relative;
+    }
+    .link {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1;
+    }
+</style>
+<body>
+<div class="accounts">
+    <tr th:each="user: ${users}">
+        <div class="account">
+            <th th:text="${user.username}"></th>
+            <a th:href="@{/oauth2/login}">
+                <span class="link"></span>
+            </a>
+        </div>
+    </tr>
+</div>
+</body>
+</html>

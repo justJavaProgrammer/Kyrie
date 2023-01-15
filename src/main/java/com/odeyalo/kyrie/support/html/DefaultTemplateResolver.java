@@ -20,6 +20,7 @@ public class DefaultTemplateResolver implements TemplateResolver {
      * Constant to registry html template that will be returned for /login request
      */
     public static final String LOGIN_TEMPLATE_TYPE = "LOGIN_TEMPLATE";
+    public static final String USER_ALREADY_LOGGED_IN_TEMPLATE_TYPE = "USER_LOGGED_IN_TEMPLATE_TYPE";
 
     private final Map<String, View> templates;
     private final List<ModelEnhancerPostProcessor> enhancers;
@@ -37,11 +38,10 @@ public class DefaultTemplateResolver implements TemplateResolver {
         this.enhancers = enhancers;
     }
 
-// TODO: TemplateResolver must return templates with values from model. But how to make injection if controller returns empty model? Should I create interceptors?
     /**
      * Create DefaultTemplateResolver with specified templates
      * @param templates - templates to registry
-     * @param enhancers
+     * @param enhancers - enhancers to registry
      */
     public DefaultTemplateResolver(Map<String, View> templates, List<ModelEnhancerPostProcessor> enhancers) {
         this.templates = templates;
@@ -51,6 +51,7 @@ public class DefaultTemplateResolver implements TemplateResolver {
     @Override
     public ModelAndView getTemplate(String templateType, Model model) {
         View view = this.templates.get(templateType);
+
         if (view == null) {
             return null;
         }
