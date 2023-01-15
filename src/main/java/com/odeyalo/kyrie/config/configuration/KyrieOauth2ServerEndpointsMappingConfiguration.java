@@ -36,6 +36,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -56,6 +57,7 @@ import java.util.Map;
 public class KyrieOauth2ServerEndpointsMappingConfiguration {
 
     public static final String DEFAULT_LOGIN_TEMPLATE_NAME = "login.html";
+    public static final String DEFAULT_USER_LOGGED_TEMPLATE_NAME = "user-logged.html";
     private final KyrieOauth2ConfigurerComposite configurer = new KyrieOauth2ConfigurerComposite();
     private final Logger logger = LoggerFactory.getLogger(KyrieOauth2ServerEndpointsMappingConfiguration.class);
 
@@ -109,6 +111,8 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
 
         registryTokenInfoEndpoint(tokenController, mapping);
 
+        registryLoginUserFromSessionAndDoGrantTypeProcessing(kyrieOauth2Controller, mapping);
+
         return new WebMvcRegistrations() {
             @Override
             public RequestMappingHandlerMapping getRequestMappingHandlerMapping() {
@@ -136,6 +140,7 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
+    @Autowired(required = false)
     public TemplateResolver templateResolver(List<ModelEnhancerPostProcessor> processors) throws Exception {
         Oauth2ServerViewRegistry viewRegistry = new Oauth2ServerViewRegistry();
 
@@ -143,8 +148,10 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
 
         Map<String, View> views = viewRegistry.getViews();
         View loginView = viewResolver.resolveViewName(DEFAULT_LOGIN_TEMPLATE_NAME, Locale.ENGLISH);
+        View userLoggedView = viewResolver.resolveViewName(DEFAULT_USER_LOGGED_TEMPLATE_NAME, Locale.ENGLISH);
 
         views.putIfAbsent(DefaultTemplateResolver.LOGIN_TEMPLATE_TYPE, loginView);
+        views.putIfAbsent(DefaultTemplateResolver.USER_ALREADY_LOGGED_IN_TEMPLATE_TYPE, userLoggedView);
 
         DefaultTemplateResolver defaultTemplateResolver = new DefaultTemplateResolver(processors);
 
@@ -225,5 +232,14 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
                 .build();
         mapping.registerMapping(loginEndpointInfoJson, kyrieOauth2Controller,
                 KyrieOauth2Controller.class.getDeclaredMethod("loginCheckAndGrantTypeProcessingUsingJson", LoginDTO.class, Map.class, SessionStatus.class));
+    }
+
+    private void registryLoginUserFromSessionAndDoGrantTypeProcessing(KyrieOauth2Controller kyrieOauth2Controller, RequestMappingHandlerMapping mapping) throws NoSuchMethodException {
+        String loginEndpointName = info.getLoginEndpointName();
+        RequestMappingInfo requestMappingInfo = RequestMappingInfo
+                .paths(loginEndpointName)
+                .methods(RequestMethod.GET)
+                .build();
+        mapping.registerMapping(requestMappingInfo, kyrieOauth2Controller, KyrieOauth2Controller.class.getDeclaredMethod("loginUserFromSessionAndDoGrantTypeProcessing", HttpServletRequest.class, Map.class, SessionStatus.class));
     }
 }
