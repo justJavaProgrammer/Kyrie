@@ -41,6 +41,7 @@ public class Oauth2ClientConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public List<Oauth2User> users() {
         Oauth2User user = Oauth2User.builder()
                 .id("1")
@@ -52,6 +53,7 @@ public class Oauth2ClientConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public List<Oauth2Client> clients() {
         Oauth2Client client = Oauth2Client.builder()
                 .clientId("odeyalo")
