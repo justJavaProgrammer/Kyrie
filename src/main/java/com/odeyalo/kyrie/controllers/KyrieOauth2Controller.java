@@ -16,6 +16,7 @@ import com.odeyalo.kyrie.core.oauth2.flow.Oauth2FlowHandler;
 import com.odeyalo.kyrie.core.oauth2.flow.Oauth2FlowHandlerFactory;
 import com.odeyalo.kyrie.core.oauth2.support.RedirectUrlCreationServiceFactory;
 import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolver;
+import com.odeyalo.kyrie.core.sso.RememberMeService;
 import com.odeyalo.kyrie.core.support.Oauth2ValidationResult;
 import com.odeyalo.kyrie.dto.ApiErrorMessage;
 import com.odeyalo.kyrie.dto.LoginDTO;
@@ -26,14 +27,22 @@ import com.odeyalo.kyrie.support.html.DefaultTemplateResolver;
 import com.odeyalo.kyrie.support.html.TemplateResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ExtendedModelMap;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -56,6 +65,9 @@ public class KyrieOauth2Controller {
     private final RedirectUrlCreationServiceFactory redirectUrlCreationServiceFactory;
     private final AuthorizationRequestValidator validator;
     private final TemplateResolver templateResolver;
+
+    @Autowired
+    private RememberMeService rememberMeService;
 
     public static final String AUTHORIZATION_REQUEST_ATTRIBUTE_NAME = "authorizationRequest";
     public static final String WRONG_CREDENTIALS_ERROR_NAME = "wrong_credentials";
@@ -109,6 +121,7 @@ public class KyrieOauth2Controller {
             @RequestParam(name = "redirect_uri") String redirectUrl,
             @RequestParam(name = "state", required = false) String state,
             @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> authorizationRequestStore) {
+        HttpServletRequest currentReq = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
         AuthorizationGrantType grantType = grantTypeResolver.resolveGrantType(responseTypes);
 
@@ -129,9 +142,42 @@ public class KyrieOauth2Controller {
 
         AuthorizationRequestContextHolder.setContext(new AuthorizationRequestContext(request));
 
+        List<Oauth2User> users = rememberMeService.login(currentReq);
+
+        if (users != null && !users.isEmpty()) {
+            logger.info("Not empty");
+            Model model = new ExtendedModelMap();
+            model.addAttribute("users", users);
+            return templateResolver.getTemplate(DefaultTemplateResolver.USER_ALREADY_LOGGED_IN_TEMPLATE_TYPE, model);
+        }
+
         return templateResolver.getTemplate(DefaultTemplateResolver.LOGIN_TEMPLATE_TYPE);
     }
 
+    @GetMapping("/login")
+    public ResponseEntity<?> loginUserFromSessionAndDoGrantTypeProcessing(HttpServletRequest request,
+                                                                          @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> sessionStore,
+                                                                          SessionStatus status) {
+        AuthorizationRequest authorizationRequest = (AuthorizationRequest) sessionStore.get(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME);
+
+        if (authorizationRequest == null) {
+            ApiErrorMessage errorMessage = new ApiErrorMessage(MISSING_AUTHORIZATION_REQUEST_ERROR_NAME, "Session attribute does not found and request cannot be processed");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        }
+        List<Oauth2User> users = rememberMeService.login(request);
+        if (users == null || users.isEmpty()) {
+            return ResponseEntity.badRequest().body("The session does not contain user. Use POST request to authenticate without session");
+        }
+        Oauth2User oauth2User = users.get(0);
+
+        String redirectUrl = doGrantTypeProcessing(authorizationRequest, oauth2User, status);
+
+        if (redirectUrl == null) {
+            ApiErrorMessage message = new ApiErrorMessage(UNSUPPORTED_GRANT_TYPE_ERROR_NAME, "Kyrie does not support: " + authorizationRequest.getGrantType());
+            return ResponseEntity.badRequest().body(message);
+        }
+        return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, redirectUrl).build();
+    }
     /**
      * The '/login' endpoint for only POST HTTP request with ONLY application/json content-type.
      * <p>Possible Http response supported by endpoint:</p>
@@ -152,7 +198,6 @@ public class KyrieOauth2Controller {
                                                                        SessionStatus status) {
         return doLoginAndGrantTypeProcessing(dto, sessionStore, status);
     }
-
 
     /**
      * The '/login' endpoint for only POST HTTP request with multipart/form-data and application/x-www-form-urlencoded content-types.
@@ -176,6 +221,7 @@ public class KyrieOauth2Controller {
 
     private ResponseEntity<?> doLoginAndGrantTypeProcessing(LoginDTO dto, Map<String, Object> sessionStore, SessionStatus status) {
         AuthorizationRequest authorizationRequest = (AuthorizationRequest) sessionStore.get(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME);
+
         if (authorizationRequest == null) {
             ApiErrorMessage errorMessage = new ApiErrorMessage(MISSING_AUTHORIZATION_REQUEST_ERROR_NAME, "Session attribute does not found and request cannot be processed");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
@@ -183,7 +229,9 @@ public class KyrieOauth2Controller {
 
         logger.info("Auth request: {}", authorizationRequest);
 
+
         AuthenticationResult result = oauth2UserAuthenticationService.authenticate(new Oauth2UserAuthenticationInfo(dto.getUsername(), dto.getPassword()));
+
         if (result == null || !result.isSuccess()) {
             ApiErrorMessage errorMessage = new ApiErrorMessage(WRONG_CREDENTIALS_ERROR_NAME, "User credentials are wrong and login can't be performed");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
@@ -191,19 +239,35 @@ public class KyrieOauth2Controller {
 
         Oauth2User user = result.getUser();
 
-        Oauth2FlowHandler oauth2FlowHandler = oauth2FlowHandlerFactory.getOauth2FlowHandler(authorizationRequest);
-        if (oauth2FlowHandler == null) {
+        String redirectUrl = doGrantTypeProcessing(authorizationRequest, user, status);
+
+        if (redirectUrl == null) {
             ApiErrorMessage message = new ApiErrorMessage(UNSUPPORTED_GRANT_TYPE_ERROR_NAME, "Kyrie does not support: " + authorizationRequest.getGrantType());
             return ResponseEntity.badRequest().body(message);
+        }
+
+        logger.info("Redirecting to: {}", redirectUrl);
+
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletResponse response = requestAttributes.getResponse();
+        HttpServletRequest request = requestAttributes.getRequest();
+
+        rememberMeService.rememberMe(user, request, response);
+
+        return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, redirectUrl).build();
+    }
+
+    private String doGrantTypeProcessing(AuthorizationRequest authorizationRequest, Oauth2User user, SessionStatus status) {
+        Oauth2FlowHandler oauth2FlowHandler = oauth2FlowHandlerFactory.getOauth2FlowHandler(authorizationRequest);
+        if (oauth2FlowHandler == null) {
+            return null;
         }
         Oauth2Token token = oauth2FlowHandler.handleFlow(authorizationRequest, user);
         String redirectUrl = redirectUrlCreationServiceFactory.getRedirectUrlCreationService(authorizationRequest).createRedirectUrl(authorizationRequest, token);
         // No need to clear the sessionStore, if session is completed, then session store will be automatically cleared by DefaultSessionAttributeStore
         status.setComplete();
-        logger.info("Redirecting to: {}", redirectUrl);
-        return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, redirectUrl).build();
+        return redirectUrl;
     }
-
 
     private RuntimeException resolveException(String redirectUrl, Oauth2ValidationResult validationResult) {
         if (Oauth2ErrorType.INVALID_REDIRECT_URI.equals(validationResult.getErrorType())) {
