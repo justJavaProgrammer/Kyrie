@@ -5,7 +5,7 @@ import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.oauth2.Oauth2Token;
 
 /**
- * Create a redirect rul for specific grant type by Oauth2 and Oidc Specifications.
+ * Create a redirect url for specific grant type by Oauth2 and Oidc Specifications.
  */
 public interface RedirectUrlCreationService {
 
