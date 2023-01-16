@@ -28,6 +28,7 @@ public class CachedContentHttpServletRequestWrapper extends HttpServletRequestWr
      *
      * @param request The request to wrap
      * @throws IllegalArgumentException if the request is null
+     * @throws IOException if the request contains malformed body
      */
     public CachedContentHttpServletRequestWrapper(HttpServletRequest request) throws IOException {
         super(request);
