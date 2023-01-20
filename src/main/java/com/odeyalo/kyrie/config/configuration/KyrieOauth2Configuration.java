@@ -1,6 +1,10 @@
 package com.odeyalo.kyrie.config.configuration;
 
 import com.odeyalo.kyrie.config.Oauth2ClientCredentialsResolver;
+import com.odeyalo.kyrie.core.authentication.EventPublisherOauth2UserAuthenticationServiceProxy;
+import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
+import com.odeyalo.kyrie.core.events.KyrieEventPublisher;
+import com.odeyalo.kyrie.core.events.listener.DefaultSpringKyrieEventMulticaster;
 import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
 import com.odeyalo.kyrie.core.oauth2.client.ClientCredentialsValidator;
 import com.odeyalo.kyrie.core.oauth2.client.DefaultClientCredentialsValidator;
@@ -11,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -71,5 +77,17 @@ public class KyrieOauth2Configuration {
         ClientId wrap = ClientId.wrap(clientCredentials.getClientId());
         logger.debug("Created client id: {}", wrap);
         return wrap;
+    }
+
+    @Bean
+    @Primary
+    public EventPublisherOauth2UserAuthenticationServiceProxy eventPublisherOauth2UserAuthenticationServiceProxy(Oauth2UserAuthenticationService authenticationService,
+                                                                                                                 KyrieEventPublisher publisher) {
+        return new EventPublisherOauth2UserAuthenticationServiceProxy(authenticationService, publisher);
+    }
+
+    @Bean
+    public KyrieEventPublisher kyrieEventPublisher(ApplicationEventMulticaster multicaster) {
+        return new DefaultSpringKyrieEventMulticaster(multicaster);
     }
 }
