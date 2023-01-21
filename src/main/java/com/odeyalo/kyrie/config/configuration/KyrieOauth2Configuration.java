@@ -1,10 +1,10 @@
 package com.odeyalo.kyrie.config.configuration;
 
 import com.odeyalo.kyrie.config.Oauth2ClientCredentialsResolver;
-import com.odeyalo.kyrie.core.authentication.EventPublisherOauth2UserAuthenticationServiceProxy;
+import com.odeyalo.kyrie.core.authentication.EventPublisherOauth2UserAuthenticationServiceDecorator;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
+import com.odeyalo.kyrie.core.events.DefaultSpringKyrieEventMulticaster;
 import com.odeyalo.kyrie.core.events.KyrieEventPublisher;
-import com.odeyalo.kyrie.core.events.listener.DefaultSpringKyrieEventMulticaster;
 import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
 import com.odeyalo.kyrie.core.oauth2.client.ClientCredentialsValidator;
 import com.odeyalo.kyrie.core.oauth2.client.DefaultClientCredentialsValidator;
@@ -81,9 +81,9 @@ public class KyrieOauth2Configuration {
 
     @Bean
     @Primary
-    public EventPublisherOauth2UserAuthenticationServiceProxy eventPublisherOauth2UserAuthenticationServiceProxy(Oauth2UserAuthenticationService authenticationService,
-                                                                                                                 KyrieEventPublisher publisher) {
-        return new EventPublisherOauth2UserAuthenticationServiceProxy(authenticationService, publisher);
+    public EventPublisherOauth2UserAuthenticationServiceDecorator eventPublisherOauth2UserAuthenticationServiceProxy(Oauth2UserAuthenticationService authenticationService,
+                                                                                                                     KyrieEventPublisher publisher) {
+        return new EventPublisherOauth2UserAuthenticationServiceDecorator(authenticationService, publisher);
     }
 
     @Bean
