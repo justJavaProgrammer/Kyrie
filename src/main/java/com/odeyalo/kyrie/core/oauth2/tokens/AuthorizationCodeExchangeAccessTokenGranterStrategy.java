@@ -9,7 +9,6 @@ import com.odeyalo.kyrie.exceptions.Oauth2ErrorType;
 import com.odeyalo.kyrie.exceptions.Oauth2Exception;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 
 
 /**
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Component;
  * @see <a href="https://www.rfc-editor.org/rfc/rfc6749#section-4.1.3">Access Token Request</a>
  * @see <a href="https://www.rfc-editor.org/rfc/rfc6749#section-4.1.4">Access Token Response</a>
  */
-@Component
 public class AuthorizationCodeExchangeAccessTokenGranterStrategy implements AccessTokenGranterStrategy {
     private final AuthorizationCodeFlowAccessTokenReturner authorizationCodeFlowAccessTokenReturner;
     private static final String AUTHORIZATION_CODE_REQUEST_PARAMETER_VALUE = "code";

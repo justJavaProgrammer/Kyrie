@@ -11,7 +11,6 @@ import com.odeyalo.kyrie.exceptions.InvalidGrantOauth2Exception;
 import com.odeyalo.kyrie.exceptions.InvalidRequestOauth2Exception;
 import com.odeyalo.kyrie.exceptions.Oauth2ErrorType;
 import com.odeyalo.kyrie.exceptions.Oauth2Exception;
-import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
@@ -20,7 +19,6 @@ import java.util.Map;
  *
  * @see AccessTokenGranterStrategy
  */
-@Component
 public class PasswordFlowAccessTokenGranterStrategy implements AccessTokenGranterStrategy {
     private final Oauth2AccessTokenGenerator generator;
     private static final String USERNAME_REQUEST_PARAMETER_NAME = "username";
