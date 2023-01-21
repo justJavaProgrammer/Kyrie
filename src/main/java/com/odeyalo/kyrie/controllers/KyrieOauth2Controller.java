@@ -17,6 +17,7 @@ import com.odeyalo.kyrie.core.oauth2.flow.Oauth2FlowHandlerFactory;
 import com.odeyalo.kyrie.core.oauth2.support.RedirectUrlCreationServiceFactory;
 import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolver;
 import com.odeyalo.kyrie.core.sso.RememberMeService;
+import com.odeyalo.kyrie.core.sso.RememberedLoggedUserAccountsContainer;
 import com.odeyalo.kyrie.core.support.Oauth2ValidationResult;
 import com.odeyalo.kyrie.dto.ApiErrorMessage;
 import com.odeyalo.kyrie.dto.LoginDTO;
@@ -142,16 +143,16 @@ public class KyrieOauth2Controller {
 
         AuthorizationRequestContextHolder.setContext(new AuthorizationRequestContext(request));
 
-        List<Oauth2User> users = rememberMeService.login(currentReq);
+        RememberedLoggedUserAccountsContainer accountsContainer = rememberMeService.autoLogin(currentReq);
 
-        if (users != null && !users.isEmpty()) {
-            logger.info("Not empty");
-            Model model = new ExtendedModelMap();
-            model.addAttribute("users", users);
-            return templateResolver.getTemplate(DefaultTemplateResolver.USER_ALREADY_LOGGED_IN_TEMPLATE_TYPE, model);
+        if (accountsContainer.isEmpty()) {
+            return templateResolver.getTemplate(DefaultTemplateResolver.LOGIN_TEMPLATE_TYPE);
         }
 
-        return templateResolver.getTemplate(DefaultTemplateResolver.LOGIN_TEMPLATE_TYPE);
+        this.logger.info("The LoggedUserAccountsContainer returns not empty list of remembered account. Using USER_ALREADY_LOGGED_IN_TEMPLATE_TYPE template");
+        Model model = new ExtendedModelMap();
+        model.addAttribute("users", accountsContainer.getUsers());
+        return templateResolver.getTemplate(DefaultTemplateResolver.USER_ALREADY_LOGGED_IN_TEMPLATE_TYPE, model);
     }
 
     @GetMapping("/login")
@@ -164,10 +165,14 @@ public class KyrieOauth2Controller {
             ApiErrorMessage errorMessage = new ApiErrorMessage(MISSING_AUTHORIZATION_REQUEST_ERROR_NAME, "Session attribute does not found and request cannot be processed");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         }
-        List<Oauth2User> users = rememberMeService.login(request);
-        if (users == null || users.isEmpty()) {
+
+        RememberedLoggedUserAccountsContainer accountsContainer = rememberMeService.autoLogin(request);
+
+        if (accountsContainer.isEmpty()) {
             return ResponseEntity.badRequest().body("The session does not contain user. Use POST request to authenticate without session");
         }
+
+        List<Oauth2User> users = accountsContainer.getUsers();
         Oauth2User oauth2User = users.get(0);
 
         String redirectUrl = doGrantTypeProcessing(authorizationRequest, oauth2User, status);
