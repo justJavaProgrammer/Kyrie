@@ -1,7 +1,6 @@
-package com.odeyalo.kyrie.core.events.listener;
+package com.odeyalo.kyrie.core.events;
 
-import com.odeyalo.kyrie.core.events.AbstractKyrieEvent;
-import com.odeyalo.kyrie.core.events.KyrieEvent;
+import com.odeyalo.kyrie.core.events.listener.KyrieEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.ApplicationEventMulticaster;
@@ -35,7 +34,6 @@ public class DefaultSpringKyrieEventMulticaster implements KyrieEventMulticaster
     }
 
     @Override
-    @SuppressWarnings("unckecked")
     public void registryListener(KyrieEventListener<? extends KyrieEvent> listener) {
         multicaster.addApplicationListener(listener);
         this.logger.debug("Registered the listener: {}", listener.getClass().getName());

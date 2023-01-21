@@ -1,7 +1,4 @@
-package com.odeyalo.kyrie.core.events.listener;
-
-import com.odeyalo.kyrie.core.events.KyrieEventListenersRegistry;
-import com.odeyalo.kyrie.core.events.KyrieEventPublisher;
+package com.odeyalo.kyrie.core.events;
 
 /**
  * A simple facade interface to unite the event registry and event publishing
