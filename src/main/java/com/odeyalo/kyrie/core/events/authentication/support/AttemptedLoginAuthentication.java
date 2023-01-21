@@ -14,8 +14,8 @@ import java.util.HashSet;
 public class AttemptedLoginAuthentication implements Authentication {
     private final String username;
     private final String password;
-    private final Collection<? extends GrantedAuthority> authorities;
     private final Object details;
+    private final Collection<? extends GrantedAuthority> authorities;
 
     /**
      * Create new AttemptedLoginAuthentication with username and password
