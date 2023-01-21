@@ -8,6 +8,8 @@ import com.odeyalo.kyrie.controllers.support.DefaultChainAuthorizationRequestVal
 import com.odeyalo.kyrie.controllers.support.validation.AuthorizationRequestValidationStep;
 import com.odeyalo.kyrie.controllers.support.validation.ClientIdAuthorizationRequestValidationStep;
 import com.odeyalo.kyrie.controllers.support.validation.RedirectUriAuthorizationRequestValidationStep;
+import com.odeyalo.kyrie.core.oauth2.client.ClientCredentialsValidator;
+import com.odeyalo.kyrie.core.oauth2.client.DefaultClientCredentialsValidator;
 import com.odeyalo.kyrie.core.oauth2.client.Oauth2ClientRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +17,12 @@ import org.springframework.context.annotation.Bean;
 import java.util.List;
 
 public class KyrieOauth2RequestValidationConfiguration {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ClientCredentialsValidator clientCredentialsValidator(Oauth2ClientRepository repository) {
+        return new DefaultClientCredentialsValidator(repository);
+    }
 
     @Bean
     @ConditionalOnMissingBean
