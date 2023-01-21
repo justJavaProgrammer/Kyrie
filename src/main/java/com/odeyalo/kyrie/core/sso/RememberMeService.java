@@ -4,12 +4,27 @@ import com.odeyalo.kyrie.core.Oauth2User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+//todo: Create events, event listeners, do something with RememberMeService, add interceptors, token enhancers, do code refactor with GET /login
 
+/**
+ * Interface that used to remember the current user and associate it with the session or other data to avoid credentials re-enter.
+ */
 public interface RememberMeService {
 
-    List<Oauth2User> login(HttpServletRequest currentRequest);
+    /**
+     * Attempt to login the user, by cookie or something else.
+     * The method used to auto login multiple users
+     * @param currentRequest - received request
+     * @return - {@link RememberedLoggedUserAccountsContainer} with users or empty list. NEVER NULL
+     */
+    RememberedLoggedUserAccountsContainer autoLogin(HttpServletRequest currentRequest);
 
+    /**
+     * Remember the current user to avoid credentials re-enter
+     * @param oauth2User - authenticated Oauth2User
+     * @param currentRequest - current request
+     * @param currentResponse - response to return to end-user
+     */
     void rememberMe(Oauth2User oauth2User, HttpServletRequest currentRequest, HttpServletResponse currentResponse);
 
 }
