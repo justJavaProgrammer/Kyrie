@@ -12,7 +12,7 @@ public abstract class AbstractAuthenticationFailureKyrieEvent extends AbstractAu
 
     /**
      * Create AbstractAuthenticationKyrieEvent with random string as id.
-     * @param authentication - will be wrapped into {@link com.odeyalo.kyrie.core.events.authentication.AbstractAuthenticationKyrieEvent.NullAuthentication} if null
+     * @param authentication - will be wrapped into {@link com.odeyalo.kyrie.core.events.authentication.support.NullAuthentication} if null
      * @param authenticationException - exception with description
      */
     public AbstractAuthenticationFailureKyrieEvent(Authentication authentication, AuthenticationException authenticationException) {
@@ -24,7 +24,7 @@ public abstract class AbstractAuthenticationFailureKyrieEvent extends AbstractAu
     /**
      * Create AbstractAuthenticationKyrieEvent with provided event id.
      * @param eventId - custom event id
-     * @param authentication - will be wrapped into {@link com.odeyalo.kyrie.core.events.authentication.AbstractAuthenticationKyrieEvent.NullAuthentication} if null
+     * @param authentication - will be wrapped into {@link com.odeyalo.kyrie.core.events.authentication.support.NullAuthentication} if null
      * @param authenticationException - exception with description what is wrong
      */
     public AbstractAuthenticationFailureKyrieEvent(String eventId, Authentication authentication, AuthenticationException authenticationException) {
