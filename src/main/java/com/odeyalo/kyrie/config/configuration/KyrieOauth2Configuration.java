@@ -1,21 +1,15 @@
 package com.odeyalo.kyrie.config.configuration;
 
 import com.odeyalo.kyrie.config.Oauth2ClientCredentialsResolver;
-import com.odeyalo.kyrie.core.authentication.EventPublisherOauth2UserAuthenticationServiceDecorator;
-import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.events.DefaultSpringKyrieEventMulticaster;
 import com.odeyalo.kyrie.core.events.KyrieEventPublisher;
 import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
-import com.odeyalo.kyrie.core.oauth2.client.ClientCredentialsValidator;
-import com.odeyalo.kyrie.core.oauth2.client.DefaultClientCredentialsValidator;
-import com.odeyalo.kyrie.core.oauth2.client.Oauth2ClientRepository;
 import com.odeyalo.kyrie.support.ClientId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -34,10 +28,12 @@ import javax.servlet.http.HttpServletRequest;
  * @version 1.0
  */
 @Import(value = {
+        GenericKyrieOauth2Configuration.class,
         Oauth2FlowHandlersConfiguration.class,
         RedirectUriCreationServicesConfiguration.class,
         KyrieOauth2RequestValidationConfiguration.class,
         KyrieOauth2ServerEndpointsMappingConfiguration.class,
+        AccessTokenGrantersConfiguration.class,
         KyrieOauth2ServerWebSecurityConfiguration.class
 })
 public class KyrieOauth2Configuration {
@@ -55,8 +51,8 @@ public class KyrieOauth2Configuration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ClientCredentialsValidator clientCredentialsValidator(Oauth2ClientRepository repository) {
-        return new DefaultClientCredentialsValidator(repository);
+    public KyrieEventPublisher kyrieEventPublisher(ApplicationEventMulticaster multicaster) {
+        return new DefaultSpringKyrieEventMulticaster(multicaster);
     }
 
     /**
@@ -77,17 +73,5 @@ public class KyrieOauth2Configuration {
         ClientId wrap = ClientId.wrap(clientCredentials.getClientId());
         logger.debug("Created client id: {}", wrap);
         return wrap;
-    }
-
-    @Bean
-    @Primary
-    public EventPublisherOauth2UserAuthenticationServiceDecorator eventPublisherOauth2UserAuthenticationServiceProxy(Oauth2UserAuthenticationService authenticationService,
-                                                                                                                     KyrieEventPublisher publisher) {
-        return new EventPublisherOauth2UserAuthenticationServiceDecorator(authenticationService, publisher);
-    }
-
-    @Bean
-    public KyrieEventPublisher kyrieEventPublisher(ApplicationEventMulticaster multicaster) {
-        return new DefaultSpringKyrieEventMulticaster(multicaster);
     }
 }
