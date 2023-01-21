@@ -1,9 +1,10 @@
 package com.odeyalo.kyrie.core.events.authentication;
 
+import com.odeyalo.kyrie.core.events.authentication.support.AttemptedLoginAuthentication;
 import org.apache.commons.lang.RandomStringUtils;
 
 /**
- * The event will be occurred every time when the user tried to login
+ * The event will be occurred every time when the user tries to login
  */
 public class UserLoginAuthenticationAttemptedKyrieEvent extends AbstractAuthenticationAttemptedKyrieEvent {
     /**
