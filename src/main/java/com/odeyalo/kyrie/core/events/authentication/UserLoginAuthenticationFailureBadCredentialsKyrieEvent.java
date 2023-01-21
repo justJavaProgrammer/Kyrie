@@ -6,8 +6,7 @@ import org.springframework.security.core.AuthenticationException;
 /**
  * Event that will be occurred when user login is failed and reason is bad credentials provided by user.
  */
-public class UserLoginAuthenticationFailureBadCredentialsKyrieEvent extends AbstractAuthenticationFailureKyrieEvent {
-
+public class UserLoginAuthenticationFailureBadCredentialsKyrieEvent extends AbstractAuthenticationFailureBadCredentialsKyrieEvent {
 
     public UserLoginAuthenticationFailureBadCredentialsKyrieEvent(Authentication authentication, AuthenticationException authenticationException) {
         super(authentication, authenticationException);
