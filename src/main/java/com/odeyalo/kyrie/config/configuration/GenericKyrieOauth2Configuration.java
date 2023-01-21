@@ -9,13 +9,11 @@ import com.odeyalo.kyrie.core.oauth2.client.Oauth2ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 import java.util.Set;
 
-@Configuration
-public class Oauth2ClientConfiguration {
+public class GenericKyrieOauth2Configuration {
 
     /**
      * Registry the InMemoryOauth2ClientRepository bean with 'oauth2ClientRepository' name.
@@ -53,6 +51,7 @@ public class Oauth2ClientConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public List<Oauth2Client> clients() {
         Oauth2Client client = Oauth2Client.builder()
                 .clientId("odeyalo")
