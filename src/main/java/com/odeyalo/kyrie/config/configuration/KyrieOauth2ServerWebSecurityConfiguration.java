@@ -136,5 +136,10 @@ public class KyrieOauth2ServerWebSecurityConfiguration {
             String requestURI = request.getRequestURI();
             return requestURI.startsWith(info.getPrefix()) || requestURI.startsWith(info.getTokenEndpointName());
         }
+
+        @Override
+        public String toString() {
+            return "Kyrie endpoints: " + info.getPrefix() + " "  + info.getTokenEndpointName();
+        }
     }
 }
