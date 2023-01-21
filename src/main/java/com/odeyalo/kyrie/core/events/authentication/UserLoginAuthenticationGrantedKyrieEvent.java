@@ -3,9 +3,10 @@ package com.odeyalo.kyrie.core.events.authentication;
 import org.springframework.security.core.Authentication;
 
 /**
- * <p>The event will be occurred everytime when user has been successfully authenticated.</p>
+ * <p>The event will be occurred every time when user has been successfully authenticated.</p>
  *
- * <strong>NOTE:</strong> The event WON'T be occurred when {@link com.odeyalo.kyrie.core.oauth2.client.Oauth2Client} authenticated. Use {@link Oauth2ClientLoginAuthenticationGrantedKyrieEvent} for this purpose
+ * <strong>NOTE:</strong> The event WON'T be occurred when {@link com.odeyalo.kyrie.core.oauth2.client.Oauth2Client} has been authenticated.
+ * Use {@link Oauth2ClientLoginAuthenticationGrantedKyrieEvent} for this purpose
  */
 public class UserLoginAuthenticationGrantedKyrieEvent extends AbstractAuthenticationKyrieEvent {
 
