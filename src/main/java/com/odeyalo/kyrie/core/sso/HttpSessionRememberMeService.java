@@ -13,6 +13,10 @@ import java.util.List;
  */
 @Component
 public class HttpSessionRememberMeService implements RememberMeService {
+    /**
+     * Used as key to store the logged accounts in one session
+     */
+    public static final String LOGGED_ACCOUNTS_HTTP_SESSION_PROPERTY_NAME = "accounts";
 
     @Override
     public RememberedLoggedUserAccountsContainer autoLogin(HttpServletRequest currentRequest) {
@@ -20,7 +24,7 @@ public class HttpSessionRememberMeService implements RememberMeService {
         if (session == null) {
             return null;
         }
-        Object accounts = session.getAttribute("accounts");
+        Object accounts = session.getAttribute(LOGGED_ACCOUNTS_HTTP_SESSION_PROPERTY_NAME);
         if (accounts == null) {
             return RememberedLoggedUserAccountsContainer.empty();
         }
