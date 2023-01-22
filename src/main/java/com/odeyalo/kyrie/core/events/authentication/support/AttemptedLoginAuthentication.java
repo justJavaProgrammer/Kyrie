@@ -108,7 +108,7 @@ public class AttemptedLoginAuthentication implements Authentication {
 
     @Override
     public String getName() {
-        return null;
+        return username;
     }
 }
 
