@@ -2,6 +2,7 @@ package com.odeyalo.kyrie.config;
 
 import com.odeyalo.kyrie.config.configurers.Oauth2ServerEndpointsConfigurer;
 import com.odeyalo.kyrie.config.configurers.Oauth2ServerViewRegistry;
+import com.odeyalo.kyrie.core.oauth2.tokens.customizer.Oauth2TokenCustomizerProcessorRegistry;
 
 /**
  * The interface provides functionality to customize different parts of Kyrie Server.
@@ -23,6 +24,10 @@ public interface KyrieOauth2Configurer  {
      * @param viewRegistry - registry to configure
      */
     default void configureTemplates(Oauth2ServerViewRegistry viewRegistry) {
+
+    }
+
+    default void configureOauth2TokenCustomizers(Oauth2TokenCustomizerProcessorRegistry customizerProcessorRegistry) {
 
     }
 }

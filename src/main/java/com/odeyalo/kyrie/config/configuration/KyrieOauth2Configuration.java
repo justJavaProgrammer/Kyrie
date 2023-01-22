@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
         KyrieOauth2RequestValidationConfiguration.class,
         KyrieOauth2ServerEndpointsMappingConfiguration.class,
         AccessTokenGrantersConfiguration.class,
+        CustomizersConfiguration.class,
         KyrieOauth2ServerWebSecurityConfiguration.class
 })
 public class KyrieOauth2Configuration {
