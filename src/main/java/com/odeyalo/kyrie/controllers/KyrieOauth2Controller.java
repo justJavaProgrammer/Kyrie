@@ -2,13 +2,12 @@ package com.odeyalo.kyrie.controllers;
 
 import com.odeyalo.kyrie.controllers.support.AdvancedModelAttribute;
 import com.odeyalo.kyrie.controllers.support.AuthorizationRequestValidator;
+import com.odeyalo.kyrie.controllers.support.validation.ValidAuthorizationRequest;
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authentication.AuthenticationResult;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationInfo;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
-import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
-import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
 import com.odeyalo.kyrie.core.authorization.support.AuthorizationRequestContext;
 import com.odeyalo.kyrie.core.authorization.support.AuthorizationRequestContextHolder;
 import com.odeyalo.kyrie.core.oauth2.Oauth2Token;
@@ -18,12 +17,8 @@ import com.odeyalo.kyrie.core.oauth2.support.RedirectUrlCreationServiceFactory;
 import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolver;
 import com.odeyalo.kyrie.core.sso.RememberMeService;
 import com.odeyalo.kyrie.core.sso.RememberedLoggedUserAccountsContainer;
-import com.odeyalo.kyrie.core.support.Oauth2ValidationResult;
 import com.odeyalo.kyrie.dto.ApiErrorMessage;
 import com.odeyalo.kyrie.dto.LoginDTO;
-import com.odeyalo.kyrie.exceptions.Oauth2ErrorType;
-import com.odeyalo.kyrie.exceptions.Oauth2Exception;
-import com.odeyalo.kyrie.exceptions.RedirectUriAwareOauth2Exception;
 import com.odeyalo.kyrie.support.html.DefaultTemplateResolver;
 import com.odeyalo.kyrie.support.html.TemplateResolver;
 import org.slf4j.Logger;
@@ -96,18 +91,14 @@ public class KyrieOauth2Controller {
 
     /**
      * '/authorize' endpoint for only GET HTTP requests.
-     * Used to validate and store valid {@link AuthorizationRequest} in Session Attributes.
+     * The endpoint only put AuthorizationRequest in session store and return the html template to enter the credentials.
      * It also stores the valid AuthorizationRequest in {@link AuthorizationRequestContextHolder} for LOCAL thread only.
      * <p>
      * The endpoint response is html template.
      *
-     * @param clientId                  - client application id that wants to access user's data
-     * @param responseTypes             - oauth2 response types that must be returned to client.
-     * @param scopes                    - scopes that client application request. Unknown scopes will be ignored
-     * @param redirectUrl               - redirect url to redirect after successful or failed user authentication. If url is malformed then 400 BAD REQUEST will be returned to end user.
-     * @param state                     - optional parameter. If state was presented, then state will be returned in request parameters from redirect_uri parameter.
+     * @param request - ready to use AuthorizationRequest that already passed all checks
      * @param authorizationRequestStore - session store
-     * @return - {@link ModelAndView} resolved by {@link TemplateResolver}
+     * @return - {@link ModelAndView} resolved by {@link TemplateResolver}. Template that will be returned to user
      * @see AuthorizationRequest
      * @see AuthorizationRequestContextHolder
      * @see javax.servlet.http.HttpSession
@@ -115,30 +106,9 @@ public class KyrieOauth2Controller {
      * @see <a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-request/">The Authorization Request</a>
      */
     @GetMapping(value = "/authorize")
-    public ModelAndView authorization(
-            @RequestParam("client_id") String clientId,
-            @RequestParam("response_type") Oauth2ResponseType[] responseTypes,
-            @RequestParam("scope") String[] scopes,
-            @RequestParam(name = "redirect_uri") String redirectUrl,
-            @RequestParam(name = "state", required = false) String state,
-            @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> authorizationRequestStore) {
+    public ModelAndView authorization(@ValidAuthorizationRequest AuthorizationRequest request, @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> authorizationRequestStore) {
         HttpServletRequest currentReq = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
-        AuthorizationGrantType grantType = grantTypeResolver.resolveGrantType(responseTypes);
-
-        AuthorizationRequest request = AuthorizationRequest.builder().clientId(clientId)
-                .responseTypes(responseTypes)
-                .grantType(grantType)
-                .redirectUrl(redirectUrl)
-                .scopes(scopes)
-                .state(state)
-                .build();
-
-        Oauth2ValidationResult validationResult = validator.validateAuthorizationRequest(request);
-        if (!validationResult.isSuccess()) {
-            // The AuthorizationRequest is not valid, throw exception based on validation result
-            throw resolveException(redirectUrl, validationResult);
-        }
         authorizationRequestStore.put(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME, request);
 
         AuthorizationRequestContextHolder.setContext(new AuthorizationRequestContext(request));
@@ -272,15 +242,5 @@ public class KyrieOauth2Controller {
         // No need to clear the sessionStore, if session is completed, then session store will be automatically cleared by DefaultSessionAttributeStore
         status.setComplete();
         return redirectUrl;
-    }
-
-    private RuntimeException resolveException(String redirectUrl, Oauth2ValidationResult validationResult) {
-        if (Oauth2ErrorType.INVALID_REDIRECT_URI.equals(validationResult.getErrorType())) {
-            return new Oauth2Exception(
-                    String.format("Failed to initialize Authorization request. Reason: %s", validationResult.getMessage()),
-                    validationResult.getMessage(), validationResult.getErrorType());
-        }
-        return new RedirectUriAwareOauth2Exception(String.format("Failed to initialize Authorization request. Reason: %s", validationResult.getMessage()),
-                validationResult.getMessage(), redirectUrl, validationResult.getErrorType());
     }
 }
