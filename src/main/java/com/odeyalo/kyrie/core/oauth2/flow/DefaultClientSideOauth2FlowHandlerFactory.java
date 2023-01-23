@@ -3,8 +3,6 @@ package com.odeyalo.kyrie.core.oauth2.flow;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -23,7 +21,6 @@ public class DefaultClientSideOauth2FlowHandlerFactory implements ClientSideOaut
     private final Map<String, ClientSideOauth2FlowHandler> handlers;
     private final Logger logger = LoggerFactory.getLogger(DefaultClientSideOauth2FlowHandlerFactory.class);
 
-    @Autowired
     public DefaultClientSideOauth2FlowHandlerFactory(List<ClientSideOauth2FlowHandler> handlers) {
         this.handlers = handlers.stream().collect(Collectors.toMap(Oauth2FlowHandler::getFlowName, Function.identity()));
         this.logger.info("Initialized the handlers map with: {}", handlers);
