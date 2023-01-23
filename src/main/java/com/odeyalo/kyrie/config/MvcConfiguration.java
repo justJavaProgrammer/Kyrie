@@ -1,9 +1,10 @@
 package com.odeyalo.kyrie.config;
 
-import com.odeyalo.kyrie.controllers.support.AdvancedModelAttributeMethodProcessor;
-import com.odeyalo.kyrie.controllers.support.SpaceSeparatedStringToArrayConverter;
-import com.odeyalo.kyrie.controllers.support.String2AuthorizationGrantTypeConverter;
-import com.odeyalo.kyrie.controllers.support.String2ResponseTypeConverter;
+import com.odeyalo.kyrie.controllers.support.*;
+import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolver;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.support.DefaultConversionService;
@@ -21,11 +22,12 @@ import java.util.List;
  * Web mvc configuration that add custom resource handlers, arguments resolvers, etc
  */
 @Configuration
-public class MvcConfiguration implements WebMvcConfigurer {
+public class MvcConfiguration implements WebMvcConfigurer, ApplicationContextAware {
 
     private static final String[] CLASSPATH_RESOURCE_LOCATIONS = {
             "classpath:/META-INF/resources/", "classpath:/resources/",
-            "classpath:/static/", "classpath:/public/" };
+            "classpath:/static/", "classpath:/public/"};
+    private ApplicationContext applicationContext;
 
 
     @Override
@@ -37,13 +39,14 @@ public class MvcConfiguration implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(new AdvancedModelAttributeMethodProcessor(new ModelAttributeMethodProcessor(false)));
+        resolvers.add(applicationContext.getBean(AuthorizationRequestMethodProcessor.class));
     }
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(string2AuthorizationGrantTypeConverter());
         registry.addConverter(string2ResponseTypeConverter());
-        registry.addConverter(new SpaceSeparatedStringToArrayConverter(defaultConversionService()));
+        registry.addConverter(spaceSeparatedStringToArrayConverter());
     }
 
     @Override
@@ -60,6 +63,11 @@ public class MvcConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
+    public SpaceSeparatedStringToArrayConverter spaceSeparatedStringToArrayConverter() {
+        return new SpaceSeparatedStringToArrayConverter(defaultConversionService());
+    }
+
+    @Bean
     public String2AuthorizationGrantTypeConverter string2AuthorizationGrantTypeConverter() {
         return new String2AuthorizationGrantTypeConverter();
     }
@@ -67,5 +75,15 @@ public class MvcConfiguration implements WebMvcConfigurer {
     @Bean
     public String2ResponseTypeConverter string2ResponseTypeConverter() {
         return new String2ResponseTypeConverter();
+    }
+
+    @Bean
+    public AuthorizationRequestMethodProcessor authorizationRequestMethodProcessor(AuthorizationGrantTypeResolver authorizationGrantTypeResolver, AuthorizationRequestValidator authorizationRequestValidator) {
+        return new AuthorizationRequestMethodProcessor(string2ResponseTypeConverter(), spaceSeparatedStringToArrayConverter(), authorizationGrantTypeResolver, authorizationRequestValidator);
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }
