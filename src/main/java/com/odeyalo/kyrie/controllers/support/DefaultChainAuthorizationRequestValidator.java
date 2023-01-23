@@ -45,13 +45,29 @@ public class DefaultChainAuthorizationRequestValidator implements AuthorizationR
             return Oauth2ValidationResult.failed(Oauth2ErrorType.INVALID_REQUEST, "If response types more than 2, then Multiple flow should be used");
         }
         for (AuthorizationRequestValidationStep step : steps) {
-            logger.info("Validating the request using {} step", step.getClass().getName());
+            logger.debug("Validating the request using {} step", step.getClass().getName());
             Oauth2ValidationResult result = step.validate(request);
-            logger.info("Result check is: {}", result);
+            logger.debug("Result check is: {}", result);
             if (!result.isSuccess()) {
                 return result;
             }
         }
         return Oauth2ValidationResult.success();
+    }
+
+    /**
+     * Add additional AuthorizationRequestValidationStep to chain.
+     * @param validationStep - validation step to add in chain
+     */
+    public void addValidationStep(AuthorizationRequestValidationStep validationStep) {
+        this.steps.add(validationStep);
+    }
+
+    /**
+     * Remove the AuthorizationRequestValidationStep from chain.
+     * @param step - step to remove
+     */
+    public void removeValidationStep(Class<? extends AuthorizationRequestValidationStep> step) {
+        this.steps.removeIf(x -> x.getClass().equals(step));
     }
 }
