@@ -21,10 +21,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for AuthorizationCodeFlowRedirectUrlCreationService class.
- * @see AuthorizationCodeFlowRedirectUrlCreationService
+ * @see DefaultAuthorizationCodeFlowRedirectUrlCreationService
  */
-class AuthorizationCodeFlowRedirectUrlCreationServiceTest {
-    private final AuthorizationCodeFlowRedirectUrlCreationService redirectUrlCreationService = new AuthorizationCodeFlowRedirectUrlCreationService();
+class DefaultAuthorizationCodeFlowRedirectUrlCreationServiceTest {
+    private final DefaultAuthorizationCodeFlowRedirectUrlCreationService redirectUrlCreationService = new DefaultAuthorizationCodeFlowRedirectUrlCreationService();
 
     @Test
     @DisplayName("Create redirect url with state param and expect code and state in redirect url")
