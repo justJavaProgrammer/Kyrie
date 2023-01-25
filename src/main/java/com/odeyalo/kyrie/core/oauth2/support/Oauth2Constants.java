@@ -20,4 +20,5 @@ public class Oauth2Constants {
     public static final String ERROR_DESCRIPTION_PARAMETER_NAME = "error_description";
     public static final String RESPONSE_TYPE = "response_type";
     public static final String REDIRECT_URI = "redirect_uri";
+    public static final String REFRESH_TOKEN = "refresh_token";
 }
