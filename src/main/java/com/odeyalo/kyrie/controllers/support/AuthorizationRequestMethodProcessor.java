@@ -10,6 +10,7 @@ import com.odeyalo.kyrie.core.support.Oauth2ValidationResult;
 import com.odeyalo.kyrie.exceptions.Oauth2ErrorType;
 import com.odeyalo.kyrie.exceptions.Oauth2Exception;
 import com.odeyalo.kyrie.exceptions.RedirectUriAwareOauth2Exception;
+import com.odeyalo.kyrie.support.AdvancedStringUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -19,6 +20,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 
 /**
  * <p> {@link HandlerMethodArgumentResolver} implementation used to resolve the {@link AuthorizationRequest} from request.</p>
@@ -78,8 +80,10 @@ public class AuthorizationRequestMethodProcessor implements HandlerMethodArgumen
         assertNotNull(scopeParam, Oauth2Constants.SCOPE);
         assertNotNull(redirectUri, Oauth2Constants.REDIRECT_URI);
 
-        Oauth2ResponseType responseTypes = responseTypeConverter.convert(responseTypeParameter);
+        Oauth2ResponseType[] responseTypes = getOauth2ResponseTypes(responseTypeParameter);
+
         String[] scopes = (String[]) arrayConverter.convert(scopeParam, TypeDescriptor.forObject(scopeParam), TypeDescriptor.array(TypeDescriptor.valueOf(String.class)));
+
         AuthorizationGrantType grantType = grantTypeResolver.resolveGrantType(responseTypes);
 
 
@@ -91,6 +95,14 @@ public class AuthorizationRequestMethodProcessor implements HandlerMethodArgumen
                 .scopes(scopes)
                 .state(state)
                 .build();
+    }
+
+    private Oauth2ResponseType[] getOauth2ResponseTypes(String responseTypeParameter) {
+        Oauth2ResponseType[] responseTypes =
+                Arrays.stream(AdvancedStringUtils.spaceDelimitedListToStringArray(responseTypeParameter))
+                .map(rawResponseType -> responseTypeConverter.convert(rawResponseType))
+                        .toArray(Oauth2ResponseType[]::new);
+        return responseTypes;
     }
 
     private void assertNotNull(String value, String parameterName) throws MissingServletRequestParameterException {
