@@ -14,7 +14,7 @@ public class CustomizableMultipleResponseTypeFlowRedirectUriCreationServiceDecor
      * @param delegate    - parent {@link CustomizableMultipleResponseTypeFlowRedirectUriCreationServiceDecorator} to delegate and create redirect uri that will be used to customize
      * @param customizers - customizers holder
      */
-    protected CustomizableMultipleResponseTypeFlowRedirectUriCreationServiceDecorator(RedirectUrlCreationService delegate, Oauth2TokenCustomizerProcessorRegistry customizers) {
+    public CustomizableMultipleResponseTypeFlowRedirectUriCreationServiceDecorator(RedirectUrlCreationService delegate, Oauth2TokenCustomizerProcessorRegistry customizers) {
         super(delegate, customizers);
     }
 }

@@ -15,7 +15,7 @@ public class CustomizableImplicitFlowRedirectUrlCreationServiceDecorator extends
      * @param delegate    - parent {@link RedirectUrlCreationService} to delegate and create redirect uri that will be used to customize
      * @param customizers - customizers holder
      */
-    protected CustomizableImplicitFlowRedirectUrlCreationServiceDecorator(ImplicitFlowRedirectUrlCreationService delegate, Oauth2TokenCustomizerProcessorRegistry customizers) {
+    public CustomizableImplicitFlowRedirectUrlCreationServiceDecorator(ImplicitFlowRedirectUrlCreationService delegate, Oauth2TokenCustomizerProcessorRegistry customizers) {
         super(delegate, customizers);
     }
 }
