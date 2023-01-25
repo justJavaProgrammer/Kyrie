@@ -28,12 +28,12 @@ public class RedirectUriCreationServicesConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ImplicitFlowRedirectUrlCreationService implicitFlowRedirectUrlCreationService() {
-        return new ImplicitFlowRedirectUrlCreationService();
+        return new DefaultImplicitFlowRedirectUrlCreationService();
     }
 
     @Bean
     @ConditionalOnMissingBean
     public MultipleResponseTypeFlowRedirectUrlCreationService multipleResponseTypeFlowRedirectUrlCreationService() {
-        return new MultipleResponseTypeFlowRedirectUrlCreationService();
+        return new DefaultMultipleResponseTypeFlowRedirectUrlCreationService();
     }
 }
