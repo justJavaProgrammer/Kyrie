@@ -7,9 +7,6 @@ import com.odeyalo.kyrie.controllers.support.DefaultChainAuthorizationRequestVal
 import com.odeyalo.kyrie.controllers.support.validation.AuthorizationRequestValidationStep;
 import com.odeyalo.kyrie.controllers.support.validation.ClientIdAuthorizationRequestValidationStep;
 import com.odeyalo.kyrie.core.Oauth2User;
-import com.odeyalo.kyrie.core.authentication.AuthenticationResult;
-import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationInfo;
-import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
@@ -27,7 +24,6 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -36,7 +32,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -49,10 +44,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpSession;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static com.odeyalo.kyrie.controllers.KyrieOauth2Controller.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -76,8 +68,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  *  <li>'/authorize' endpoint with multiple response types and openid scope</li>
  *  <li>'/authorize' endpoint with multiple response types and WITHOUT openid scope</li>
  * </ul>
- * @see KyrieOauth2Controller
+ *
  * @version 1.0
+ * @see KyrieOauth2Controller
  */
 @ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -125,19 +118,16 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
      */
     @TestConfiguration
     public static class KyrieOauth2ControllerTestConfiguration {
-        @Autowired
-        private BeanFactory beanFactory;
 
         @Bean
-        @Primary
-        public Oauth2UserAuthenticationService oauth2UserAuthenticationService() {
-            return (info) -> {
-                if (info.equals(new Oauth2UserAuthenticationInfo(ADMIN_USERNAME_VALUE, ADMIN_PASSWORD_VALUE))) {
-                    Oauth2User user = new Oauth2User(ADMIN_USER_ID_VALUE, ADMIN_USERNAME_VALUE, ADMIN_PASSWORD_VALUE, Collections.singleton("ADMIN"), Collections.emptyMap());
-                    return AuthenticationResult.success(user);
-                }
-                return AuthenticationResult.failed();
-            };
+        public List<Oauth2User> users() {
+            return List.of(Oauth2User.builder()
+                    .id("1")
+                    .username(ADMIN_USERNAME_VALUE)
+                    .password(ADMIN_PASSWORD_VALUE)
+                    .authorities(Set.of("USER"))
+                    .additionalInfo(Collections.emptyMap())
+                    .build());
         }
 
         /**
@@ -200,7 +190,8 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                     assertNotNull(session, "Session cannot be null!");
                     Enumeration<String> attributeNames = session.getAttributeNames();
                     assertNotNull(attributeNames, "Session attributes cannot be null!");
-                    assertFalse(attributeNames.hasMoreElements());
+                    assertTrue(attributeNames.hasMoreElements(), "The session must contain element with remembered user");
+                    assertNull(session.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME), "After request was successfully handled, Authorization request must be removed from session store");
                 }
         );
     }
@@ -246,7 +237,8 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                     assertNotNull(session, "Session cannot be null!");
                     Enumeration<String> attributeNames = session.getAttributeNames();
                     assertNotNull(attributeNames, "Session attributes cannot be null!");
-                    assertFalse(attributeNames.hasMoreElements());
+                    assertTrue(attributeNames.hasMoreElements(), "The session must contain element with remembered user");
+                    assertNull(session.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME), "After request was successfully handled, Authorization request must be removed from session store");
                 }
         );
     }
@@ -292,8 +284,8 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                     HttpSession session = result.getRequest().getSession();
                     assertNotNull(session, "Session cannot be null!");
                     Enumeration<String> attributeNames = session.getAttributeNames();
-                    assertNotNull(attributeNames, "Session attributes cannot be null!");
-                    assertFalse(attributeNames.hasMoreElements());
+                    assertTrue(attributeNames.hasMoreElements(), "The session must contain element with remembered user");
+                    assertNull(session.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME), "After request was successfully handled, Authorization request must be removed from session store");
                 }
         );
     }
@@ -339,7 +331,8 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                     assertNotNull(session, "Session cannot be null!");
                     Enumeration<String> attributeNames = session.getAttributeNames();
                     assertNotNull(attributeNames, "Session attributes cannot be null!");
-                    assertFalse(attributeNames.hasMoreElements());
+                    assertTrue(attributeNames.hasMoreElements(), "The session must contain element with remembered user");
+                    assertNull(session.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME), "After request was successfully handled, Authorization request must be removed from session store");
                 }
         );
     }
@@ -389,8 +382,8 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                     HttpSession session = result.getRequest().getSession();
                     assertNotNull(session, "Session cannot be null!");
                     Enumeration<String> attributeNames = session.getAttributeNames();
-                    assertNotNull(attributeNames, "Session attributes cannot be null!");
-                    assertFalse(attributeNames.hasMoreElements());
+                    assertTrue(attributeNames.hasMoreElements(), "The session must contain element with remembered user");
+                    assertNull(session.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME), "After request was successfully handled, Authorization request must be removed from session store");
                 }
         );
     }
@@ -440,8 +433,8 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                     HttpSession session = result.getRequest().getSession();
                     assertNotNull(session, "Session cannot be null!");
                     Enumeration<String> attributeNames = session.getAttributeNames();
-                    assertNotNull(attributeNames, "Session attributes cannot be null!");
-                    assertFalse(attributeNames.hasMoreElements());
+                    assertTrue(attributeNames.hasMoreElements(), "The session must contain element with remembered user");
+                    assertNull(session.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME), "After request was successfully handled, Authorization request must be removed from session store");
                 }
         );
     }
@@ -492,8 +485,8 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                     HttpSession session = result.getRequest().getSession();
                     assertNotNull(session, "Session cannot be null!");
                     Enumeration<String> attributeNames = session.getAttributeNames();
-                    assertNotNull(attributeNames, "Session attributes cannot be null!");
-                    assertFalse(attributeNames.hasMoreElements());
+                    assertTrue(attributeNames.hasMoreElements(), "The session must contain element with remembered user");
+                    assertNull(session.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME), "After request was successfully handled, Authorization request must be removed from session store");
                 }
         );
     }
@@ -543,8 +536,8 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                     HttpSession session = result.getRequest().getSession();
                     assertNotNull(session, "Session cannot be null!");
                     Enumeration<String> attributeNames = session.getAttributeNames();
-                    assertNotNull(attributeNames, "Session attributes cannot be null!");
-                    assertFalse(attributeNames.hasMoreElements());
+                    assertTrue(attributeNames.hasMoreElements(), "The session must contain element with remembered user");
+                    assertNull(session.getAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME), "After request was successfully handled, Authorization request must be removed from session store");
                 }
         );
     }
@@ -775,11 +768,12 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
 
     /**
      * Test /login endpoint that doesn't contain an authorization request in session store and except 400 Bad Request
+     *
      * @throws Exception - if any exception occurred
      */
     @Test
     @DisplayName("Test /login endpoint using application/json content type with empty authorization request and expect bad request")
-    void loginCheckWithEmptyAuthorizationRequestUsingJsonAndExpect400() throws Exception{
+    void loginCheckWithEmptyAuthorizationRequestUsingJsonAndExpect400() throws Exception {
         LoginDTO dto = new LoginDTO(ADMIN_USERNAME_VALUE, ADMIN_PASSWORD_VALUE);
         String json = objectMapper.writeValueAsString(dto);
         mockMvc.perform(post(OAUTH_2_LOGIN_ENDPOINT_VALUE)
@@ -797,13 +791,15 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                         });
 
     }
+
     /**
      * Test /login endpoint that doesn't contain an authorization request in session store and except 400 Bad Request
+     *
      * @throws Exception - if any exception occurred
      */
     @Test
     @DisplayName("Test /login endpoint using multipart/form-data content type with empty authorization request and expect bad request")
-    void loginCheckWithEmptyAuthorizationRequestUsingFormDataAndExpect400() throws Exception{
+    void loginCheckWithEmptyAuthorizationRequestUsingFormDataAndExpect400() throws Exception {
         mockMvc.perform(post(OAUTH_2_LOGIN_ENDPOINT_VALUE)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .param(USERNAME_PARAMETER_KEY, ADMIN_USERNAME_VALUE)
@@ -930,9 +926,10 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                             String errorDescription = message.getErrorDescription();
                             assertNotNull(error, "Error name must be presented");
                             assertNotNull(errorDescription, "Error description must be presented");
-                            assertEquals(UNSUPPORTED_GRANT_TYPE_ERROR_NAME,error, "Error names must be equal");
+                            assertEquals(UNSUPPORTED_GRANT_TYPE_ERROR_NAME, error, "Error names must be equal");
                         });
     }
+
     /**
      * Extracted method to perform mock request to endpoint with implicit flow and do some default checks
      *
