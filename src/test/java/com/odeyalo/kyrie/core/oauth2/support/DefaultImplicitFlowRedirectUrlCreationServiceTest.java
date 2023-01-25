@@ -18,10 +18,10 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Tests for ImplicitFlowRedirectUrlCreationService class.
  *
- * @see ImplicitFlowRedirectUrlCreationService
+ * @see DefaultImplicitFlowRedirectUrlCreationService
  */
-class ImplicitFlowRedirectUrlCreationServiceTest {
-    private final ImplicitFlowRedirectUrlCreationService redirectUrlCreationService = new ImplicitFlowRedirectUrlCreationService();
+class DefaultImplicitFlowRedirectUrlCreationServiceTest {
+    private final DefaultImplicitFlowRedirectUrlCreationService redirectUrlCreationService = new DefaultImplicitFlowRedirectUrlCreationService();
 
     @Test
     @DisplayName("Create redirect url using implicit flow with state and expect state, token, expires_in and token type params in redirect url")
