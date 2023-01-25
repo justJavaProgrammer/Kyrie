@@ -60,5 +60,4 @@ public class MultipleResponseTypeFlowRedirectUrlCreationService implements Redir
     public AuthorizationGrantType supportedGrantType() {
         return AuthorizationGrantType.MULTIPLE;
     }
-
 }
