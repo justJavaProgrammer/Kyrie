@@ -51,7 +51,7 @@ public class GenericKyrieOauth2Configuration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
+//    @ConditionalOnMissingBean
     public List<Oauth2Client> clients() {
         Oauth2Client client = Oauth2Client.builder()
                 .clientId("odeyalo")
