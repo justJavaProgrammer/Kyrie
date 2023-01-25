@@ -9,7 +9,7 @@ import com.odeyalo.kyrie.controllers.TokenController;
 import com.odeyalo.kyrie.controllers.support.AuthorizationRequestValidator;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
-import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
+import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.oauth2.Oauth2TokenGeneratorFacade;
 import com.odeyalo.kyrie.core.oauth2.flow.Oauth2FlowHandlerFactory;
 import com.odeyalo.kyrie.core.oauth2.support.RedirectUrlCreationServiceFactory;
@@ -219,7 +219,7 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
                         .produces(MediaType.TEXT_HTML_VALUE, MediaType.APPLICATION_JSON_VALUE)
                         .build();
         mapping.registerMapping(authorizeEndpointInfo, kyrieOauth2Controller,
-                KyrieOauth2Controller.class.getDeclaredMethod("authorization", String.class, Oauth2ResponseType[].class, String[].class, String.class, String.class, Map.class));
+                KyrieOauth2Controller.class.getDeclaredMethod("authorization", AuthorizationRequest.class, Map.class));
     }
 
     private void registryLoginEndpointJson(KyrieOauth2Controller kyrieOauth2Controller, RequestMappingHandlerMapping mapping) throws NoSuchMethodException {
