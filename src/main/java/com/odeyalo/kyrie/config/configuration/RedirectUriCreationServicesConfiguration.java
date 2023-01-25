@@ -9,17 +9,16 @@ import java.util.List;
 /**
  * Create beans that will be used to generate redirect_uri based on specific Oauth2 Flow.
  *
- * @see RedirectUrlCreationService
  * @version 1.0
+ * @see RedirectUrlCreationService
  */
 public class RedirectUriCreationServicesConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
     public AuthorizationCodeFlowRedirectUrlCreationService authorizationCodeFlowRedirectUrlCreationService() {
-        return new AuthorizationCodeFlowRedirectUrlCreationService();
+        return new DefaultAuthorizationCodeFlowRedirectUrlCreationService();
     }
-
     @Bean
     @ConditionalOnMissingBean
     public RedirectUrlCreationServiceFactory defaultRedirectUrlCreationServiceFactory(List<RedirectUrlCreationService> redirectUrlCreationServices) {
