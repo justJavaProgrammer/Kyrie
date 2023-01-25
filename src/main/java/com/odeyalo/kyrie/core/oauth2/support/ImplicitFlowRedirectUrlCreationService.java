@@ -3,7 +3,7 @@ package com.odeyalo.kyrie.core.oauth2.support;
 import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 
 /**
- * More specified interface that used to only to handle implicit flow
+ * More specific interface that used to only to handle implicit flow
  */
 public interface ImplicitFlowRedirectUrlCreationService extends RedirectUrlCreationService {
     /**
