@@ -18,6 +18,6 @@ public interface Oauth2TokenCustomizerProcessor {
      * @param original - original Oauth2Token that was generated.
      * @param builder - builder to put the customized field values from original Oauth2Token
      */
-    void enhanceOauth2Token(Oauth2Token original, CombinedOauth2Token.CombinedOauth2TokenBuilder<?, ?> builder);
+    void customizeOauth2Token(Oauth2Token original, CombinedOauth2Token.CombinedOauth2TokenBuilder<?, ?> builder);
 
 }
