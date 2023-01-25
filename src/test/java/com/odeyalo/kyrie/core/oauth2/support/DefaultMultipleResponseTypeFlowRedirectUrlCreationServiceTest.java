@@ -1,6 +1,5 @@
 package com.odeyalo.kyrie.core.oauth2.support;
 
-import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
@@ -8,7 +7,6 @@ import com.odeyalo.kyrie.core.oauth2.CombinedOauth2Token;
 import com.odeyalo.kyrie.core.oauth2.flow.MultipleResponseTypeOidcOauth2FlowHandler;
 import com.odeyalo.kyrie.core.oauth2.oidc.OidcResponseType;
 import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessToken;
-import com.odeyalo.kyrie.core.oauth2.tokens.code.AuthorizationCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.MultiValueMap;
@@ -23,11 +21,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for MultipleResponseTypeFlowRedirectUrlCreationService class.
- * @see MultipleResponseTypeFlowRedirectUrlCreationService
+ * @see DefaultMultipleResponseTypeFlowRedirectUrlCreationService
  * @version 1.0
  */
-class MultipleResponseTypeFlowRedirectUrlCreationServiceTest {
-    private final MultipleResponseTypeFlowRedirectUrlCreationService multipleResponseTypeFlowRedirectUrlCreationService = new MultipleResponseTypeFlowRedirectUrlCreationService();
+class DefaultMultipleResponseTypeFlowRedirectUrlCreationServiceTest {
+    private final DefaultMultipleResponseTypeFlowRedirectUrlCreationService defaultMultipleResponseTypeFlowRedirectUrlCreationService = new DefaultMultipleResponseTypeFlowRedirectUrlCreationService();
     private static final String STATE_QUERY_PARAM_KEY = "state";
     private static final String REDIRECT_URL = "http://localhost:9000/callback";
     private static final String STATE = "state123";
@@ -55,7 +53,7 @@ class MultipleResponseTypeFlowRedirectUrlCreationServiceTest {
                 .scopes(READ_WRITE_SCOPES)
                 .build();
 
-        String actualUrl = multipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, new CombinedOauth2Token(
+        String actualUrl = defaultMultipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, new CombinedOauth2Token(
                 Map.of(
                         MultipleResponseTypeOidcOauth2FlowHandler.ID_TOKEN_KEY, EXPECTED_ID_TOKEN_VALUE,
                         MultipleResponseTypeOidcOauth2FlowHandler.AUTHORIZATION_CODE_TOKEN_KEY, EXPECTED_AUTH_CODE_VALUE)
@@ -96,7 +94,7 @@ class MultipleResponseTypeFlowRedirectUrlCreationServiceTest {
                 .expiresIn(LocalDateTime.now().plusHours(1).toInstant(ZoneOffset.UTC)).build();
 
 
-        String actualUrl = multipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, token);
+        String actualUrl = defaultMultipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, token);
 
         MultiValueMap<String, String> params = UriComponentsBuilder.fromHttpUrl(actualUrl).build().getQueryParams();
         assertNotEquals(0, params.size());
@@ -141,7 +139,7 @@ class MultipleResponseTypeFlowRedirectUrlCreationServiceTest {
                 .expiresIn(LocalDateTime.now().plusHours(1).toInstant(ZoneOffset.UTC)).build();
 
 
-        String actualUrl = multipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, token);
+        String actualUrl = defaultMultipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, token);
 
         MultiValueMap<String, String> params = UriComponentsBuilder.fromHttpUrl(actualUrl).build().getQueryParams();
         assertNotEquals(0, params.size());
@@ -184,7 +182,7 @@ class MultipleResponseTypeFlowRedirectUrlCreationServiceTest {
                 .expiresIn(LocalDateTime.now().plusHours(1).toInstant(ZoneOffset.UTC)).build();
 
 
-        String actualUrl = multipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, token);
+        String actualUrl = defaultMultipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, token);
 
         MultiValueMap<String, String> params = UriComponentsBuilder.fromHttpUrl(actualUrl).build().getQueryParams();
         assertNotEquals(0, params.size());
@@ -226,7 +224,7 @@ class MultipleResponseTypeFlowRedirectUrlCreationServiceTest {
 
 
         UnsupportedOperationException exception = assertThrows(UnsupportedOperationException.class, () -> {
-            multipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, token);
+            defaultMultipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, token);
         });
 
         String message = exception.getMessage();
@@ -253,7 +251,7 @@ class MultipleResponseTypeFlowRedirectUrlCreationServiceTest {
                 .expiresIn(LocalDateTime.now().plusHours(1).toInstant(ZoneOffset.UTC)).build();
 
 
-        assertThrows(UnsupportedOperationException.class, () -> multipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, token),
+        assertThrows(UnsupportedOperationException.class, () -> defaultMultipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, token),
                 "If response types is less than 2 then the exception must be thrown");
     }
 
@@ -272,13 +270,13 @@ class MultipleResponseTypeFlowRedirectUrlCreationServiceTest {
                 .build();
 
         Oauth2AccessToken accessToken = Oauth2AccessToken.builder().tokenValue("token_value").issuedAt(Instant.now()).expiresIn(Instant.now().plusSeconds(60)).build();
-        assertThrows(UnsupportedOperationException.class, () -> multipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, accessToken));
+        assertThrows(UnsupportedOperationException.class, () -> defaultMultipleResponseTypeFlowRedirectUrlCreationService.createRedirectUrl(request, accessToken));
 
     }
 
     @Test
     @DisplayName("Check supported type")
     void supportedType() {
-        assertEquals(AuthorizationGrantType.MULTIPLE, multipleResponseTypeFlowRedirectUrlCreationService.supportedGrantType());
+        assertEquals(AuthorizationGrantType.MULTIPLE, defaultMultipleResponseTypeFlowRedirectUrlCreationService.supportedGrantType());
     }
 }
