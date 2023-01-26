@@ -10,11 +10,11 @@ import com.odeyalo.kyrie.controllers.support.AuthorizationRequestValidator;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
-import com.odeyalo.kyrie.core.oauth2.Oauth2TokenGeneratorFacade;
 import com.odeyalo.kyrie.core.oauth2.flow.Oauth2FlowHandlerFactory;
 import com.odeyalo.kyrie.core.oauth2.support.RedirectUrlCreationServiceFactory;
 import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolver;
 import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessTokenManager;
+import com.odeyalo.kyrie.core.oauth2.tokens.facade.AccessTokenGranterStrategyFacadeWrapper;
 import com.odeyalo.kyrie.dto.LoginDTO;
 import com.odeyalo.kyrie.support.html.DefaultTemplateResolver;
 import com.odeyalo.kyrie.support.html.ModelEnhancerPostProcessor;
@@ -164,8 +164,8 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
     }
 
     @Bean
-    public TokenController tokenController(Oauth2AccessTokenManager accessTokenManager, Oauth2TokenGeneratorFacade tokenGeneratorFacade) {
-        return new TokenController(accessTokenManager, tokenGeneratorFacade);
+    public TokenController tokenController(Oauth2AccessTokenManager accessTokenManager, AccessTokenGranterStrategyFacadeWrapper wrapper) {
+        return new TokenController(accessTokenManager, wrapper);
     }
 
     private void registryTokenInfoEndpoint(TokenController tokenController, RequestMappingHandlerMapping mapping) throws NoSuchMethodException {

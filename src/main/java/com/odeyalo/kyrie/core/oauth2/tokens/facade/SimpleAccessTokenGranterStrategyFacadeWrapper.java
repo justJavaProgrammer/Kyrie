@@ -8,7 +8,6 @@ import com.odeyalo.kyrie.core.oauth2.tokens.TokenRequest;
 import com.odeyalo.kyrie.core.oauth2.tokens.customizer.Oauth2TokenCustomizerProcessorRegistry;
 import com.odeyalo.kyrie.dto.Oauth2AccessTokenResponse;
 import com.odeyalo.kyrie.support.Oauth2Utils;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +17,6 @@ import java.util.Map;
  * {@link com.odeyalo.kyrie.core.oauth2.tokens.customizer.Oauth2TokenCustomizerProcessor}
  * to customize the {@link com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessToken}
  */
-@Component
 public class SimpleAccessTokenGranterStrategyFacadeWrapper implements AccessTokenGranterStrategyFacadeWrapper {
     private final AccessTokenGranterStrategyFactory delegateFactory;
     private final Oauth2TokenCustomizerProcessorRegistry container;
