@@ -40,4 +40,9 @@ public interface RefreshTokenRepository {
      */
     void deleteById(String id);
 
+    /**
+     * Delete the refresh tokekn by token value
+     * @param tokenValue - token value
+     */
+    void deleteByTokenValue(String tokenValue);
 }
