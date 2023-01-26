@@ -22,6 +22,10 @@ public class RefreshToken extends AbstractOauth2Token {
      * True if the refresh token is active and can be used to obtain new access tokens, false otherwise
      */
     protected boolean active;
+    /**
+     * Client id associated with this refresh token. No other client id WON'T be able to obtain new access token using this refresh token.
+     */
+    protected String clientId;
 
     public RefreshToken(String tokenValue) {
         this.tokenValue = tokenValue;
