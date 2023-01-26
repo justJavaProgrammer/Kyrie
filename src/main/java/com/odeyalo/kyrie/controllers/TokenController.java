@@ -1,18 +1,16 @@
 package com.odeyalo.kyrie.controllers;
 
 import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
-import com.odeyalo.kyrie.core.oauth2.Oauth2TokenGeneratorFacade;
 import com.odeyalo.kyrie.core.oauth2.support.Oauth2Constants;
-import com.odeyalo.kyrie.core.oauth2.tokens.AccessTokenGranterStrategyFactory;
 import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessToken;
 import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessTokenManager;
 import com.odeyalo.kyrie.core.oauth2.tokens.TokenRequest;
+import com.odeyalo.kyrie.core.oauth2.tokens.facade.AccessTokenGranterStrategyFacadeWrapper;
 import com.odeyalo.kyrie.dto.AccessTokenIntrospectionResponse;
-import com.odeyalo.kyrie.dto.KyrieSuccessfulObtainTokenResponse;
+import com.odeyalo.kyrie.dto.Oauth2AccessTokenResponse;
 import com.odeyalo.kyrie.support.Oauth2Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,14 +26,12 @@ import java.util.stream.Collectors;
 public class TokenController {
     private final Logger logger = LoggerFactory.getLogger(TokenController.class);
     private final Oauth2AccessTokenManager tokenManager;
-    private final Oauth2TokenGeneratorFacade generatorFacade;
 
-    @Autowired
-    private AccessTokenGranterStrategyFactory factory;
+    private final AccessTokenGranterStrategyFacadeWrapper wrapper;
 
-    public TokenController(Oauth2AccessTokenManager tokenManager, Oauth2TokenGeneratorFacade generatorFacade) {
+    public TokenController(Oauth2AccessTokenManager tokenManager, AccessTokenGranterStrategyFacadeWrapper wrapper) {
         this.tokenManager = tokenManager;
-        this.generatorFacade = generatorFacade;
+        this.wrapper = wrapper;
     }
 
     /**
@@ -95,16 +91,12 @@ public class TokenController {
                 .scope(info.getScope()).build();
     }
 
-    private ResponseEntity<KyrieSuccessfulObtainTokenResponse> doObtainAccessToken(TokenRequest body) {
+    private ResponseEntity<?> doObtainAccessToken(TokenRequest body) {
         logger.info("body {}", body);
-        Oauth2AccessToken token = factory.getGranter(body).obtainAccessToken(body);
-        return ResponseEntity.ok(
-                new KyrieSuccessfulObtainTokenResponse(
-                        token.getTokenValue(),
-                        token.getTokenType().getValue(),
-                        Oauth2Utils.getExpiresIn(token).orElse(token.getExpiresIn().getEpochSecond()),
-                        token.getScope())
-        );
+        Oauth2AccessTokenResponse tokenResponse = wrapper.getResponse(body);
+        this.logger.info("Return: {}", tokenResponse);
+        return ResponseEntity.ok(tokenResponse);
+
     }
 }
 
