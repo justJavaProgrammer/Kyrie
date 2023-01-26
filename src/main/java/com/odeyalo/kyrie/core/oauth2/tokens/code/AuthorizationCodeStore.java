@@ -1,7 +1,7 @@
 package com.odeyalo.kyrie.core.oauth2.tokens.code;
 
 /**
- * Used to store an generated authorization code
+ * Used to store the generated authorization code
  */
 public interface AuthorizationCodeStore {
 
