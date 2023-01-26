@@ -27,6 +27,10 @@ public interface KyrieOauth2Configurer  {
 
     }
 
+    /**
+     * The method can be used to customize the {@link Oauth2TokenCustomizerProcessorRegistry}, add or remove the {@link com.odeyalo.kyrie.core.oauth2.tokens.customizer.Oauth2TokenCustomizerProcessor}
+     * @param customizerProcessorRegistry - registry to customize
+     */
     default void configureOauth2TokenCustomizers(Oauth2TokenCustomizerProcessorRegistry customizerProcessorRegistry) {
 
     }
