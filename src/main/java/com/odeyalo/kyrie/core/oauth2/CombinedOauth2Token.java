@@ -57,9 +57,6 @@ public class CombinedOauth2Token extends AbstractOauth2Token {
         return new CombinedOauth2Token(parent, additionalInfo);
     }
 
-
-    // TODO: Write Enhancer for Oauth2Token that will be transformed into CombinedOauth2Token
-
     public static abstract class CombinedOauth2TokenBuilder<C extends CombinedOauth2Token, B extends CombinedOauth2TokenBuilder<C, B>> extends AbstractOauth2TokenBuilder<C, B> {
         /**
          * Add value to  additionalInfo only if optional is presented
