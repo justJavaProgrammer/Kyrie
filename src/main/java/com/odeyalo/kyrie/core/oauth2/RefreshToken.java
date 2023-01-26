@@ -13,9 +13,17 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @SuperBuilder
-public class RefreshOauth2Token extends AbstractOauth2Token {
+public class RefreshToken extends AbstractOauth2Token {
+    /**
+     * Scopes associated with this refresh token
+     */
+    protected String[] scopes;
+    /**
+     * True if the refresh token is active and can be used to obtain new access tokens, false otherwise
+     */
+    protected boolean active;
 
-    public RefreshOauth2Token(String tokenValue) {
+    public RefreshToken(String tokenValue) {
         this.tokenValue = tokenValue;
     }
 }
