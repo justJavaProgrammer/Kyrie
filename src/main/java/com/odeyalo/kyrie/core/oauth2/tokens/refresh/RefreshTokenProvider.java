@@ -1,7 +1,7 @@
 package com.odeyalo.kyrie.core.oauth2.tokens.refresh;
 
-import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
 import com.odeyalo.kyrie.core.oauth2.RefreshToken;
+import com.odeyalo.kyrie.support.ClientId;
 import org.springframework.util.Assert;
 
 /**
@@ -13,11 +13,11 @@ public interface RefreshTokenProvider {
      *
      * The refresh token that was provided can be saved in some type of store or can be self-contained string with all data inside token
      *
-     * @param credentials - client credentials with required non-null client id
+     * @param clientId - client id that requested refresh token
      * @param scopes - specific scopes that this refresh token contains
      * @return - generated refresh token
      */
-    RefreshToken generateToken(Oauth2ClientCredentials credentials, String[] scopes);
+    RefreshToken generateToken(ClientId clientId, String[] scopes);
 
     /**
      * Used to get refresh token by refresh token value.
