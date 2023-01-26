@@ -47,6 +47,9 @@ public class RequestBodyOauth2ClientCredentialsResolverHelper implements Oauth2C
         if (credentials == null) {
             return null;
         }
+        if ((credentials.clientId == null || credentials.clientSecret == null)) {
+            return null;
+        }
         return Oauth2ClientCredentials.of(credentials.getClientId(), credentials.getClientSecret());
     }
 
