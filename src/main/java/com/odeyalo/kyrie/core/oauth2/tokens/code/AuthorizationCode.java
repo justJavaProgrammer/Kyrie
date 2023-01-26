@@ -20,7 +20,7 @@ public class AuthorizationCode extends AbstractOauth2Token {
     @NonNull
     private final Oauth2User user;
     /**
-     * Array of the scopes to this authorization code
+     * Array of the scopes associated with this authorization code
      */
     @NonNull
     private final String[] scopes;
