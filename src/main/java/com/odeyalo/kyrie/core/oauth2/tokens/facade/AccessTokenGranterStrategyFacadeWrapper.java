@@ -6,7 +6,7 @@ import com.odeyalo.kyrie.core.oauth2.tokens.TokenRequest;
 import com.odeyalo.kyrie.dto.Oauth2AccessTokenResponse;
 
 /**
- * Facade interface that will be automatically wrap the {@link Oauth2AccessToken} from {@link com.odeyalo.kyrie.core.oauth2.tokens.AccessTokenGranterStrategy} to {@link CombinedOauth2Token}
+ * Facade interface that will automatically wrap the {@link Oauth2AccessToken} from {@link com.odeyalo.kyrie.core.oauth2.tokens.AccessTokenGranterStrategy} to {@link CombinedOauth2Token}
  */
 public interface AccessTokenGranterStrategyFacadeWrapper {
 
