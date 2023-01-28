@@ -247,6 +247,6 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
                 .paths(loginEndpointName)
                 .methods(RequestMethod.GET)
                 .build();
-        mapping.registerMapping(requestMappingInfo, kyrieOauth2Controller, KyrieOauth2Controller.class.getDeclaredMethod("loginUserFromSessionAndDoGrantTypeProcessing", HttpServletRequest.class, Map.class, SessionStatus.class));
+        mapping.registerMapping(requestMappingInfo, kyrieOauth2Controller, KyrieOauth2Controller.class.getDeclaredMethod("loginUserFromRememberMeAndDoGrantTypeProcessing", HttpServletRequest.class, String.class, Map.class, SessionStatus.class));
     }
 }
