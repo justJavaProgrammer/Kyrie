@@ -47,6 +47,7 @@ public class MvcConfiguration implements WebMvcConfigurer, ApplicationContextAwa
         registry.addConverter(string2AuthorizationGrantTypeConverter());
         registry.addConverter(string2ResponseTypeConverter());
         registry.addConverter(spaceSeparatedStringToArrayConverter());
+        registry.addConverter(string2PromptTypeConverter());
     }
 
     @Override
@@ -59,12 +60,18 @@ public class MvcConfiguration implements WebMvcConfigurer, ApplicationContextAwa
         DefaultConversionService defaultConversionService = new DefaultConversionService();
         defaultConversionService.addConverter(string2ResponseTypeConverter());
         defaultConversionService.addConverter(string2AuthorizationGrantTypeConverter());
+        defaultConversionService.addConverter(string2PromptTypeConverter());
         return defaultConversionService;
     }
 
     @Bean
     public SpaceSeparatedStringToArrayConverter spaceSeparatedStringToArrayConverter() {
         return new SpaceSeparatedStringToArrayConverter(defaultConversionService());
+    }
+
+    @Bean
+    public String2PromptTypeConverter string2PromptTypeConverter() {
+        return new String2PromptTypeConverter();
     }
 
     @Bean
