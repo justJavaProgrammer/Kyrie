@@ -59,10 +59,11 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
     public static final String DEFAULT_LOGIN_TEMPLATE_NAME = "login.html";
     public static final String DEFAULT_USER_LOGGED_TEMPLATE_NAME = "user-logged.html";
     private final KyrieOauth2ConfigurerComposite configurer = new KyrieOauth2ConfigurerComposite();
+    private final ViewResolver viewResolver;
+    private Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo info;
+
     private final Logger logger = LoggerFactory.getLogger(KyrieOauth2ServerEndpointsMappingConfiguration.class);
 
-    private Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo info;
-    private final ViewResolver viewResolver;
 
     public KyrieOauth2ServerEndpointsMappingConfiguration(@Qualifier("thymeleafViewResolver") ViewResolver viewResolver) {
         this.viewResolver = viewResolver;
@@ -81,9 +82,15 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
      */
     @PostConstruct
     public void configurerInitialize() {
+
+    }
+
+    @Bean
+    public Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo oauth2ServerEndpointsInfo() {
         Oauth2ServerEndpointsConfigurer configurer = new Oauth2ServerEndpointsConfigurer();
         this.configurer.configureEndpoints(configurer);
-        this.info = configurer.buildOauth2ServerEndpointsInfo();
+        info = configurer.buildOauth2ServerEndpointsInfo();
+        return info;
     }
 
     /**
@@ -219,7 +226,7 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
                         .produces(MediaType.TEXT_HTML_VALUE, MediaType.APPLICATION_JSON_VALUE)
                         .build();
         mapping.registerMapping(authorizeEndpointInfo, kyrieOauth2Controller,
-                KyrieOauth2Controller.class.getDeclaredMethod("authorization", AuthorizationRequest.class, Map.class));
+                KyrieOauth2Controller.class.getDeclaredMethod("authorization", AuthorizationRequest.class, String.class, Map.class));
     }
 
     private void registryLoginEndpointJson(KyrieOauth2Controller kyrieOauth2Controller, RequestMappingHandlerMapping mapping) throws NoSuchMethodException {
