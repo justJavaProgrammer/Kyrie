@@ -13,6 +13,7 @@ import com.odeyalo.kyrie.core.authorization.support.AuthorizationRequestContextH
 import com.odeyalo.kyrie.core.oauth2.Oauth2Token;
 import com.odeyalo.kyrie.core.oauth2.flow.Oauth2FlowHandler;
 import com.odeyalo.kyrie.core.oauth2.flow.Oauth2FlowHandlerFactory;
+import com.odeyalo.kyrie.core.oauth2.prompt.PromptHandler;
 import com.odeyalo.kyrie.core.oauth2.prompt.PromptHandlerFactory;
 import com.odeyalo.kyrie.core.oauth2.support.RedirectUrlCreationServiceFactory;
 import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolver;
@@ -20,6 +21,7 @@ import com.odeyalo.kyrie.core.sso.RememberMeService;
 import com.odeyalo.kyrie.core.sso.RememberedLoggedUserAccountsContainer;
 import com.odeyalo.kyrie.dto.ApiErrorMessage;
 import com.odeyalo.kyrie.dto.LoginDTO;
+import com.odeyalo.kyrie.exceptions.UnsupportedPromptTypeException;
 import com.odeyalo.kyrie.support.html.TemplateResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +39,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -111,24 +112,28 @@ public class KyrieOauth2Controller {
     public ModelAndView authorization(@ValidAuthorizationRequest AuthorizationRequest request,
                                       @RequestParam(value = "prompt", defaultValue = "login") String promptType,
                                       @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> authorizationRequestStore) {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
 
-
-        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
-        HttpServletRequest currentReq = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        HttpServletResponse response = attributes.getResponse();
+        HttpServletRequest currentReq = attributes.getRequest();
 
         authorizationRequestStore.put(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME, request);
 
         AuthorizationRequestContextHolder.setContext(new AuthorizationRequestContext(request));
 
+        PromptHandler promptHandler = promptHandlerFactory.getHandler(promptType);
+        if (promptHandler == null) {
+            throw new UnsupportedPromptTypeException("The given prompt does not supported by Oauth Server.", request.getRedirectUrl());
+        }
         // Delegate all job to PromptHandler
-        return promptHandlerFactory.getHandler(promptType).handlePrompt(new ExtendedModelMap(), currentReq, response);
-
+        return promptHandler.handlePrompt(new ExtendedModelMap(), currentReq, response);
     }
 
     @GetMapping("/login")
-    public ResponseEntity<?> loginUserFromSessionAndDoGrantTypeProcessing(HttpServletRequest request,
-                                                                          @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> sessionStore,
-                                                                          SessionStatus status) {
+    public ResponseEntity<?> loginUserFromRememberMeAndDoGrantTypeProcessing(HttpServletRequest request,
+                                                                             @RequestParam(name = "user_id") String userId,
+                                                                             @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> sessionStore,
+                                                                             SessionStatus status) {
         AuthorizationRequest authorizationRequest = (AuthorizationRequest) sessionStore.get(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME);
 
         if (authorizationRequest == null) {
@@ -142,8 +147,7 @@ public class KyrieOauth2Controller {
             return ResponseEntity.badRequest().body("The session does not contain user. Use POST request to authenticate without session");
         }
 
-        List<Oauth2User> users = accountsContainer.getUsers();
-        Oauth2User oauth2User = users.get(0);
+        Oauth2User oauth2User = accountsContainer.get(userId);
 
         String redirectUrl = doGrantTypeProcessing(authorizationRequest, oauth2User, status);
 
