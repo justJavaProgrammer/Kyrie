@@ -7,7 +7,6 @@ import com.odeyalo.kyrie.core.authorization.support.AuthorizationRequestContextH
 import com.odeyalo.kyrie.core.oauth2.support.Oauth2Constants;
 import com.odeyalo.kyrie.core.sso.RememberMeService;
 import com.odeyalo.kyrie.core.sso.RememberedLoggedUserAccountsContainer;
-import com.odeyalo.kyrie.exceptions.InvalidRedirectUriOauth2Exception;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
@@ -17,7 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -45,24 +44,17 @@ public class NonePromptHandler implements PromptHandler {
     @Override
     public ModelAndView handlePrompt(Model model, HttpServletRequest request, HttpServletResponse response) {
         RememberedLoggedUserAccountsContainer container = rememberMeService.autoLogin(request);
-        List<Oauth2User> users = container.getUsers();
+        Map<String, Oauth2User> users = container.getUsersMap();
         // The user doesn't logged yet or have more than 1 account, send interaction_required by OpenID spec.
         if (CollectionUtils.isEmpty(users) || users.size() != 1) {
             sendInteractionRequiredRedirect(response);
         }
         // Get the login endpoint that was configured by Oauth2ServerEndpointsConfigurer
         String loginEndpointName = endpointsInfo.getLoginEndpointName();
-
-        sendRedirect(response, loginEndpointName);
+        String id = users.keySet().stream().findFirst().get();
+        String redirectUri = UriComponentsBuilder.fromPath(loginEndpointName).queryParam("user_id", id).toUriString();
+        sendRedirect(response, redirectUri);
         return null;
-    }
-
-    private void sendRedirect(HttpServletResponse response, String location) {
-        try {
-            response.sendRedirect(location);
-        } catch (IOException ex) {
-            throw new IllegalArgumentException("The location is wrong");
-        }
     }
 
     private void sendInteractionRequiredRedirect(HttpServletResponse response) {
@@ -70,11 +62,14 @@ public class NonePromptHandler implements PromptHandler {
         String redirectUri = UriComponentsBuilder.fromUriString(authorizationRequest.getRedirectUrl())
                 .queryParam(Oauth2Constants.ERROR_PARAMETER_NAME, INTERACTION_REQUIRED)
                 .toUriString();
+        sendRedirect(response, redirectUri);
+    }
+
+    private void sendRedirect(HttpServletResponse response, String location) {
         try {
-            response.sendRedirect(redirectUri);
+            response.sendRedirect(location);
         } catch (IOException ex) {
-            // Should never be thrown since AuthorizationRequest already passed all checks and is valid
-            throw new InvalidRedirectUriOauth2Exception("The redirect cannot be performed since redirect uri is wrong", "The redirect cannot be performed since redirect uri is wrong");
+            throw new IllegalArgumentException("The location is wrong");
         }
     }
 
