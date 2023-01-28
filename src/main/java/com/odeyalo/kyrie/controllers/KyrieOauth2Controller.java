@@ -13,13 +13,13 @@ import com.odeyalo.kyrie.core.authorization.support.AuthorizationRequestContextH
 import com.odeyalo.kyrie.core.oauth2.Oauth2Token;
 import com.odeyalo.kyrie.core.oauth2.flow.Oauth2FlowHandler;
 import com.odeyalo.kyrie.core.oauth2.flow.Oauth2FlowHandlerFactory;
+import com.odeyalo.kyrie.core.oauth2.prompt.PromptHandlerFactory;
 import com.odeyalo.kyrie.core.oauth2.support.RedirectUrlCreationServiceFactory;
 import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolver;
 import com.odeyalo.kyrie.core.sso.RememberMeService;
 import com.odeyalo.kyrie.core.sso.RememberedLoggedUserAccountsContainer;
 import com.odeyalo.kyrie.dto.ApiErrorMessage;
 import com.odeyalo.kyrie.dto.LoginDTO;
-import com.odeyalo.kyrie.support.html.DefaultTemplateResolver;
 import com.odeyalo.kyrie.support.html.TemplateResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ExtendedModelMap;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -65,6 +64,9 @@ public class KyrieOauth2Controller {
     @Autowired
     private RememberMeService rememberMeService;
 
+    @Autowired
+    private PromptHandlerFactory promptHandlerFactory;
+
     public static final String AUTHORIZATION_REQUEST_ATTRIBUTE_NAME = "authorizationRequest";
     public static final String WRONG_CREDENTIALS_ERROR_NAME = "wrong_credentials";
     public static final String MISSING_AUTHORIZATION_REQUEST_ERROR_NAME = "missing_authorization_request";
@@ -96,7 +98,7 @@ public class KyrieOauth2Controller {
      * <p>
      * The endpoint response is html template.
      *
-     * @param request - ready to use AuthorizationRequest that already passed all checks
+     * @param request                   - ready to use AuthorizationRequest that already passed all checks
      * @param authorizationRequestStore - session store
      * @return - {@link ModelAndView} resolved by {@link TemplateResolver}. Template that will be returned to user
      * @see AuthorizationRequest
@@ -106,23 +108,21 @@ public class KyrieOauth2Controller {
      * @see <a href="https://www.oauth.com/oauth2-servers/authorization/the-authorization-request/">The Authorization Request</a>
      */
     @GetMapping(value = "/authorize")
-    public ModelAndView authorization(@ValidAuthorizationRequest AuthorizationRequest request, @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> authorizationRequestStore) {
+    public ModelAndView authorization(@ValidAuthorizationRequest AuthorizationRequest request,
+                                      @RequestParam(value = "prompt", defaultValue = "login") String promptType,
+                                      @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> authorizationRequestStore) {
+
+
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
         HttpServletRequest currentReq = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 
         authorizationRequestStore.put(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME, request);
 
         AuthorizationRequestContextHolder.setContext(new AuthorizationRequestContext(request));
 
-        RememberedLoggedUserAccountsContainer accountsContainer = rememberMeService.autoLogin(currentReq);
+        // Delegate all job to PromptHandler
+        return promptHandlerFactory.getHandler(promptType).handlePrompt(new ExtendedModelMap(), currentReq, response);
 
-        if (accountsContainer.isEmpty()) {
-            return templateResolver.getTemplate(DefaultTemplateResolver.LOGIN_TEMPLATE_TYPE);
-        }
-
-        this.logger.info("The LoggedUserAccountsContainer returns not empty list of remembered account. Using USER_ALREADY_LOGGED_IN_TEMPLATE_TYPE template");
-        Model model = new ExtendedModelMap();
-        model.addAttribute("users", accountsContainer.getUsers());
-        return templateResolver.getTemplate(DefaultTemplateResolver.USER_ALREADY_LOGGED_IN_TEMPLATE_TYPE, model);
     }
 
     @GetMapping("/login")
@@ -153,6 +153,7 @@ public class KyrieOauth2Controller {
         }
         return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, redirectUrl).build();
     }
+
     /**
      * The '/login' endpoint for only POST HTTP request with ONLY application/json content-type.
      * <p>Possible Http response supported by endpoint:</p>
