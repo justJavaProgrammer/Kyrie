@@ -1,27 +1,17 @@
 package com.odeyalo.kyrie.controllers.support;
 
 import com.odeyalo.kyrie.core.oauth2.prompt.PromptType;
-import com.odeyalo.kyrie.exceptions.UnsupportedPromptTypeException;
-import org.springframework.core.MethodParameter;
-import org.springframework.web.bind.support.WebDataBinderFactory;
-import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.method.support.ModelAndViewContainer;
+import org.springframework.core.convert.converter.Converter;
 
-public class String2PromptTypeConverter implements HandlerMethodArgumentResolver{
+public class String2PromptTypeConverter implements Converter<String, PromptType> {
 
+    /**
+     * Convert string to {@link PromptType}, return null if convertion cannot be done or prompt type does not exist
+     * @param source - string to convert
+     * @return - PromptType based on the source, null otherwise
+     */
     @Override
-    public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().equals(PromptType.class);
-    }
-
-    @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        String prompt = webRequest.getParameter("prompt");
-        PromptType promptType = PromptType.valueOf(prompt);
-        if (promptType == null) {
-            throw new UnsupportedPromptTypeException(String.format("The prompt type: %s does not supported", prompt));
-        }
-        return promptType;
+    public PromptType convert(String source) {
+        return PromptType.valueOf(source);
     }
 }
