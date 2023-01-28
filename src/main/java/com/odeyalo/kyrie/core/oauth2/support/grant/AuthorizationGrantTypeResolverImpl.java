@@ -76,7 +76,7 @@ public class AuthorizationGrantTypeResolverImpl implements AuthorizationGrantTyp
     // Sort to make AuthorizationGrantType with minimum supported response types first
     // AuthorizationGrantType's with ONE element will ALWAYS be first.
     private List<AuthorizationGrantType> getSortedGrantTypes() {
-        return Arrays.stream(AuthorizationGrantType.values())
+        return AuthorizationGrantType.types.values().stream()
                 .sorted(Comparator.comparingInt(grantType -> grantType.getSupportedResponseTypes().length))
                 .collect(Collectors.toList());
     }
