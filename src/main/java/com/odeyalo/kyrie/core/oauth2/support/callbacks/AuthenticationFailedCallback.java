@@ -1,4 +1,4 @@
-package com.odeyalo.kyrie.core.oauth2.support.grant.callbacks;
+package com.odeyalo.kyrie.core.oauth2.support.callbacks;
 
 import lombok.Data;
 
