@@ -1,5 +1,6 @@
 package com.odeyalo.kyrie.core.oauth2.prompt;
 
+import com.odeyalo.kyrie.core.sso.RememberedLoggedUserAccountsContainer;
 import com.odeyalo.kyrie.support.html.DefaultTemplateResolver;
 import com.odeyalo.kyrie.support.html.TemplateResolver;
 import org.springframework.stereotype.Component;
@@ -33,6 +34,19 @@ public class LoginPromptHandler implements PromptHandler {
      */
     @Override
     public ModelAndView handlePrompt(Model model, HttpServletRequest request, HttpServletResponse response) {
+        return templateResolver.getTemplate(DefaultTemplateResolver.LOGIN_TEMPLATE_TYPE);
+    }
+
+    /**
+     * Always return login template
+     * @param model - model for this prompt
+     * @param container - container with user accounts to avoid unnecessary calls to remember-me services
+     * @param request - current request
+     * @param response - response associated with this requeest
+     * @return
+     */
+    @Override
+    public ModelAndView handlePrompt(Model model, RememberedLoggedUserAccountsContainer container, HttpServletRequest request, HttpServletResponse response) {
         return templateResolver.getTemplate(DefaultTemplateResolver.LOGIN_TEMPLATE_TYPE);
     }
 

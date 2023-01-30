@@ -44,17 +44,28 @@ public class NonePromptHandler implements PromptHandler {
     @Override
     public ModelAndView handlePrompt(Model model, HttpServletRequest request, HttpServletResponse response) {
         RememberedLoggedUserAccountsContainer container = rememberMeService.autoLogin(request);
+
+        return handlePrompt(model, container, request, response);
+    }
+
+    @Override
+    public ModelAndView handlePrompt(Model model, RememberedLoggedUserAccountsContainer container, HttpServletRequest request, HttpServletResponse response) {
         Map<String, Oauth2User> users = container.getUsersMap();
         // The user doesn't logged yet or have more than 1 account, send interaction_required by OpenID spec.
         if (CollectionUtils.isEmpty(users) || users.size() != 1) {
             sendInteractionRequiredRedirect(response);
         }
+        handleNonePrompt(response, users);
+        return null;
+    }
+
+
+    private void handleNonePrompt(HttpServletResponse response, Map<String, Oauth2User> users) {
         // Get the login endpoint that was configured by Oauth2ServerEndpointsConfigurer
         String loginEndpointName = endpointsInfo.getLoginEndpointName();
         String id = users.keySet().stream().findFirst().get();
         String redirectUri = UriComponentsBuilder.fromPath(loginEndpointName).queryParam("user_id", id).toUriString();
         sendRedirect(response, redirectUri);
-        return null;
     }
 
     private void sendInteractionRequiredRedirect(HttpServletResponse response) {
