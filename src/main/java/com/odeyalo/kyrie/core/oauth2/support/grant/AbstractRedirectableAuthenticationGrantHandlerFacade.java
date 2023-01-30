@@ -1,0 +1,86 @@
+package com.odeyalo.kyrie.core.oauth2.support.grant;
+
+import com.odeyalo.kyrie.core.Oauth2User;
+import com.odeyalo.kyrie.core.authentication.AuthenticationResult;
+import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationInfo;
+import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
+import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
+import com.odeyalo.kyrie.core.oauth2.support.grant.callbacks.AuthenticationFailedCallback;
+import com.odeyalo.kyrie.core.oauth2.support.grant.callbacks.SuccessfulAuthenticationCallback;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * Abstract base class that used to authenticate the user and add callbacks before, after authenticate and after all.
+ */
+public abstract class AbstractRedirectableAuthenticationGrantHandlerFacade implements RedirectableAuthenticationGrantHandlerFacade {
+
+
+    protected final Oauth2UserAuthenticationService oauth2UserAuthenticationService;
+
+    protected AbstractRedirectableAuthenticationGrantHandlerFacade(Oauth2UserAuthenticationService oauth2UserAuthenticationService) {
+        this.oauth2UserAuthenticationService = oauth2UserAuthenticationService;
+    }
+
+    protected abstract HandleResult doHandleGrant(Oauth2User user, AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response);
+
+
+    /**
+     * Authenticate the user using {@link Oauth2UserAuthenticationService}
+     * and delegate all the job to {@link #doHandleGrant(Oauth2User, AuthorizationRequest, HttpServletRequest, HttpServletResponse)},
+     * Trigger the callbacks based on authentication result.
+     *
+     * @param authenticationInfo - provided credentials by user
+     * @param authorizationRequest - current AuthorizationRequest
+     * @param request - current http request
+     * @param response - response associated with this request
+     * @return - result from {{@link #doHandleGrant(Oauth2User, AuthorizationRequest, HttpServletRequest, HttpServletResponse)}}
+     *
+     * @see #handleAuthenticationSuccessCallback(SuccessfulAuthenticationCallback.SuccessfulAuthenticationCallbackData)
+     * @see #handleAuthenticationFailedCallback(AuthenticationFailedCallback.AuthenticationFailedCallbackData)
+     */
+    @Override
+    public HandleResult handleGrant(Oauth2UserAuthenticationInfo authenticationInfo, AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response) {
+        AuthenticationResult result = oauth2UserAuthenticationService.authenticate(authenticationInfo);
+
+        if (result == null || !result.isSuccess()) {
+            handleAuthenticationFailedCallback(new AuthenticationFailedCallback.AuthenticationFailedCallbackData("Credentials are wrong or user does not exist"));
+            return HandleResult.WRONG_USER_CREDENTIALS_HANDLE_RESULT;
+        }
+
+        Oauth2User user = result.getUser();
+
+        handleAuthenticationSuccessCallback(new SuccessfulAuthenticationCallback.SuccessfulAuthenticationCallbackData(user));
+
+        HandleResult handleResult = doHandleGrant(user, authorizationRequest, request, response);
+
+
+        afterAllSuccess(new AfterAllSuccessCallbackData(handleResult.getRedirectUri(), user));
+
+        return handleResult;
+    }
+
+    public void handleAuthenticationSuccessCallback(SuccessfulAuthenticationCallback.SuccessfulAuthenticationCallbackData data) {
+
+    }
+
+    public void handleAuthenticationFailedCallback(AuthenticationFailedCallback.AuthenticationFailedCallbackData data) {
+
+    }
+
+    void afterAllSuccess(AfterAllSuccessCallbackData data) {
+
+    }
+
+    @Data
+    @AllArgsConstructor
+    protected static class AfterAllSuccessCallbackData {
+        // Generated redirect uri
+        private String redirectUri;
+        // Authenticated user
+        private Oauth2User user;
+    }
+}
