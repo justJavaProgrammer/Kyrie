@@ -5,8 +5,8 @@ import com.odeyalo.kyrie.core.authentication.AuthenticationResult;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationInfo;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
-import com.odeyalo.kyrie.core.oauth2.support.grant.callbacks.AuthenticationFailedCallback;
-import com.odeyalo.kyrie.core.oauth2.support.grant.callbacks.SuccessfulAuthenticationCallback;
+import com.odeyalo.kyrie.core.oauth2.support.callbacks.AuthenticationFailedCallback;
+import com.odeyalo.kyrie.core.oauth2.support.callbacks.SuccessfulAuthenticationCallback;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
