@@ -4,7 +4,6 @@ import com.odeyalo.kyrie.controllers.support.AdvancedModelAttribute;
 import com.odeyalo.kyrie.controllers.support.AuthorizationRequestValidator;
 import com.odeyalo.kyrie.controllers.support.validation.ValidAuthorizationRequest;
 import com.odeyalo.kyrie.core.Oauth2User;
-import com.odeyalo.kyrie.core.authentication.AuthenticationResult;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationInfo;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
@@ -17,6 +16,7 @@ import com.odeyalo.kyrie.core.oauth2.prompt.PromptHandler;
 import com.odeyalo.kyrie.core.oauth2.prompt.PromptHandlerFactory;
 import com.odeyalo.kyrie.core.oauth2.support.RedirectUrlCreationServiceFactory;
 import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolver;
+import com.odeyalo.kyrie.core.oauth2.support.grant.RedirectableAuthenticationGrantHandlerFacade;
 import com.odeyalo.kyrie.core.sso.RememberMeService;
 import com.odeyalo.kyrie.core.sso.RememberedLoggedUserAccountsContainer;
 import com.odeyalo.kyrie.dto.ApiErrorMessage;
@@ -41,6 +41,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.odeyalo.kyrie.core.oauth2.prompt.CombinedPromptHandler.COMBINED_PROMPT_TYPE_NAME;
 
 /**
  * Main controller that provides '/authorize' and '/login' endpoints .
@@ -74,6 +76,9 @@ public class KyrieOauth2Controller {
     public static final String UNSUPPORTED_GRANT_TYPE_ERROR_NAME = "unsupported_grant_type";
 
     private final Logger logger = LoggerFactory.getLogger(KyrieOauth2Controller.class);
+
+    @Autowired
+    private RedirectableAuthenticationGrantHandlerFacade redirectableAuthenticationGrantHandlerFacade;
 
     public KyrieOauth2Controller(Oauth2UserAuthenticationService oauth2UserAuthenticationService, Oauth2FlowHandlerFactory oauth2FlowHandlerFactory,
                                  AuthorizationGrantTypeResolver grantTypeResolver,
@@ -110,7 +115,7 @@ public class KyrieOauth2Controller {
      */
     @GetMapping(value = "/authorize")
     public ModelAndView authorization(@ValidAuthorizationRequest AuthorizationRequest request,
-                                      @RequestParam(value = "prompt", defaultValue = "login") String promptType,
+                                      @RequestParam(value = "prompt", defaultValue = COMBINED_PROMPT_TYPE_NAME) String promptType,
                                       @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> authorizationRequestStore) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
 
@@ -209,32 +214,58 @@ public class KyrieOauth2Controller {
 
         logger.info("Auth request: {}", authorizationRequest);
 
-
-        AuthenticationResult result = oauth2UserAuthenticationService.authenticate(new Oauth2UserAuthenticationInfo(dto.getUsername(), dto.getPassword()));
-
-        if (result == null || !result.isSuccess()) {
-            ApiErrorMessage errorMessage = new ApiErrorMessage(WRONG_CREDENTIALS_ERROR_NAME, "User credentials are wrong and login can't be performed");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
-        }
-
-        Oauth2User user = result.getUser();
-
-        String redirectUrl = doGrantTypeProcessing(authorizationRequest, user, status);
-
-        if (redirectUrl == null) {
-            ApiErrorMessage message = new ApiErrorMessage(UNSUPPORTED_GRANT_TYPE_ERROR_NAME, "Kyrie does not support: " + authorizationRequest.getGrantType());
-            return ResponseEntity.badRequest().body(message);
-        }
-
-        logger.info("Redirecting to: {}", redirectUrl);
-
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletResponse response = requestAttributes.getResponse();
         HttpServletRequest request = requestAttributes.getRequest();
 
-        rememberMeService.rememberMe(user, request, response);
+        RedirectableAuthenticationGrantHandlerFacade.HandleResult result = redirectableAuthenticationGrantHandlerFacade.handleGrant(new Oauth2UserAuthenticationInfo(dto.getUsername(), dto.getPassword()), authorizationRequest, request, response);
 
-        return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, redirectUrl).build();
+        if (result.isSuccess()) {
+            String redirectUri = result.getRedirectUri();
+            status.setComplete();
+            return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, redirectUri).build();
+        }
+
+        if (RedirectableAuthenticationGrantHandlerFacade.HandleResult.WRONG_USER_CREDENTIALS_HANDLE_RESULT.equals(result)) {
+            ApiErrorMessage errorMessage = new ApiErrorMessage(WRONG_CREDENTIALS_ERROR_NAME, "User credentials are wrong and login can't be performed");
+            status.setComplete();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+        }
+
+        if (RedirectableAuthenticationGrantHandlerFacade.HandleResult.UNSUPPORTED_GRANT_TYPE_HANDLE_RESULT.equals(result)) {
+            ApiErrorMessage message = new ApiErrorMessage(UNSUPPORTED_GRANT_TYPE_ERROR_NAME, "Kyrie does not support: " + authorizationRequest.getGrantType());
+            status.setComplete();
+            // TODO: Should be redirect instead of HTTP 400
+            return ResponseEntity.badRequest().body(message);
+        }
+
+        status.setComplete();
+
+        //        AuthenticationResult result = oauth2UserAuthenticationService.authenticate(new Oauth2UserAuthenticationInfo(dto.getUsername(), dto.getPassword()));
+//
+//        if (result == null || !result.isSuccess()) {
+//            ApiErrorMessage errorMessage = new ApiErrorMessage(WRONG_CREDENTIALS_ERROR_NAME, "User credentials are wrong and login can't be performed");
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
+//        }
+//
+//        Oauth2User user = result.getUser();
+//
+//        String redirectUrl = doGrantTypeProcessing(authorizationRequest, user, status);
+//
+//        if (redirectUrl == null) {
+//            ApiErrorMessage message = new ApiErrorMessage(UNSUPPORTED_GRANT_TYPE_ERROR_NAME, "Kyrie does not support: " + authorizationRequest.getGrantType());
+//            return ResponseEntity.badRequest().body(message);
+//        }
+//
+//        logger.info("Redirecting to: {}", redirectUrl);
+//
+//        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+//        HttpServletResponse response = requestAttributes.getResponse();
+//        HttpServletRequest request = requestAttributes.getRequest();
+//
+//        rememberMeService.rememberMe(user, request, response);
+
+        return ResponseEntity.internalServerError().body("Request processing cannot be performed and error is unknown");
     }
 
     private String doGrantTypeProcessing(AuthorizationRequest authorizationRequest, Oauth2User user, SessionStatus status) {
