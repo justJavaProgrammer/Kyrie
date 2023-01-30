@@ -55,13 +55,16 @@ public class RememberedLoggedUserAccountsContainer {
         return new RememberedLoggedUserAccountsContainer(Collections.emptyList());
     }
 
-
     public List<Oauth2User> getUsers() {
         return new ArrayList<>(users.values());
     }
 
     public Map<String, Oauth2User> getUsersMap() {
         return users;
+    }
+
+    public int size() {
+        return users.size();
     }
 
     public boolean isEmpty() {
