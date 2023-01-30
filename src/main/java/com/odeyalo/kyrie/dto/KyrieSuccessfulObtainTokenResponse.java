@@ -23,6 +23,7 @@ public class KyrieSuccessfulObtainTokenResponse {
     @NonNull
     private final String token;
     // Prefix of the token
+    @JsonProperty("token_type")
     @NonNull
     private final String prefix;
     // Seconds of the token lifetime
