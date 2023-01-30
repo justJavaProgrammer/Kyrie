@@ -21,6 +21,7 @@ public class DefaultTemplateResolver implements TemplateResolver {
      */
     public static final String LOGIN_TEMPLATE_TYPE = "LOGIN_TEMPLATE";
     public static final String USER_ALREADY_LOGGED_IN_TEMPLATE_TYPE = "USER_LOGGED_IN_TEMPLATE_TYPE";
+    public static final String CONSENT_VIEW_TEMPLATE_TYPE = "CONSENT_VIEW_TEMPLATE_TYPE";
 
     private final Map<String, View> templates;
     private final List<ModelEnhancerPostProcessor> enhancers;
