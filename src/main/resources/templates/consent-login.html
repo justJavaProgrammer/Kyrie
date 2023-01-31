@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Consent access</title>
+</head>
+<body>
+<div class="body">
+    The application required following scopes
+    <tr th:each="scope: ${scopes}">
+        <th th:text="${scope}"></th>
+    </tr>
+</div>
+
+<form action="/oauth2/consent" method="POST">
+    <input type="submit" value="Approve" name="approved"/>
+    <input type="submit" value="Deny" name="denied"/>
+</form>
+
+</body>
+</html>
