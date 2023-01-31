@@ -45,7 +45,15 @@ public abstract class AbstractCustomizableRedirectUriCreationServiceDecorator im
 
         CombinedOauth2Token.CombinedOauth2TokenBuilder<?, ?> builder = CombinedOauth2Token.builder();
 
-        customizers.getCustomizers().forEach(customizer -> customizer.customizeOauth2Token(token, builder));
+        customizers.getCustomizers().forEach(customizer -> {
+            //todo
+            try {
+                customizer.customizeOauth2Token(token, builder);
+            } catch (Exception ex) {
+                this.logger.error("Oauth2TokenCustomizerProcessor threw exception, ignore the result");
+            }
+        });
+
 
         CombinedOauth2Token combinedOauth2Token = builder.build();
 
