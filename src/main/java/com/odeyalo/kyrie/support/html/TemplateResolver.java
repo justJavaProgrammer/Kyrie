@@ -24,6 +24,7 @@ public interface TemplateResolver {
     /**
      * Resolve the html template by given template type, add dynamic values from Model in View
      * @param templateType - type of the template
+     * @param model - model for the view, can be used as store to transfer the different objects
      * @return - ModelAndView that will be returned as response by template type with injected values from Model, otherwise null
      */
     ModelAndView getTemplate(String templateType, Model model);
