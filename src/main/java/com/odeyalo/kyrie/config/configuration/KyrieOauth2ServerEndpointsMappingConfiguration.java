@@ -37,6 +37,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -58,6 +59,7 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
 
     public static final String DEFAULT_LOGIN_TEMPLATE_NAME = "login.html";
     public static final String DEFAULT_USER_LOGGED_TEMPLATE_NAME = "user-logged.html";
+    public static final String DEFAULT_CONSENT_TEMPLATE_NAME = "consent-login.html";
     private final KyrieOauth2ConfigurerComposite configurer = new KyrieOauth2ConfigurerComposite();
     private final ViewResolver viewResolver;
     private Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo info;
@@ -114,11 +116,17 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
 
         registryTokenEndpointJson(tokenController, mapping);
 
+        registryGetConsentPage(kyrieOauth2Controller, mapping);
+
+        registryHandleConsentPage(kyrieOauth2Controller, mapping);
+
+        registryLoginUserFromSessionAndDoGrantTypeProcessing(kyrieOauth2Controller, mapping);
+
         registryTokenEndpointFormData(tokenController, mapping);
 
         registryTokenInfoEndpoint(tokenController, mapping);
 
-        registryLoginUserFromSessionAndDoGrantTypeProcessing(kyrieOauth2Controller, mapping);
+
 
         return new WebMvcRegistrations() {
             @Override
@@ -156,9 +164,11 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
         Map<String, View> views = viewRegistry.getViews();
         View loginView = viewResolver.resolveViewName(DEFAULT_LOGIN_TEMPLATE_NAME, Locale.ENGLISH);
         View userLoggedView = viewResolver.resolveViewName(DEFAULT_USER_LOGGED_TEMPLATE_NAME, Locale.ENGLISH);
+        View consentView = viewResolver.resolveViewName(DEFAULT_CONSENT_TEMPLATE_NAME, Locale.ENGLISH);
 
         views.putIfAbsent(DefaultTemplateResolver.LOGIN_TEMPLATE_TYPE, loginView);
         views.putIfAbsent(DefaultTemplateResolver.USER_ALREADY_LOGGED_IN_TEMPLATE_TYPE, userLoggedView);
+        views.putIfAbsent(DefaultTemplateResolver.CONSENT_VIEW_TEMPLATE_TYPE, consentView);
 
         DefaultTemplateResolver defaultTemplateResolver = new DefaultTemplateResolver(processors);
 
@@ -248,5 +258,22 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
                 .methods(RequestMethod.GET)
                 .build();
         mapping.registerMapping(requestMappingInfo, kyrieOauth2Controller, KyrieOauth2Controller.class.getDeclaredMethod("loginUserFromRememberMeAndDoGrantTypeProcessing", HttpServletRequest.class, String.class, Map.class, SessionStatus.class));
+    }
+
+    private void registryGetConsentPage(KyrieOauth2Controller controller, RequestMappingHandlerMapping mapping) throws NoSuchMethodException {
+        String consentPageEndpointName = info.getConsentPageEndpointName();
+        RequestMappingInfo requestMappingInfo = RequestMappingInfo
+                .paths(consentPageEndpointName)
+                .methods(RequestMethod.GET)
+                .build();
+        mapping.registerMapping(requestMappingInfo, controller, KyrieOauth2Controller.class.getDeclaredMethod("consentPage", Map.class, HttpServletRequest.class));
+    }
+    private void registryHandleConsentPage(KyrieOauth2Controller controller, RequestMappingHandlerMapping mapping) throws NoSuchMethodException {
+        String consentPageEndpointName = info.getConsentPageEndpointName();
+        RequestMappingInfo requestMappingInfo = RequestMappingInfo
+                .paths(consentPageEndpointName)
+                .methods(RequestMethod.POST)
+                .build();
+        mapping.registerMapping(requestMappingInfo, controller, KyrieOauth2Controller.class.getDeclaredMethod("handleConsentSubmit", HttpServletRequest.class, HttpServletResponse.class, Map.class));
     }
 }
