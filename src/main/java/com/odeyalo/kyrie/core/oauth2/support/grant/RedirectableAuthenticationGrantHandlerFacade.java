@@ -5,6 +5,7 @@ import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,11 +26,6 @@ public interface RedirectableAuthenticationGrantHandlerFacade {
      */
     HandleResult handleGrant(Oauth2UserAuthenticationInfo authenticationInfo, AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response);
 
-    // Todo: maybe create callbacks for authentication callback
-//    default void successLoginCallback() {
-//
-//    }
-
     @RequiredArgsConstructor
     @AllArgsConstructor
     @Data
@@ -42,6 +38,7 @@ public interface RedirectableAuthenticationGrantHandlerFacade {
 
         private final boolean isSuccess;
         // True if session MUST BE closed after grant handling
+        @Accessors(fluent = true)
         private final boolean shouldCloseSession;
         private String redirectUri;
         private String errorType;
