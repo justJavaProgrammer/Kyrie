@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 /**
  * The interface is used to enhance the Model that will be used to render view.
  */
+@FunctionalInterface
 public interface ModelEnhancerPostProcessor {
 
     /**
