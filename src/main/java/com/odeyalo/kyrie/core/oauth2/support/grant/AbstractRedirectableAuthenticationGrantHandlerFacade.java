@@ -9,24 +9,24 @@ import com.odeyalo.kyrie.core.oauth2.support.callbacks.AuthenticationFailedCallb
 import com.odeyalo.kyrie.core.oauth2.support.callbacks.SuccessfulAuthenticationCallback;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Abstract base class that used to authenticate the user and add callbacks before, after authenticate and after all.
+ * Abstract base class that used to authenticate the user and add callbacks before, after authentication and after all.
  */
 public abstract class AbstractRedirectableAuthenticationGrantHandlerFacade implements RedirectableAuthenticationGrantHandlerFacade {
-
-
     protected final Oauth2UserAuthenticationService oauth2UserAuthenticationService;
+    protected final Logger logger = LoggerFactory.getLogger(AbstractRedirectableAuthenticationGrantHandlerFacade.class);
 
     protected AbstractRedirectableAuthenticationGrantHandlerFacade(Oauth2UserAuthenticationService oauth2UserAuthenticationService) {
         this.oauth2UserAuthenticationService = oauth2UserAuthenticationService;
     }
 
     protected abstract HandleResult doHandleGrant(Oauth2User user, AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response);
-
 
     /**
      * Authenticate the user using {@link Oauth2UserAuthenticationService}
