@@ -25,14 +25,15 @@ public class Oauth2ServerEndpointsConfigurer {
     private String tokenInfoEndpointName = "/tokeninfo";
     @NonNull
     private String authorizeEndpointName = prefix + "/authorize";
-
+    @NonNull
+    private String consentPageEndpointName = prefix + "/consent";
     /**
      * Build Oauth2ServerEndpointsInfo based on provided values
      *
      * @return - ready-to-use Oauth2ServerEndpointsInfo
      */
     public Oauth2ServerEndpointsInfo buildOauth2ServerEndpointsInfo() {
-        return new Oauth2ServerEndpointsInfo(prefix, loginEndpointName, tokenEndpointName, tokenInfoEndpointName, authorizeEndpointName);
+        return new Oauth2ServerEndpointsInfo(prefix, loginEndpointName, tokenEndpointName, tokenInfoEndpointName, authorizeEndpointName, consentPageEndpointName);
     }
 
     /**
@@ -46,5 +47,6 @@ public class Oauth2ServerEndpointsConfigurer {
         private String tokenEndpointName;
         private String tokenInfoEndpointName;
         private String authorizeEndpointName;
+        private String consentPageEndpointName;
     }
 }
