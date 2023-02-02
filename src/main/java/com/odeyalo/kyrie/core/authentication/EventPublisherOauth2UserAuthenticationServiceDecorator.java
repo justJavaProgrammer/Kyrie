@@ -59,9 +59,10 @@ public class EventPublisherOauth2UserAuthenticationServiceDecorator implements O
         eventPublisher.publishEvent(new UserLoginAuthenticationAttemptedKyrieEvent(AttemptedLoginAuthentication.of(info.getUsername(), info.getPassword())));
 
         AuthenticationResult result = delegate.authenticate(info);
-        //todo
         if (result.isSuccess()) {
-            eventPublisher.publishEvent(new UserLoginAuthenticationGrantedKyrieEvent(new UsernamePasswordAuthenticationToken(result.getUser(), result.getUser().getPassword(), getAuthorities(result))));
+            Oauth2User authenticatedUser = result.getUser();
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authenticatedUser, authenticatedUser.getPassword(), getAuthorities(result));
+            eventPublisher.publishEvent(new UserLoginAuthenticationGrantedKyrieEvent(authentication, authenticatedUser));
         } else {
             eventPublisher.publishEvent(new UserLoginAuthenticationFailureBadCredentialsKyrieEvent(null, new BadCredentialsException("The provided credentials is wrong")));
         }
