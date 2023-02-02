@@ -1,5 +1,6 @@
 package com.odeyalo.kyrie.core.events.authentication;
 
+import com.odeyalo.kyrie.core.Oauth2User;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -9,12 +10,20 @@ import org.springframework.security.core.Authentication;
  * Use {@link Oauth2ClientLoginAuthenticationGrantedKyrieEvent} for this purpose
  */
 public class UserLoginAuthenticationGrantedKyrieEvent extends AbstractAuthenticationKyrieEvent {
+    // User that granted access
+    protected final Oauth2User oauth2User;
 
-    public UserLoginAuthenticationGrantedKyrieEvent(Authentication authentication) {
+    public UserLoginAuthenticationGrantedKyrieEvent(Authentication authentication, Oauth2User oauth2User) {
         super(authentication);
+        this.oauth2User = oauth2User;
     }
 
-    public UserLoginAuthenticationGrantedKyrieEvent(Authentication authentication, String eventId) {
+    public UserLoginAuthenticationGrantedKyrieEvent(Authentication authentication, String eventId, Oauth2User oauth2User) {
         super(authentication, eventId);
+        this.oauth2User = oauth2User;
+    }
+
+    public Oauth2User getOauth2User() {
+        return oauth2User;
     }
 }
