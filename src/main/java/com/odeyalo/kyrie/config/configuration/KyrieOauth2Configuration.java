@@ -1,12 +1,20 @@
 package com.odeyalo.kyrie.config.configuration;
 
 import com.odeyalo.kyrie.config.Oauth2ClientCredentialsResolver;
+import com.odeyalo.kyrie.config.configurers.Oauth2ServerEndpointsConfigurer;
+import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.events.DefaultSpringKyrieEventMulticaster;
 import com.odeyalo.kyrie.core.events.KyrieEventPublisher;
 import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
+import com.odeyalo.kyrie.core.oauth2.flow.support.RedirectableOauth2FlowHandlerFacade;
+import com.odeyalo.kyrie.core.oauth2.support.consent.ConsentPageHandler;
+import com.odeyalo.kyrie.core.oauth2.support.grant.ConsentPageConfigurableRedirectableAuthenticationGrantHandlerFacade;
+import com.odeyalo.kyrie.core.oauth2.support.grant.DefaultRedirectableAuthenticationGrantHandlerFacade;
+import com.odeyalo.kyrie.core.oauth2.support.grant.RedirectableAuthenticationGrantHandlerFacade;
 import com.odeyalo.kyrie.support.ClientId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -32,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
         Oauth2FlowHandlersConfiguration.class,
         RedirectUriCreationServicesConfiguration.class,
         KyrieOauth2RequestValidationConfiguration.class,
+        PromptHandlersConfiguration.class,
         KyrieOauth2ServerEndpointsMappingConfiguration.class,
         AccessTokenGrantersConfiguration.class,
         CustomizersConfiguration.class,
@@ -54,6 +63,20 @@ public class KyrieOauth2Configuration {
     @ConditionalOnMissingBean
     public KyrieEventPublisher kyrieEventPublisher(ApplicationEventMulticaster multicaster) {
         return new DefaultSpringKyrieEventMulticaster(multicaster);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RedirectableAuthenticationGrantHandlerFacade redirectableAuthenticationGrantHandlerFacade(@Value("${kyrie.oauth2.consent.page.enabled:false}") boolean isConsentEnabled,
+                                                                                                     Oauth2UserAuthenticationService oauth2UserAuthenticationService,
+                                                                                                     Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo endpointsInfo,
+                                                                                                     ConsentPageHandler consentPageHandler,
+                                                                                                     RedirectableOauth2FlowHandlerFacade redirectableOauth2FlowHandlerFacade) {
+        if (isConsentEnabled) {
+            this.logger.info("The consent page is enabled");
+            return new ConsentPageConfigurableRedirectableAuthenticationGrantHandlerFacade(oauth2UserAuthenticationService, endpointsInfo, consentPageHandler);
+        }
+        return new DefaultRedirectableAuthenticationGrantHandlerFacade(oauth2UserAuthenticationService, redirectableOauth2FlowHandlerFacade);
     }
 
     /**
