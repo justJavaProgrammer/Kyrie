@@ -30,7 +30,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -76,7 +75,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureMockMvc
 @Import(KyrieOauth2ControllerTest.KyrieOauth2ControllerTestConfiguration.class)
-@PropertySource(value = "classpath:application-test.properties")
 class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
     public static final String CLIENT_ID_PARAM_VALUE = "client_id";
     public static final String RESPONSE_TYPE_PARAM_VALUE = "response_type";
