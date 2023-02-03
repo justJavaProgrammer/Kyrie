@@ -3,7 +3,6 @@ package com.odeyalo.kyrie.core.support.web;
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +13,6 @@ import java.util.Iterator;
 /**
  * {@link TemporaryRequestAttributesRepository} implementation that stores the attributes in http session
  */
-@Component
 public class HttpSessionTemporaryRequestAttributesRepository implements TemporaryRequestAttributesRepository {
     private final Logger logger = LoggerFactory.getLogger(HttpSessionTemporaryRequestAttributesRepository.class);
 
