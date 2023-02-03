@@ -32,20 +32,4 @@ public interface ConsentPageHandler {
      */
     void handleSubmit(AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response);
 
-    /**
-     * Will be invoked if user approved the access for the client application
-     * @param authorizationRequest - authorization request associated with this consent page
-     * @param request - current request
-     * @param response - response associated with this request
-     */
-    void onAccessApproved(AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response);
-
-    /**
-     * Will be invoked if user denied access grant to the client application
-     * @param authorizationRequest - authorization request associated with this consent page
-     * @param request - current request
-     * @param response - response associated with this request
-     * */
-    void onAccessDenied(AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response);
-
 }
