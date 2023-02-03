@@ -54,7 +54,7 @@ public interface RedirectableAuthenticationGrantHandlerFacade {
         }
 
         public static HandleResult failed(boolean shouldCloseSession, String errorType) {
-            return new HandleResult(false, shouldCloseSession, errorType);
+            return new HandleResult(false, shouldCloseSession, null, errorType);
         }
     }
 }
