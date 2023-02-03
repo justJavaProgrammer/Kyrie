@@ -6,15 +6,17 @@ import com.odeyalo.kyrie.config.configurers.Oauth2ServerEndpointsConfigurer;
 import com.odeyalo.kyrie.config.configurers.Oauth2ServerViewRegistry;
 import com.odeyalo.kyrie.controllers.KyrieOauth2Controller;
 import com.odeyalo.kyrie.controllers.TokenController;
-import com.odeyalo.kyrie.controllers.support.AuthorizationRequestValidator;
-import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.oauth2.flow.Oauth2FlowHandlerFactory;
+import com.odeyalo.kyrie.core.oauth2.prompt.PromptHandlerFactory;
 import com.odeyalo.kyrie.core.oauth2.support.RedirectUrlCreationServiceFactory;
-import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolver;
+import com.odeyalo.kyrie.core.oauth2.support.consent.ConsentPageHandler;
+import com.odeyalo.kyrie.core.oauth2.support.grant.RedirectableAuthenticationGrantHandlerFacade;
 import com.odeyalo.kyrie.core.oauth2.tokens.Oauth2AccessTokenManager;
 import com.odeyalo.kyrie.core.oauth2.tokens.facade.AccessTokenGranterStrategyFacadeWrapper;
+import com.odeyalo.kyrie.core.sso.RememberMeService;
+import com.odeyalo.kyrie.core.support.web.TemporaryRequestAttributesRepository;
 import com.odeyalo.kyrie.dto.LoginDTO;
 import com.odeyalo.kyrie.support.html.DefaultTemplateResolver;
 import com.odeyalo.kyrie.support.html.ModelEnhancerPostProcessor;
@@ -137,13 +139,16 @@ public class KyrieOauth2ServerEndpointsMappingConfiguration {
     }
 
     @Bean
-    public KyrieOauth2Controller kyrieOauth2Controller(Oauth2UserAuthenticationService authenticationService,
-                                                       Oauth2FlowHandlerFactory factory,
-                                                       AuthorizationGrantTypeResolver resolver,
+    public KyrieOauth2Controller kyrieOauth2Controller(Oauth2FlowHandlerFactory oauth2FlowHandlerFactory,
                                                        RedirectUrlCreationServiceFactory redirectUrlCreationServiceFactory,
-                                                       AuthorizationRequestValidator validator,
-                                                       TemplateResolver templateResolver) {
-        return new KyrieOauth2Controller(authenticationService, factory, resolver, redirectUrlCreationServiceFactory, validator, templateResolver);
+                                                       RememberMeService rememberMeService,
+                                                       PromptHandlerFactory promptHandlerFactory,
+                                                       TemporaryRequestAttributesRepository requestAttributesRepository,
+                                                       RedirectableAuthenticationGrantHandlerFacade redirectableAuthenticationGrantHandlerFacade,
+                                                       ConsentPageHandler consentPageHandler) {
+        return new KyrieOauth2Controller(oauth2FlowHandlerFactory,
+                redirectUrlCreationServiceFactory, rememberMeService, promptHandlerFactory, requestAttributesRepository,
+                redirectableAuthenticationGrantHandlerFacade, consentPageHandler);
     }
 
     /**
