@@ -33,7 +33,7 @@ public class HttpSessionRememberMeService implements RememberMeService {
 
     @Override
     public void rememberMe(Oauth2User oauth2User, HttpServletRequest currentRequest, HttpServletResponse currentResponse) {
-        HttpSession session = currentRequest.getSession(true);
-        session.setAttribute("accounts", new RememberedLoggedUserAccountsContainer(List.of(oauth2User)));
+        HttpSession session = currentRequest.getSession();
+        session.setAttribute(LOGGED_ACCOUNTS_HTTP_SESSION_PROPERTY_NAME, new RememberedLoggedUserAccountsContainer(List.of(oauth2User)));
     }
 }
