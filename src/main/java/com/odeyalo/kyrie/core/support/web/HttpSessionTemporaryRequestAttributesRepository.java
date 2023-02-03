@@ -51,6 +51,9 @@ public class HttpSessionTemporaryRequestAttributesRepository implements Temporar
 
     @Override
     public void remove(HttpServletRequest request, String key) {
+        if (key == null) {
+            return;
+        }
         HttpSession session = request.getSession();
         session.removeAttribute(key);
         this.logger.info("Removed the attribute from request: {}", key);
