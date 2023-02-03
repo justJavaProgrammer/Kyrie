@@ -32,7 +32,6 @@ public class PromptType {
     private static void cachePrompt(String name, PromptType type){
         if (cached == null) {
             cached = new LinkedHashMap<>();
-            System.out.println("Create new cache");
         }
         cached.put(name, type);
     }
