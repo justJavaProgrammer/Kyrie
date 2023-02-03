@@ -1,11 +1,9 @@
 package com.odeyalo.kyrie.controllers;
 
 import com.odeyalo.kyrie.controllers.support.AdvancedModelAttribute;
-import com.odeyalo.kyrie.controllers.support.AuthorizationRequestValidator;
 import com.odeyalo.kyrie.controllers.support.validation.ValidAuthorizationRequest;
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationInfo;
-import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.authorization.support.AuthorizationRequestContext;
 import com.odeyalo.kyrie.core.authorization.support.AuthorizationRequestContextHolder;
@@ -16,17 +14,16 @@ import com.odeyalo.kyrie.core.oauth2.prompt.PromptHandler;
 import com.odeyalo.kyrie.core.oauth2.prompt.PromptHandlerFactory;
 import com.odeyalo.kyrie.core.oauth2.support.RedirectUrlCreationServiceFactory;
 import com.odeyalo.kyrie.core.oauth2.support.consent.ConsentPageHandler;
-import com.odeyalo.kyrie.core.oauth2.support.grant.AuthorizationGrantTypeResolver;
 import com.odeyalo.kyrie.core.oauth2.support.grant.RedirectableAuthenticationGrantHandlerFacade;
 import com.odeyalo.kyrie.core.sso.RememberMeService;
 import com.odeyalo.kyrie.core.sso.RememberedLoggedUserAccountsContainer;
+import com.odeyalo.kyrie.core.support.web.TemporaryRequestAttributesRepository;
 import com.odeyalo.kyrie.dto.ApiErrorMessage;
 import com.odeyalo.kyrie.dto.LoginDTO;
 import com.odeyalo.kyrie.exceptions.UnsupportedPromptTypeException;
 import com.odeyalo.kyrie.support.html.TemplateResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -58,18 +55,13 @@ import static com.odeyalo.kyrie.core.oauth2.prompt.CombinedPromptHandler.COMBINE
 @SessionAttributes(value = {KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME})
 public class KyrieOauth2Controller {
 
-    private final Oauth2UserAuthenticationService oauth2UserAuthenticationService;
     private final Oauth2FlowHandlerFactory oauth2FlowHandlerFactory;
-    private final AuthorizationGrantTypeResolver grantTypeResolver;
     private final RedirectUrlCreationServiceFactory redirectUrlCreationServiceFactory;
-    private final AuthorizationRequestValidator validator;
-    private final TemplateResolver templateResolver;
-
-    @Autowired
-    private RememberMeService rememberMeService;
-
-    @Autowired
-    private PromptHandlerFactory promptHandlerFactory;
+    private final RememberMeService rememberMeService;
+    private final PromptHandlerFactory promptHandlerFactory;
+    private final TemporaryRequestAttributesRepository requestAttributesRepository;
+    private final RedirectableAuthenticationGrantHandlerFacade redirectableAuthenticationGrantHandlerFacade;
+    private final ConsentPageHandler consentPageHandler;
 
     public static final String AUTHORIZATION_REQUEST_ATTRIBUTE_NAME = "authorizationRequest";
     public static final String WRONG_CREDENTIALS_ERROR_NAME = "wrong_credentials";
@@ -78,22 +70,21 @@ public class KyrieOauth2Controller {
 
     private final Logger logger = LoggerFactory.getLogger(KyrieOauth2Controller.class);
 
-    @Autowired
-    private RedirectableAuthenticationGrantHandlerFacade redirectableAuthenticationGrantHandlerFacade;
 
-    @Autowired
-    private ConsentPageHandler consentPageHandler;
-
-    public KyrieOauth2Controller(Oauth2UserAuthenticationService oauth2UserAuthenticationService, Oauth2FlowHandlerFactory oauth2FlowHandlerFactory,
-                                 AuthorizationGrantTypeResolver grantTypeResolver,
+    public KyrieOauth2Controller(Oauth2FlowHandlerFactory oauth2FlowHandlerFactory,
                                  RedirectUrlCreationServiceFactory redirectUrlCreationServiceFactory,
-                                 AuthorizationRequestValidator validator, TemplateResolver templateResolver) {
-        this.oauth2UserAuthenticationService = oauth2UserAuthenticationService;
+                                 RememberMeService rememberMeService,
+                                 PromptHandlerFactory promptHandlerFactory,
+                                 TemporaryRequestAttributesRepository requestAttributesRepository,
+                                 RedirectableAuthenticationGrantHandlerFacade redirectableAuthenticationGrantHandlerFacade,
+                                 ConsentPageHandler consentPageHandler) {
         this.oauth2FlowHandlerFactory = oauth2FlowHandlerFactory;
-        this.grantTypeResolver = grantTypeResolver;
         this.redirectUrlCreationServiceFactory = redirectUrlCreationServiceFactory;
-        this.validator = validator;
-        this.templateResolver = templateResolver;
+        this.rememberMeService = rememberMeService;
+        this.promptHandlerFactory = promptHandlerFactory;
+        this.requestAttributesRepository = requestAttributesRepository;
+        this.redirectableAuthenticationGrantHandlerFacade = redirectableAuthenticationGrantHandlerFacade;
+        this.consentPageHandler = consentPageHandler;
     }
 
     @ModelAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME)
@@ -140,7 +131,8 @@ public class KyrieOauth2Controller {
 
     @GetMapping("/consent")
     public ModelAndView consentPage(@ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> sessionStore, HttpServletRequest request) {
-        Oauth2User user = (Oauth2User) sessionStore.get("user");
+        Oauth2User user = requestAttributesRepository.get(request, Oauth2User.class);
+
         AuthorizationRequest authorizationRequest = (AuthorizationRequest) sessionStore.get(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME);
 
         return consentPageHandler.getConsentPage(user, authorizationRequest, request);
@@ -150,7 +142,6 @@ public class KyrieOauth2Controller {
     public ResponseEntity<?> handleConsentSubmit(HttpServletRequest request,
                                                  HttpServletResponse response,
                                                  @ModelAttribute(KyrieOauth2Controller.AUTHORIZATION_REQUEST_ATTRIBUTE_NAME) Map<String, Object> sessionStore) {
-        //todo
         AuthorizationRequest authorizationRequest = (AuthorizationRequest) sessionStore.get(AUTHORIZATION_REQUEST_ATTRIBUTE_NAME);
         consentPageHandler.handleSubmit(authorizationRequest, request, response);
         return ResponseEntity.ok().build();
@@ -261,35 +252,11 @@ public class KyrieOauth2Controller {
         }
 
         if (result.shouldCloseSession()) {
+            requestAttributesRepository.clear(request);
             status.setComplete();
         }
 
         return responseEntity;
-
-        //        AuthenticationResult result = oauth2UserAuthenticationService.authenticate(new Oauth2UserAuthenticationInfo(dto.getUsername(), dto.getPassword()));
-//
-//        if (result == null || !result.isSuccess()) {
-//            ApiErrorMessage errorMessage = new ApiErrorMessage(WRONG_CREDENTIALS_ERROR_NAME, "User credentials are wrong and login can't be performed");
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessage);
-//        }
-//
-//        Oauth2User user = result.getUser();
-//
-//        String redirectUrl = doGrantTypeProcessing(authorizationRequest, user, status);
-//
-//        if (redirectUrl == null) {
-//            ApiErrorMessage message = new ApiErrorMessage(UNSUPPORTED_GRANT_TYPE_ERROR_NAME, "Kyrie does not support: " + authorizationRequest.getGrantType());
-//            return ResponseEntity.badRequest().body(message);
-//        }
-//
-//        logger.info("Redirecting to: {}", redirectUrl);
-//
-//        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-//        HttpServletResponse response = requestAttributes.getResponse();
-//        HttpServletRequest request = requestAttributes.getRequest();
-//
-//        rememberMeService.rememberMe(user, request, response);
-
     }
 
     private String doGrantTypeProcessing(AuthorizationRequest authorizationRequest, Oauth2User user, SessionStatus status) {
