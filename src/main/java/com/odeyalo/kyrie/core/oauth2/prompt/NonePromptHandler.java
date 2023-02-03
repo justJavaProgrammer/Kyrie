@@ -7,7 +7,6 @@ import com.odeyalo.kyrie.core.authorization.support.AuthorizationRequestContextH
 import com.odeyalo.kyrie.core.oauth2.support.Oauth2Constants;
 import com.odeyalo.kyrie.core.sso.RememberMeService;
 import com.odeyalo.kyrie.core.sso.RememberedLoggedUserAccountsContainer;
-import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
@@ -23,13 +22,12 @@ import java.util.Map;
  *     The Authorization Server MUST NOT display any authentication or consent user interface pages.
  * </p>
  */
-@Component
 public class NonePromptHandler implements PromptHandler {
     private final RememberMeService rememberMeService;
     private final Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo endpointsInfo;
     public static final String INTERACTION_REQUIRED = "interaction_required";
 
-    public NonePromptHandler(RememberMeService rememberMeService, Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo endpointsInfo) {
+        public NonePromptHandler(RememberMeService rememberMeService, Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo endpointsInfo) {
         this.rememberMeService = rememberMeService;
         this.endpointsInfo = endpointsInfo;
     }

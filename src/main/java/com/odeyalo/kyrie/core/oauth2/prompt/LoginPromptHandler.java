@@ -3,7 +3,6 @@ package com.odeyalo.kyrie.core.oauth2.prompt;
 import com.odeyalo.kyrie.core.sso.RememberedLoggedUserAccountsContainer;
 import com.odeyalo.kyrie.support.html.DefaultTemplateResolver;
 import com.odeyalo.kyrie.support.html.TemplateResolver;
-import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -15,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
  * login - The Authorization Server SHOULD prompt the End-User for re-authentication. If it cannot reauthenticate the End-User, it MUST return an error, typically login_required.
  * </p>
  */
-@Component
 public class LoginPromptHandler implements PromptHandler {
     private final TemplateResolver templateResolver;
 

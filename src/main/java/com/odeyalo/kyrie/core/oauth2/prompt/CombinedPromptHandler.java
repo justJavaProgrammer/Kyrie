@@ -2,8 +2,9 @@ package com.odeyalo.kyrie.core.oauth2.prompt;
 
 import com.odeyalo.kyrie.core.sso.RememberMeService;
 import com.odeyalo.kyrie.core.sso.RememberedLoggedUserAccountsContainer;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -21,8 +22,7 @@ import javax.servlet.http.HttpServletResponse;
  *     </ul>
  * </p>
  */
-@Component
-public class CombinedPromptHandler implements PromptHandler {
+public class CombinedPromptHandler implements PromptHandler, ApplicationListener<ApplicationStartedEvent> {
     public static final String COMBINED_PROMPT_TYPE_NAME = "combined";
     private final RememberMeService rememberMeService;
     private final PromptHandlerFactory factory;
@@ -30,6 +30,14 @@ public class CombinedPromptHandler implements PromptHandler {
     public CombinedPromptHandler(RememberMeService rememberMeService, @Lazy PromptHandlerFactory factory) {
         this.rememberMeService = rememberMeService;
         this.factory = factory;
+    }
+
+    /**
+     * Initialize the lazy bean to avoid lazy-exceptions in runtime
+     */
+    @Override
+    public void onApplicationEvent(ApplicationStartedEvent event) {
+        factory.getHandler(PromptType.CONSENT);
     }
 
     @Override
