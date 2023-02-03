@@ -252,7 +252,7 @@ public class KyrieOauth2Controller {
         }
 
         if (result.shouldCloseSession()) {
-            requestAttributesRepository.clear(request);
+            requestAttributesRepository.remove(request, Oauth2User.class);
             status.setComplete();
         }
 
