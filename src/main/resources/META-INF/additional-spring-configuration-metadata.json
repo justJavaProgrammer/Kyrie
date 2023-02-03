@@ -13,7 +13,7 @@
     {
       "name": "kyrie.oauth2.consent.page.enabled",
       "type": "java.lang.Boolean",
-      "description": "If true, then user will be redirected to consent page after login to confirm access. Otherwise, no consent page will be snown and access will be granted without consent page."
+      "description": "If true, then user will be redirected to consent page after login to confirm access. Otherwise, no consent page will be shown and access will be granted without consent page."
     }
   ]
 }
