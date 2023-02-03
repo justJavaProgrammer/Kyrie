@@ -6,6 +6,8 @@ import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.oauth2.client.InMemoryOauth2ClientRepository;
 import com.odeyalo.kyrie.core.oauth2.client.Oauth2Client;
 import com.odeyalo.kyrie.core.oauth2.client.Oauth2ClientRepository;
+import com.odeyalo.kyrie.core.support.web.HttpSessionTemporaryRequestAttributesRepository;
+import com.odeyalo.kyrie.core.support.web.TemporaryRequestAttributesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +38,12 @@ public class GenericKyrieOauth2Configuration {
     @Autowired(required = false)
     public Oauth2UserAuthenticationService oauth2UserAuthenticationService(List<Oauth2User> users) {
         return new InMemoryOauth2UserAuthenticationService(users);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public TemporaryRequestAttributesRepository temporaryRequestAttributesRepository() {
+        return new HttpSessionTemporaryRequestAttributesRepository();
     }
 
     @Bean
