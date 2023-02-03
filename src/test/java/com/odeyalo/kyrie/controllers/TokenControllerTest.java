@@ -33,7 +33,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -57,7 +56,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureMockMvc
 @Import({TokenControllerTest.TokenControllerTestConfiguration.class})
-@PropertySource(value = "classpath:application-test.properties")
 class TokenControllerTest extends AbstractIntegrationTest {
     public static final String CLIENT_ID = "client_id";
     public static final String CLIENT_SECRET = "client_secret";
