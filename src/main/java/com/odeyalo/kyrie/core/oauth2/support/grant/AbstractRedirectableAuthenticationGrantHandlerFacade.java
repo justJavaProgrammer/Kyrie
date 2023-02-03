@@ -57,7 +57,6 @@ public abstract class AbstractRedirectableAuthenticationGrantHandlerFacade imple
 
         HandleResult handleResult = doHandleGrant(user, authorizationRequest, request, response);
 
-
         afterAllSuccess(new AfterAllSuccessCallbackData(handleResult.getRedirectUri(), user));
 
         return handleResult;
