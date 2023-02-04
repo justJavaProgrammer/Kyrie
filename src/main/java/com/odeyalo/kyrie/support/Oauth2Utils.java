@@ -2,6 +2,8 @@ package com.odeyalo.kyrie.support;
 
 import com.odeyalo.kyrie.core.oauth2.Oauth2Token;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Optional;
 
 /**
@@ -26,5 +28,14 @@ public abstract class Oauth2Utils {
             return null;
         }
         return AdvancedStringUtils.spaceDelimitedListToStringArray(rawScopes);
+    }
+
+    public static boolean isUriValid(String uri) {
+        try {
+            new URL(uri);
+            return true;
+        } catch (MalformedURLException e) {
+            return false;
+        }
     }
 }
