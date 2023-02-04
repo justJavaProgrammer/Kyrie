@@ -50,7 +50,7 @@ public abstract class AbstractDecoratorWrapperBeanPostProcessorSupport implement
         Object[] args = new Object[parameterTypes.length];
         int index = 0;
 
-        this.logger.info("Starting wrapping bean: {} to: {}", beanToWrap, wrapper.getName());
+        this.logger.debug("Starting wrapping bean: {} to: {}", beanToWrap, wrapper.getName());
         // Iterate through all constructor parameters and put it in args array
         for (Class<?> parameterType : parameterTypes) {
             Object bean = parameterType.isAssignableFrom(beanToWrap.getClass()) ? beanToWrap : context.getBean(parameterType);
@@ -61,7 +61,7 @@ public abstract class AbstractDecoratorWrapperBeanPostProcessorSupport implement
 
         try {
             Object wrapped = wrapper.getConstructor(parameterTypes).newInstance(args);
-            this.logger.info("Successfully wrapped the bean to: {}", wrapped);
+            this.logger.debug("Successfully wrapped the bean to: {}", wrapped);
             return wrapped;
         } catch (Exception ex) {
             throw new BeanCreationException(String.format("Wrapper initialization has been failed. Cannot wrap bean class %s to: %s", beanToWrap.getClass().getName(), wrapper.getTypeName()), ex);
