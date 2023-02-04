@@ -10,6 +10,7 @@ import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authorization.AuthorizationGrantType;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
 import com.odeyalo.kyrie.core.authorization.Oauth2ResponseType;
+import com.odeyalo.kyrie.core.oauth2.client.Oauth2Client;
 import com.odeyalo.kyrie.core.oauth2.oidc.OidcResponseType;
 import com.odeyalo.kyrie.core.oauth2.support.Oauth2Constants;
 import com.odeyalo.kyrie.core.oauth2.tokens.jwt.Oauth2AccessTokenGenerator;
@@ -94,6 +95,7 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
     public static final String NOT_EXISTED_CLIENT_ID_VALUE = "not_existed_client_id";
     public static final String ERROR_PARAMETER_NAME = "error";
     public static final String ERROR_DESCRIPTION_PARAMETER_NAME = "error_description";
+    public static final String ALLOWED_REDIRECT_URI = "http://localhost:9000";
 
     @Autowired
     private WebApplicationContext context;
@@ -128,6 +130,17 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                     .build());
         }
 
+        @Bean
+        public List<Oauth2Client> clients() {
+            return  List.of(
+                    Oauth2Client.builder()
+                            .clientId(MOCK_CLIENT_ID_VALUE)
+                            .clientSecret("secret")
+                            .allowedRedirectUri(ALLOWED_REDIRECT_URI)
+                            .clientType(Oauth2Client.ClientType.CONFIDENTIAL)
+                            .build()
+            );
+        }
         /**
          * Return DefaultChainAuthorizationRequestValidator with mocked ClientIdAuthorizationRequestValidationStep
          *
@@ -646,7 +659,7 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
 
         mockMvc.perform(
                 get(OAUTH_2_AUTHORIZE_ENDPOINT)
-                        .param(CLIENT_ID_PARAM_VALUE, CLIENT_ID_PARAM_VALUE)
+                        .param(CLIENT_ID_PARAM_VALUE, MOCK_CLIENT_ID_VALUE)
                         .param(RESPONSE_TYPE_PARAM_VALUE, responseTypes)
                         .param(SCOPE_PARAM_VALUE, scopes)
                         .param(REDIRECT_URI_PARAM_VALUE, malformedRedirectUri)
@@ -713,18 +726,17 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
     void testAuthorizeEndpointWithWrongClientId_AndExpectError() throws Exception {
         String responseTypes = "code";
         String scopes = "read write";
-        String redirectUri = "http://localhost:9000";
 
         mockMvc.perform(
                 get(OAUTH_2_AUTHORIZE_ENDPOINT)
                         .param(CLIENT_ID_PARAM_VALUE, NOT_EXISTED_CLIENT_ID_VALUE)
                         .param(RESPONSE_TYPE_PARAM_VALUE, responseTypes)
                         .param(SCOPE_PARAM_VALUE, scopes)
-                        .param(REDIRECT_URI_PARAM_VALUE, redirectUri)
+                        .param(REDIRECT_URI_PARAM_VALUE, ALLOWED_REDIRECT_URI)
                         .param(STATE_PARAM_VALUE, MOCK_STATE_VALUE))
                 .andExpectAll(MockMvcResultMatchers.status().is3xxRedirection(),
                         MockMvcResultMatchers.status().isFound(),
-                        MockMvcResultMatchers.redirectedUrlPattern(redirectUri + "**"),
+                        MockMvcResultMatchers.redirectedUrlPattern(ALLOWED_REDIRECT_URI + "**"),
                         Oauth2RedirectUrlResultMatchers.oauth2().isParameterPresented(ERROR_PARAMETER_NAME),
                         Oauth2RedirectUrlResultMatchers.oauth2().isParameterEqualTo(ERROR_PARAMETER_NAME, Oauth2ErrorType.INVALID_CLIENT.getErrorName()),
                         Oauth2RedirectUrlResultMatchers.oauth2().isParameterPresented(ERROR_DESCRIPTION_PARAMETER_NAME),
