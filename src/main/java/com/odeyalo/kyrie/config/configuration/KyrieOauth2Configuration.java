@@ -4,10 +4,11 @@ import com.odeyalo.kyrie.config.Oauth2ClientCredentialsResolver;
 import com.odeyalo.kyrie.config.configurers.Oauth2ServerEndpointsConfigurer;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.events.DefaultSpringKyrieEventMulticaster;
+import com.odeyalo.kyrie.core.events.KyrieEvent;
 import com.odeyalo.kyrie.core.events.KyrieEventPublisher;
+import com.odeyalo.kyrie.core.events.listener.KyrieEventListener;
 import com.odeyalo.kyrie.core.oauth2.Oauth2ClientCredentials;
 import com.odeyalo.kyrie.core.oauth2.flow.support.RedirectableOauth2FlowHandlerFacade;
-import com.odeyalo.kyrie.core.oauth2.support.consent.ConsentPageHandler;
 import com.odeyalo.kyrie.core.oauth2.support.grant.ConsentPageConfigurableRedirectableAuthenticationGrantHandlerFacade;
 import com.odeyalo.kyrie.core.oauth2.support.grant.DefaultRedirectableAuthenticationGrantHandlerFacade;
 import com.odeyalo.kyrie.core.oauth2.support.grant.RedirectableAuthenticationGrantHandlerFacade;
@@ -25,6 +26,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * <p>
@@ -62,8 +64,8 @@ public class KyrieOauth2Configuration {
 
     @Bean
     @ConditionalOnMissingBean
-    public KyrieEventPublisher kyrieEventPublisher(ApplicationEventMulticaster multicaster) {
-        return new DefaultSpringKyrieEventMulticaster(multicaster);
+    public KyrieEventPublisher kyrieEventPublisher(ApplicationEventMulticaster multicaster, List<KyrieEventListener<? extends KyrieEvent>> listeners) {
+        return new DefaultSpringKyrieEventMulticaster(multicaster, listeners);
     }
 
     @Bean
@@ -71,11 +73,10 @@ public class KyrieOauth2Configuration {
     public RedirectableAuthenticationGrantHandlerFacade redirectableAuthenticationGrantHandlerFacade(@Value("${kyrie.oauth2.consent.page.enabled:false}") boolean isConsentEnabled,
                                                                                                      Oauth2UserAuthenticationService oauth2UserAuthenticationService,
                                                                                                      Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo endpointsInfo,
-                                                                                                     ConsentPageHandler consentPageHandler,
                                                                                                      RedirectableOauth2FlowHandlerFacade redirectableOauth2FlowHandlerFacade) {
         if (isConsentEnabled) {
             this.logger.info("The consent page is enabled");
-            return new ConsentPageConfigurableRedirectableAuthenticationGrantHandlerFacade(oauth2UserAuthenticationService, endpointsInfo, consentPageHandler);
+            return new ConsentPageConfigurableRedirectableAuthenticationGrantHandlerFacade(oauth2UserAuthenticationService, endpointsInfo);
         }
         return new DefaultRedirectableAuthenticationGrantHandlerFacade(oauth2UserAuthenticationService, redirectableOauth2FlowHandlerFacade);
     }
