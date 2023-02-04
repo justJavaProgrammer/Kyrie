@@ -73,6 +73,16 @@ public class Oauth2Client implements UserDetails {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "Oauth2Client{" +
+                "clientId='" + clientId + '\'' +
+                ", clientSecret=[PROTECTED]'" + '\'' +
+                ", allowedRedirectUris=" + allowedRedirectUris +
+                ", clientType=" + clientType +
+                '}';
+    }
+
     /**
      * Type of the client.
      *

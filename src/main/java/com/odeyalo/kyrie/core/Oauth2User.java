@@ -1,6 +1,9 @@
 package com.odeyalo.kyrie.core;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Singular;
 
 import java.util.Map;
 import java.util.Set;
@@ -21,4 +24,15 @@ public class Oauth2User {
     // Value - value of info part
     @Singular("addInfo")
     private Map<String, Object> additionalInfo;
+
+    @Override
+    public String toString() {
+        return "Oauth2User{" +
+                "id='" + id + '\'' +
+                ", username='" + username + '\'' +
+                ", password=[PROTECTED]'" + '\'' +
+                ", authorities=" + authorities +
+                ", additionalInfo=" + additionalInfo +
+                '}';
+    }
 }
