@@ -2,6 +2,7 @@ package com.odeyalo.kyrie.exceptions;
 
 
 import com.odeyalo.kyrie.dto.ApiErrorMessage;
+import com.odeyalo.kyrie.support.Oauth2Utils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -66,7 +67,7 @@ public class GlobalExceptionHandlerController {
     public ResponseEntity<?> handleRedirectUriAwareOauth2Exception(RedirectUriAwareOauth2Exception exception) {
         String uri = exception.getRedirectUri();
         // If uri is not set, then delegate it to generic exception handler
-        if (uri == null) {
+        if (uri == null || !Oauth2Utils.isUriValid(uri)) {
             return handleOauth2Exception(exception);
         }
         String redirectUri = UriComponentsBuilder.fromHttpUrl(uri)
