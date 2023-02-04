@@ -26,10 +26,9 @@ import java.util.Arrays;
  * <p> {@link HandlerMethodArgumentResolver} implementation used to resolve the {@link AuthorizationRequest} from request.</p>
  * <p> It will be invoked only for method parameters that is AuthorizationRequest type</p>
  * <p>
- *     AuthorizationRequestMethodProcessor supports {@link AuthorizationRequest} validation.
- *     To enable the validation for AuthorizationRequest method parameter MUST be annotated with the {@link ValidAuthorizationRequest} annotation
+ * AuthorizationRequestMethodProcessor supports {@link AuthorizationRequest} validation.
+ * To enable the validation for AuthorizationRequest method parameter MUST be annotated with the {@link ValidAuthorizationRequest} annotation
  * </p>
- *
  */
 public class AuthorizationRequestMethodProcessor implements HandlerMethodArgumentResolver {
     private final String2ResponseTypeConverter responseTypeConverter;
@@ -64,6 +63,7 @@ public class AuthorizationRequestMethodProcessor implements HandlerMethodArgumen
 
     /**
      * Build the AuthorizationRequest based on request parameters
+     *
      * @param request - current request
      * @return - built AuthorizationRequest
      * @throws MissingServletRequestParameterException - if required request param is not presented
@@ -100,7 +100,7 @@ public class AuthorizationRequestMethodProcessor implements HandlerMethodArgumen
     private Oauth2ResponseType[] getOauth2ResponseTypes(String responseTypeParameter) {
         Oauth2ResponseType[] responseTypes =
                 Arrays.stream(AdvancedStringUtils.spaceDelimitedListToStringArray(responseTypeParameter))
-                .map(rawResponseType -> responseTypeConverter.convert(rawResponseType))
+                        .map(rawResponseType -> responseTypeConverter.convert(rawResponseType))
                         .toArray(Oauth2ResponseType[]::new);
         return responseTypes;
     }
@@ -113,7 +113,8 @@ public class AuthorizationRequestMethodProcessor implements HandlerMethodArgumen
 
     /**
      * Validate the AuthorizationRequest only if method parameter has {@link ValidAuthorizationRequest} annotation
-     * @param parameter - method parameter that contains info about parameter
+     *
+     * @param parameter            - method parameter that contains info about parameter
      * @param authorizationRequest - request to validate
      */
     private void validateIfNecessary(MethodParameter parameter, AuthorizationRequest authorizationRequest) {
@@ -128,11 +129,12 @@ public class AuthorizationRequestMethodProcessor implements HandlerMethodArgumen
 
     private RuntimeException resolveException(String redirectUrl, Oauth2ValidationResult validationResult) {
         if (Oauth2ErrorType.INVALID_REDIRECT_URI.equals(validationResult.getErrorType())) {
-            return new Oauth2Exception(
-                    String.format("Failed to initialize Authorization request. Reason: %s", validationResult.getMessage()),
-                    validationResult.getMessage(), validationResult.getErrorType());
+            return new RedirectUriAwareOauth2Exception(String.format("Failed to initialize Authorization request. Reason: %s", validationResult.getMessage()),
+                    validationResult.getMessage(), redirectUrl, validationResult.getErrorType());
+
         }
-        return new RedirectUriAwareOauth2Exception(String.format("Failed to initialize Authorization request. Reason: %s", validationResult.getMessage()),
-                validationResult.getMessage(), redirectUrl, validationResult.getErrorType());
+        return new Oauth2Exception(
+                String.format("Failed to initialize Authorization request. Reason: %s", validationResult.getMessage()),
+                validationResult.getMessage(), validationResult.getErrorType());
     }
 }
