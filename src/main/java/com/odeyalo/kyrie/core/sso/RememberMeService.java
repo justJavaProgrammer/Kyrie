@@ -4,7 +4,6 @@ import com.odeyalo.kyrie.core.Oauth2User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-//todo: Create events, event listeners, do something with RememberMeService, add interceptors, token enhancers, do code refactor with GET /login
 
 /**
  * Interface that used to remember the current user and associate it with the session or other data to avoid credentials re-enter.
