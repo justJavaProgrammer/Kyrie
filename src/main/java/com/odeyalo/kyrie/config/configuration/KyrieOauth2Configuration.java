@@ -11,7 +11,6 @@ import com.odeyalo.kyrie.core.oauth2.support.consent.ConsentPageHandler;
 import com.odeyalo.kyrie.core.oauth2.support.grant.ConsentPageConfigurableRedirectableAuthenticationGrantHandlerFacade;
 import com.odeyalo.kyrie.core.oauth2.support.grant.DefaultRedirectableAuthenticationGrantHandlerFacade;
 import com.odeyalo.kyrie.core.oauth2.support.grant.RedirectableAuthenticationGrantHandlerFacade;
-import com.odeyalo.kyrie.core.sso.RememberMeService;
 import com.odeyalo.kyrie.support.ClientId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
         Oauth2FlowHandlersConfiguration.class,
         RedirectUriCreationServicesConfiguration.class,
         KyrieOauth2RequestValidationConfiguration.class,
+        DomainKyrieEventListenersConfiguration.class,
         PromptHandlersConfiguration.class,
         KyrieOauth2ServerEndpointsMappingConfiguration.class,
         AccessTokenGrantersConfiguration.class,
@@ -72,13 +72,12 @@ public class KyrieOauth2Configuration {
                                                                                                      Oauth2UserAuthenticationService oauth2UserAuthenticationService,
                                                                                                      Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo endpointsInfo,
                                                                                                      ConsentPageHandler consentPageHandler,
-                                                                                                     RedirectableOauth2FlowHandlerFacade redirectableOauth2FlowHandlerFacade,
-                                                                                                     RememberMeService rememberMeService) {
+                                                                                                     RedirectableOauth2FlowHandlerFacade redirectableOauth2FlowHandlerFacade) {
         if (isConsentEnabled) {
             this.logger.info("The consent page is enabled");
             return new ConsentPageConfigurableRedirectableAuthenticationGrantHandlerFacade(oauth2UserAuthenticationService, endpointsInfo, consentPageHandler);
         }
-        return new DefaultRedirectableAuthenticationGrantHandlerFacade(oauth2UserAuthenticationService, redirectableOauth2FlowHandlerFacade, rememberMeService);
+        return new DefaultRedirectableAuthenticationGrantHandlerFacade(oauth2UserAuthenticationService, redirectableOauth2FlowHandlerFacade);
     }
 
     /**
