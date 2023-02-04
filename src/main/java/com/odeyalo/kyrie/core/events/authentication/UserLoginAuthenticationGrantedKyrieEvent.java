@@ -1,6 +1,7 @@
 package com.odeyalo.kyrie.core.events.authentication;
 
 import com.odeyalo.kyrie.core.Oauth2User;
+import io.jsonwebtoken.lang.Assert;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -15,11 +16,13 @@ public class UserLoginAuthenticationGrantedKyrieEvent extends AbstractAuthentica
 
     public UserLoginAuthenticationGrantedKyrieEvent(Authentication authentication, Oauth2User oauth2User) {
         super(authentication);
+        Assert.notNull(oauth2User, "The user must be presented and must be not null!");
         this.oauth2User = oauth2User;
     }
 
     public UserLoginAuthenticationGrantedKyrieEvent(Authentication authentication, String eventId, Oauth2User oauth2User) {
         super(authentication, eventId);
+        Assert.notNull(oauth2User, "The user must be presented and must be not null!");
         this.oauth2User = oauth2User;
     }
 
