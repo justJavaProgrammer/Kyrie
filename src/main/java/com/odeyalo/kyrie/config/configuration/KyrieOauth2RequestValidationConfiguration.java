@@ -8,6 +8,7 @@ import com.odeyalo.kyrie.controllers.support.DefaultChainAuthorizationRequestVal
 import com.odeyalo.kyrie.controllers.support.validation.AuthorizationRequestValidationStep;
 import com.odeyalo.kyrie.controllers.support.validation.ClientIdAuthorizationRequestValidationStep;
 import com.odeyalo.kyrie.controllers.support.validation.RedirectUriAuthorizationRequestValidationStep;
+import com.odeyalo.kyrie.controllers.support.validation.RegisteredRedirectUriAuthorizationRequestValidationStep;
 import com.odeyalo.kyrie.core.oauth2.client.ClientCredentialsValidator;
 import com.odeyalo.kyrie.core.oauth2.client.DefaultClientCredentialsValidator;
 import com.odeyalo.kyrie.core.oauth2.client.Oauth2ClientRepository;
@@ -52,5 +53,11 @@ public class KyrieOauth2RequestValidationConfiguration {
     @ConditionalOnMissingBean
     public RedirectUriAuthorizationRequestValidationStep redirectUriAuthorizationRequestValidationStep() {
         return new RedirectUriAuthorizationRequestValidationStep();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RegisteredRedirectUriAuthorizationRequestValidationStep registeredRedirectUriAuthorizationRequestValidationStep(Oauth2ClientRepository oauth2ClientRepository) {
+        return new RegisteredRedirectUriAuthorizationRequestValidationStep(oauth2ClientRepository);
     }
 }
