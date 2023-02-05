@@ -132,7 +132,7 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
 
         @Bean
         public List<Oauth2Client> clients() {
-            return  List.of(
+            return List.of(
                     Oauth2Client.builder()
                             .clientId(MOCK_CLIENT_ID_VALUE)
                             .clientSecret("secret")
@@ -141,6 +141,7 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                             .build()
             );
         }
+
         /**
          * Return DefaultChainAuthorizationRequestValidator with mocked ClientIdAuthorizationRequestValidationStep
          *
@@ -734,13 +735,15 @@ class KyrieOauth2ControllerTest extends AbstractIntegrationTest {
                         .param(SCOPE_PARAM_VALUE, scopes)
                         .param(REDIRECT_URI_PARAM_VALUE, ALLOWED_REDIRECT_URI)
                         .param(STATE_PARAM_VALUE, MOCK_STATE_VALUE))
-                .andExpectAll(MockMvcResultMatchers.status().is3xxRedirection(),
-                        MockMvcResultMatchers.status().isFound(),
-                        MockMvcResultMatchers.redirectedUrlPattern(ALLOWED_REDIRECT_URI + "**"),
-                        Oauth2RedirectUrlResultMatchers.oauth2().isParameterPresented(ERROR_PARAMETER_NAME),
-                        Oauth2RedirectUrlResultMatchers.oauth2().isParameterEqualTo(ERROR_PARAMETER_NAME, Oauth2ErrorType.INVALID_CLIENT.getErrorName()),
-                        Oauth2RedirectUrlResultMatchers.oauth2().isParameterPresented(ERROR_DESCRIPTION_PARAMETER_NAME),
-                        Oauth2RedirectUrlResultMatchers.oauth2().isParameterNotNull(ERROR_DESCRIPTION_PARAMETER_NAME));
+                .andExpectAll(MockMvcResultMatchers.status().isBadRequest(),
+                        (result) -> {
+                            String json = result.getResponse().getContentAsString();
+                            ApiErrorMessage message = objectMapper.readValue(json, ApiErrorMessage.class);
+                            String error = message.getError();
+                            String errorDescription = message.getErrorDescription();
+                            assertEquals(Oauth2ErrorType.INVALID_CLIENT.getErrorName(), error, "Error must be invalid client! ");
+                            assertNotNull(errorDescription, "Description must be not null!");
+                        });
     }
 
     /**
