@@ -78,12 +78,14 @@ public class DefaultKyrieHtmlFormConsentPageHandler extends AbstractConsentPageH
     @Override
     public void onAccessApproved(Oauth2User user, AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response) {
         String redirectUri = redirectableOauth2FlowHandlerFacade.handleFlow(user, authorizationRequest);
+        temporaryRequestAttributesRepository.remove(request, AUTHENTICATED_USER_ATTRIBUTE_NAME);
         sendRedirect(response, redirectUri);
     }
 
     @Override
     public void onAccessDenied(Oauth2User user, AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response) {
         String redirectUri = UriComponentsBuilder.fromUriString(authorizationRequest.getRedirectUrl()).queryParam(Oauth2Constants.ERROR_PARAMETER_NAME, "access_denied").toUriString();
+        temporaryRequestAttributesRepository.remove(request, AUTHENTICATED_USER_ATTRIBUTE_NAME);
         sendRedirect(response, redirectUri);
     }
 
