@@ -1,5 +1,7 @@
 package com.odeyalo.kyrie.core.support.web;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +13,12 @@ import java.util.Enumeration;
 import java.util.Iterator;
 
 /**
- * {@link TemporaryRequestAttributesRepository} implementation that stores the attributes in http session
+ * {@link TemporaryRequestAttributesRepository} implementation that stores the attributes in http session.
+ *
+ * <p>
+ * The ALL values will be wrapped in {@link HttpSessionAttributeWrapper}
+ * to make possible see the difference between default session attributes and attributes from HttpSessionTemporaryRequestAttributesRepository
+ * </p>
  */
 public class HttpSessionTemporaryRequestAttributesRepository implements TemporaryRequestAttributesRepository {
     private final Logger logger = LoggerFactory.getLogger(HttpSessionTemporaryRequestAttributesRepository.class);
@@ -19,7 +26,7 @@ public class HttpSessionTemporaryRequestAttributesRepository implements Temporar
     @Override
     public void save(HttpServletRequest request, String key, Object value) {
         Assert.notNull(value, "The value must be not null!");
-        request.getSession().setAttribute(key, value);
+        request.getSession().setAttribute(key, new HttpSessionAttributeWrapper(value));
         this.logger.info("Saved the request attribute in http session with key: {} and value: {}", key, value);
     }
 
@@ -32,7 +39,13 @@ public class HttpSessionTemporaryRequestAttributesRepository implements Temporar
 
     @Override
     public Object get(HttpServletRequest request, String key) {
-        return request.getSession().getAttribute(key);
+        Object attribute = request.getSession().getAttribute(key);
+
+        if (attribute instanceof HttpSessionAttributeWrapper) {
+            HttpSessionAttributeWrapper wrapper = (HttpSessionAttributeWrapper) attribute;
+            return wrapper.getValue();
+        }
+        return attribute;
     }
 
     @Override
@@ -46,6 +59,12 @@ public class HttpSessionTemporaryRequestAttributesRepository implements Temporar
         HttpSession session = request.getSession();
         String key = getKeyByClass(cls, session);
         Object attribute = session.getAttribute(key);
+        // Unwrap the attribute if necessary
+        if (attribute instanceof HttpSessionAttributeWrapper) {
+            HttpSessionAttributeWrapper wrapper = (HttpSessionAttributeWrapper) attribute;
+            attribute = wrapper.getValue();
+        }
+
         return cls.cast(attribute);
     }
 
@@ -67,13 +86,19 @@ public class HttpSessionTemporaryRequestAttributesRepository implements Temporar
         remove(request, key);
     }
 
+    /**
+     * The clear() method implementation that clears ONLY the {@link HttpSessionAttributeWrapper} instances and does not affect on other session attributes
+     * @param request - request to remove the attributes
+     */
     @Override
     public void clear(HttpServletRequest request) {
         HttpSession session = request.getSession();
         Enumeration<String> attributeNames = session.getAttributeNames();
         while (attributeNames.hasMoreElements()) {
             String key = attributeNames.nextElement();
-            session.removeAttribute(key);
+            if (session.getAttribute(key) instanceof HttpSessionAttributeWrapper) {
+                session.removeAttribute(key);
+            }
         }
     }
 
@@ -82,10 +107,21 @@ public class HttpSessionTemporaryRequestAttributesRepository implements Temporar
         while (iterator.hasNext()) {
             String key = iterator.next();
             Object attribute = session.getAttribute(key);
+
+            if (attribute instanceof HttpSessionAttributeWrapper) {
+                attribute = ((HttpSessionAttributeWrapper) attribute).getValue();
+            }
+
             if (attribute.getClass().equals(cls)) {
                 return key;
             }
         }
         return null;
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static class HttpSessionAttributeWrapper {
+        private Object value;
     }
 }
