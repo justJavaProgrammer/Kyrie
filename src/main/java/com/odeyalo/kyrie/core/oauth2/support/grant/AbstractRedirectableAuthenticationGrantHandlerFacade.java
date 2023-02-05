@@ -5,6 +5,9 @@ import com.odeyalo.kyrie.core.authentication.AuthenticationResult;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationInfo;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
+import com.odeyalo.kyrie.core.authorization.support.AuthorizationRequestContextHolder;
+import com.odeyalo.kyrie.core.events.AuthorizationRequestProcessingFinishedKyrieEvent;
+import com.odeyalo.kyrie.core.events.KyrieEventPublisher;
 import com.odeyalo.kyrie.core.oauth2.support.callbacks.AuthenticationFailedCallback;
 import com.odeyalo.kyrie.core.oauth2.support.callbacks.SuccessfulAuthenticationCallback;
 import lombok.AllArgsConstructor;
@@ -20,10 +23,13 @@ import javax.servlet.http.HttpServletResponse;
  */
 public abstract class AbstractRedirectableAuthenticationGrantHandlerFacade implements RedirectableAuthenticationGrantHandlerFacade {
     protected final Oauth2UserAuthenticationService oauth2UserAuthenticationService;
+    private final KyrieEventPublisher publisher;
     protected final Logger logger = LoggerFactory.getLogger(AbstractRedirectableAuthenticationGrantHandlerFacade.class);
 
-    protected AbstractRedirectableAuthenticationGrantHandlerFacade(Oauth2UserAuthenticationService oauth2UserAuthenticationService) {
+    protected AbstractRedirectableAuthenticationGrantHandlerFacade(Oauth2UserAuthenticationService oauth2UserAuthenticationService,
+                                                                   KyrieEventPublisher publisher) {
         this.oauth2UserAuthenticationService = oauth2UserAuthenticationService;
+        this.publisher = publisher;
     }
 
     protected abstract HandleResult doHandleGrant(Oauth2User user, AuthorizationRequest authorizationRequest, HttpServletRequest request, HttpServletResponse response);
@@ -59,6 +65,9 @@ public abstract class AbstractRedirectableAuthenticationGrantHandlerFacade imple
 
         afterAllSuccess(new AfterAllSuccessCallbackData(handleResult.getRedirectUri(), user));
 
+
+        publishEventOnSessionClose(handleResult);
+
         return handleResult;
     }
 
@@ -72,6 +81,13 @@ public abstract class AbstractRedirectableAuthenticationGrantHandlerFacade imple
 
     void afterAllSuccess(AfterAllSuccessCallbackData data) {
 
+    }
+
+    protected void publishEventOnSessionClose(HandleResult result) {
+        if (result.shouldCloseSession()) {
+            AuthorizationRequest request = AuthorizationRequestContextHolder.getContext().getRequest();
+            publisher.publishEvent(new AuthorizationRequestProcessingFinishedKyrieEvent(request));
+        }
     }
 
     @Data
