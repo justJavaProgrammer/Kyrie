@@ -4,6 +4,7 @@ import com.odeyalo.kyrie.config.configurers.Oauth2ServerEndpointsConfigurer;
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
+import com.odeyalo.kyrie.core.events.KyrieEventPublisher;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,8 +17,9 @@ public class ConsentPageConfigurableRedirectableAuthenticationGrantHandlerFacade
     private final Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo endpointsInfo;
 
     public ConsentPageConfigurableRedirectableAuthenticationGrantHandlerFacade(Oauth2UserAuthenticationService oauth2UserAuthenticationService,
+                                                                               KyrieEventPublisher publisher,
                                                                                Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo endpointsInfo) {
-        super(oauth2UserAuthenticationService);
+        super(oauth2UserAuthenticationService, publisher);
         this.endpointsInfo = endpointsInfo;
     }
 
