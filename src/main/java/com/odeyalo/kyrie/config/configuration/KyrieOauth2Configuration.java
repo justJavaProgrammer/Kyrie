@@ -73,12 +73,13 @@ public class KyrieOauth2Configuration {
     public RedirectableAuthenticationGrantHandlerFacade redirectableAuthenticationGrantHandlerFacade(@Value("${kyrie.oauth2.consent.page.enabled:false}") boolean isConsentEnabled,
                                                                                                      Oauth2UserAuthenticationService oauth2UserAuthenticationService,
                                                                                                      Oauth2ServerEndpointsConfigurer.Oauth2ServerEndpointsInfo endpointsInfo,
-                                                                                                     RedirectableOauth2FlowHandlerFacade redirectableOauth2FlowHandlerFacade) {
+                                                                                                     RedirectableOauth2FlowHandlerFacade redirectableOauth2FlowHandlerFacade,
+                                                                                                     KyrieEventPublisher publisher) {
         if (isConsentEnabled) {
             this.logger.info("The consent page is enabled");
-            return new ConsentPageConfigurableRedirectableAuthenticationGrantHandlerFacade(oauth2UserAuthenticationService, endpointsInfo);
+            return new ConsentPageConfigurableRedirectableAuthenticationGrantHandlerFacade(oauth2UserAuthenticationService, publisher, endpointsInfo);
         }
-        return new DefaultRedirectableAuthenticationGrantHandlerFacade(oauth2UserAuthenticationService, redirectableOauth2FlowHandlerFacade);
+        return new DefaultRedirectableAuthenticationGrantHandlerFacade(oauth2UserAuthenticationService, publisher, redirectableOauth2FlowHandlerFacade);
     }
 
     /**
