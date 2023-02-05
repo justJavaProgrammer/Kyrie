@@ -3,6 +3,7 @@ package com.odeyalo.kyrie.core.oauth2.support.grant;
 import com.odeyalo.kyrie.core.Oauth2User;
 import com.odeyalo.kyrie.core.authentication.Oauth2UserAuthenticationService;
 import com.odeyalo.kyrie.core.authorization.AuthorizationRequest;
+import com.odeyalo.kyrie.core.events.KyrieEventPublisher;
 import com.odeyalo.kyrie.core.oauth2.flow.support.RedirectableOauth2FlowHandlerFacade;
 import com.odeyalo.kyrie.exceptions.Oauth2ErrorType;
 import com.odeyalo.kyrie.exceptions.Oauth2Exception;
@@ -18,8 +19,9 @@ public class DefaultRedirectableAuthenticationGrantHandlerFacade extends Abstrac
     private final RedirectableOauth2FlowHandlerFacade redirectableOauth2FlowHandlerFacade;
 
     public DefaultRedirectableAuthenticationGrantHandlerFacade(Oauth2UserAuthenticationService oauth2UserAuthenticationService,
+                                                               KyrieEventPublisher publisher,
                                                                RedirectableOauth2FlowHandlerFacade redirectableOauth2FlowHandlerFacade){
-        super(oauth2UserAuthenticationService);
+        super(oauth2UserAuthenticationService, publisher);
         this.redirectableOauth2FlowHandlerFacade = redirectableOauth2FlowHandlerFacade;
     }
 
