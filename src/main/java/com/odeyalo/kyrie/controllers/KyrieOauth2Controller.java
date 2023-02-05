@@ -225,6 +225,8 @@ public class KyrieOauth2Controller {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
         }
 
+        AuthorizationRequestContextHolder.setContext(new AuthorizationRequestContext(authorizationRequest));
+
         logger.info("Auth request: {}", authorizationRequest);
 
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -252,7 +254,6 @@ public class KyrieOauth2Controller {
         }
 
         if (result.shouldCloseSession()) {
-            requestAttributesRepository.remove(request, Oauth2User.class);
             status.setComplete();
         }
 
