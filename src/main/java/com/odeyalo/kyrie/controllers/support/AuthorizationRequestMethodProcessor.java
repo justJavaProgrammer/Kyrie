@@ -128,13 +128,14 @@ public class AuthorizationRequestMethodProcessor implements HandlerMethodArgumen
     }
 
     private RuntimeException resolveException(String redirectUrl, Oauth2ValidationResult validationResult) {
-        if (Oauth2ErrorType.INVALID_REDIRECT_URI.equals(validationResult.getErrorType())) {
-            return new RedirectUriAwareOauth2Exception(String.format("Failed to initialize Authorization request. Reason: %s", validationResult.getMessage()),
-                    validationResult.getMessage(), redirectUrl, validationResult.getErrorType());
+        Oauth2ErrorType errorType = validationResult.getErrorType();
 
+        if (Oauth2ErrorType.INVALID_REDIRECT_URI.equals(errorType) || Oauth2ErrorType.INVALID_CLIENT.equals(errorType)) {
+            return new Oauth2Exception(
+                    String.format("Failed to initialize Authorization request. Reason: %s", validationResult.getMessage()),
+                    validationResult.getMessage(), errorType);
         }
-        return new Oauth2Exception(
-                String.format("Failed to initialize Authorization request. Reason: %s", validationResult.getMessage()),
-                validationResult.getMessage(), validationResult.getErrorType());
+        return new RedirectUriAwareOauth2Exception(String.format("Failed to initialize Authorization request. Reason: %s", validationResult.getMessage()),
+                validationResult.getMessage(), redirectUrl, errorType);
     }
 }
