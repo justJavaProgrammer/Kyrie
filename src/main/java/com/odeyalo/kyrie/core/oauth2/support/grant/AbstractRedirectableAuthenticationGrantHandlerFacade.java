@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public abstract class AbstractRedirectableAuthenticationGrantHandlerFacade implements RedirectableAuthenticationGrantHandlerFacade {
     protected final Oauth2UserAuthenticationService oauth2UserAuthenticationService;
-    private final KyrieEventPublisher publisher;
+    protected final KyrieEventPublisher publisher;
     protected final Logger logger = LoggerFactory.getLogger(AbstractRedirectableAuthenticationGrantHandlerFacade.class);
 
     protected AbstractRedirectableAuthenticationGrantHandlerFacade(Oauth2UserAuthenticationService oauth2UserAuthenticationService,
