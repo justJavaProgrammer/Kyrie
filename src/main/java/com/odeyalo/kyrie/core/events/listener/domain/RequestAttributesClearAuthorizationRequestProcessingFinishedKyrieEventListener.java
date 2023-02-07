@@ -6,7 +6,6 @@ import com.odeyalo.kyrie.core.support.web.TemporaryRequestAttributesRepository;
 import io.jsonwebtoken.lang.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -15,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * The event listener is used to clear the temporary request store.
  */
-@Component
 public class RequestAttributesClearAuthorizationRequestProcessingFinishedKyrieEventListener implements AuthorizationRequestProcessingFinishedKyrieEventListener {
     private final TemporaryRequestAttributesRepository temporaryRequestAttributesRepository;
     private final Logger logger = LoggerFactory.getLogger(RequestAttributesClearAuthorizationRequestProcessingFinishedKyrieEventListener.class);
