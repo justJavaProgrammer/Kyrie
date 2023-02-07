@@ -26,11 +26,10 @@ Required parameters:
 
 ``` http
 GET /oauth2/authorize?client_id=odeyalo&response_type=code
-&redirect_uri=https://example.com/callback&scope=read write&state=dQw4w9WgXcQ
-&state=dQw4w9WgXcQ
+&redirect_uri=https://example.com/callback&scope=read write&state=dQw4w9WgXcQ&state=dQw4w9WgXcQ
 ```
 The following request returns the login page to the end user, after the user has been authenticated, 
-user will be redirected to ``https://example.com/callback?code=a6cb3be8f0ed35ecba5fd2df692e2578`` 
+user will be redirected to ``https://example.com/callback?code=a6cb3be8f0ed35ecba5fd2df692e2578&state=dQw4w9WgXcQ`` 
 
 **NOTE:** ``a6cb3be8f0ed35ecba5fd2df692e2578`` is an authorization code that can be used to obtain an access token
 
