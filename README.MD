@@ -24,9 +24,9 @@ Required parameters:
 * state - An opaque value used by the client to maintain
   state between the request and callback
 
-``` http request
-GET /oauth2/authorize?client_id=odeyalo&response_type=code&
-redirect_uri=https://example.com/callback&scope=read write&state=dQw4w9WgXcQ
+``` http
+GET /oauth2/authorize?client_id=odeyalo&response_type=code
+&redirect_uri=https://example.com/callback&scope=read write&state=dQw4w9WgXcQ
 ```
 The following request returns the login page to the end user, after the user has been authenticated, 
 user will be redirected to ``https://example.com/callback?code=a6cb3be8f0ed35ecba5fd2df692e2578`` 
