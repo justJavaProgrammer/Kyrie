@@ -6,7 +6,7 @@ Kyrie is Oauth2 protocol implementation using Java and Spring Framework
 ## API
 The Kyrie provides the several endpoints:
 
-* [GET /oauth2/authorize](#GET-oauth2/authorize) - as described in RFC6749, used to prepare the Authorization request and return the login page to the user.
+* [GET /oauth2/authorize](#get-oauth2authorize) - as described in RFC6749, used to prepare the Authorization request and return the login page to the user.
 * GET /oauth2/login - endpoint used to log in the user from the remember-me container, it does not require the user credentials
 * POST /oauth2/login - endpoint used to log in the user using credentials, this endpoint does not support remember-me 
 * GET /oauth2/consent - endpoint used to return the consent page to the user
@@ -31,12 +31,12 @@ GET /oauth2/authorize?client_id=odeyalo&response_type=code
 The following request returns the login page to the end user, after the user has been authenticated, 
 user will be redirected to ``https://example.com/callback?code=a6cb3be8f0ed35ecba5fd2df692e2578`` 
 
-**NOTE:** ``a6cb3be8f0ed35ecba5fd2df692e2578`` is an authorization code that can be used to obtain access token
+**NOTE:** ``a6cb3be8f0ed35ecba5fd2df692e2578`` is an authorization code that can be used to obtain an access token
 
 Additional request parameters that can be presented in request:
-* prompt - String that used to resolve the html page to return to the user
+* [prompt](#supported-prompts-by-kyrie-server) - String that used to resolve the html page to return to the user
 
-Supported prompts by Kyrie Server:
+### Supported prompts by Kyrie Server:
 * none - The Authorization Server MUST NOT display any authentication or consent user interface pages
 * login - The Authorization Server SHOULD prompt the End-User for reauthentication
 * consent - The Authorization Server SHOULD prompt the End-User for consent before returning information to the Client
