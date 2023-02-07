@@ -147,6 +147,11 @@ public class KyrieOauth2Controller {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Endpoint that used to login the user from remember-me service
+     * @param userId - user id in remember me container to login
+     * @return - redirect if the login was success
+     */
     @GetMapping("/login")
     public ResponseEntity<?> loginUserFromRememberMeAndDoGrantTypeProcessing(HttpServletRequest request,
                                                                              @RequestParam(name = "user_id") String userId,
@@ -249,7 +254,6 @@ public class KyrieOauth2Controller {
 
         if (RedirectableAuthenticationGrantHandlerFacade.HandleResult.UNSUPPORTED_GRANT_TYPE_HANDLE_RESULT.equals(result)) {
             ApiErrorMessage message = new ApiErrorMessage(UNSUPPORTED_GRANT_TYPE_ERROR_NAME, "Kyrie does not support: " + authorizationRequest.getGrantType());
-            // TODO: Should be redirect instead of HTTP 400
             responseEntity = ResponseEntity.badRequest().body(message);
         }
 
